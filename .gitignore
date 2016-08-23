@@ -8,3 +8,8 @@ build
 /**/debug
 /**/release
 .vscode/
+/**/*.vcxproj
+/**/*.sdf
+/**/*.v11.suo
+/**/*.vcxproj.filters
+/**/*.opensdf
