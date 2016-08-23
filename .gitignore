@@ -1,0 +1,10 @@
+/**/Makefile
+/**/Makefile.*
+/**/*.pro.user
+bin
+lib
+build
+/**/*.pdb
+/**/debug
+/**/release
+.vscode/
