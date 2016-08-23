@@ -1,5 +1,7 @@
 #include <QMetaOrm/criterion.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 Criterion::Ptr Criterion::and(Criterion::Ptr left,  Criterion::Ptr right) {
    if (!left && right)

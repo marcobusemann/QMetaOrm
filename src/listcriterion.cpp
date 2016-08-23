@@ -1,5 +1,7 @@
 #include <QMetaOrm/listcriterion.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 ListCriterion::Ptr ListCriterion::in(const QString &prop, const QVariantList &values) {
    return ListCriterion::Ptr(new ListCriterion(ExpressionType::In, prop, values));

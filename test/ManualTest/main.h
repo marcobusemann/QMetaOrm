@@ -86,8 +86,10 @@ signals:
    void propertyChanged();
 };
 
-namespace QMetaOrmMappings {
-   template <> MetaEntity mapping<Todo>();
+namespace QMetaOrm {
+   namespace Mappings {
+      template <> MetaEntity mapping<Todo>();
+   }
 }
 
 class TodoBuilder
@@ -141,7 +143,7 @@ public:
    ~TodoCriterionData() { }
 
    QSharedDataPointer<TodoCriterionData> m_parent;
-   Criterion::Ptr m_combination;
+   QMetaOrm::Criterion::Ptr m_combination;
 };
 
 class TodoCriterionBuilder
@@ -157,27 +159,27 @@ public:
    }
 
    TodoCriterionBuilder idEquals(int id) {
-      m_data->m_combination = Criterion::and(m_data->m_combination, ValueCriterion::equals(Todo::p::id, id));
+      m_data->m_combination = QMetaOrm::Criterion::and(m_data->m_combination, QMetaOrm::ValueCriterion::equals(Todo::p::id, id));
       return *this;
    }
 
    TodoCriterionBuilder titleEquals(const QString &title) {
-      m_data->m_combination = Criterion::and(m_data->m_combination, ValueCriterion::equals(Todo::p::title, title));
+      m_data->m_combination = QMetaOrm::Criterion::and(m_data->m_combination, QMetaOrm::ValueCriterion::equals(Todo::p::title, title));
       return *this;
    }
 
    TodoCriterionBuilder startEquals(const QDateTime &start) {
-      m_data->m_combination = Criterion::and(m_data->m_combination, ValueCriterion::equals(Todo::p::start, start));
+      m_data->m_combination = QMetaOrm::Criterion::and(m_data->m_combination, QMetaOrm::ValueCriterion::equals(Todo::p::start, start));
       return *this;
    }
 
    TodoCriterionBuilder endEquals(const QString &end) {
-      m_data->m_combination = Criterion::and(m_data->m_combination, ValueCriterion::equals(Todo::p::end, end));
+      m_data->m_combination = QMetaOrm::Criterion::and(m_data->m_combination, QMetaOrm::ValueCriterion::equals(Todo::p::end, end));
       return *this;
    }
 
    TodoCriterionBuilder or(TodoCriterionBuilder &criterium) {
-      m_data->m_combination = Criterion::or(m_data->m_combination, criterium.m_data->m_combination);
+      m_data->m_combination = QMetaOrm::Criterion::or(m_data->m_combination, criterium.m_data->m_combination);
       return *this;
    }
 
@@ -190,11 +192,11 @@ public:
    TodoCriterionBuilder end() {
       if (!m_data->m_parent) return *this;
       TodoCriterionBuilder end(m_data->m_parent);
-      end.m_data->m_combination = Criterion::or(end.m_data->m_combination, m_data->m_combination);
+      end.m_data->m_combination = QMetaOrm::Criterion::or(end.m_data->m_combination, m_data->m_combination);
       return end;
    }
 
-   Criterion::Ptr build() {
+   QMetaOrm::Criterion::Ptr build() {
       return m_data->m_combination;
    }
 
@@ -216,14 +218,14 @@ public:
    virtual void remove(T item) = 0;
 
    virtual T get(Key id) const = 0;
-   virtual QList<T> find(Criterion::Ptr criterion, int skip = -1, int pageSize = -1) = 0;
+   virtual QList<T> find(QMetaOrm::Criterion::Ptr criterion, int skip = -1, int pageSize = -1) = 0;
 };
 
 //-----------------------------------------------------------------------------
 class TodoRepository: public IRepository<Todo, int>
 {
 public:
-   TodoRepository(SessionFactory::Ptr sessionFactory)
+   TodoRepository(QMetaOrm::SessionFactory::Ptr sessionFactory)
       : m_sessionFactory(sessionFactory)
    {
    }
@@ -248,11 +250,26 @@ public:
       return session->selectOne<Todo>(id);
    }
 
-   virtual QList<Todo> find(Criterion::Ptr criterion, int skip = -1, int pageSize = -1) {
+   virtual QList<Todo> find(QMetaOrm::Criterion::Ptr criterion, int skip = -1, int pageSize = -1) {
       auto session = m_sessionFactory->createSession();
       return session->selectMany<Todo>(criterion, skip, pageSize);
    }
 
 private:
-   SessionFactory::Ptr m_sessionFactory;
+   QMetaOrm::SessionFactory::Ptr m_sessionFactory;
+};
+
+//-----------------------------------------------------------------------------
+class ICommand {
+public:
+   virtual ~ICommand() {}
+   virtual void execute() = 0;
+};
+
+//-----------------------------------------------------------------------------
+template <class T>
+class IQuery {
+public:
+   virtual ~IQuery() {}
+   virtual QList<T> query();
 };

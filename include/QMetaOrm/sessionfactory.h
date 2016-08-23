@@ -6,31 +6,34 @@
 
 #include <QSharedPointer>
 
-/**
- * @brief The SessionFactory class
- */
-class QMETAORM_LIBRARY_API SessionFactory
-{
-public:
-   typedef QSharedPointer<SessionFactory> Ptr;
+namespace QMetaOrm {
 
-public:
-   virtual ~SessionFactory() {}
-   virtual Session::Ptr createSession() const = 0;
-};
+   /**
+    * @brief The SessionFactory class
+    */
+   class QMETAORM_LIBRARY_API SessionFactory
+   {
+   public:
+      typedef QSharedPointer<SessionFactory> Ptr;
 
-/**
- * @brief The DefaultSessionFactory class
- */
-class QMETAORM_LIBRARY_API DefaultSessionFactory: public SessionFactory
-{
-public:
-   static SessionFactory::Ptr create(DatabaseFactory::Ptr databaseFactory);
+   public:
+      virtual ~SessionFactory() {}
+      virtual Session::Ptr createSession() const = 0;
+   };
 
-public:
-   DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory);
-   virtual Session::Ptr createSession() const override;
+   /**
+    * @brief The DefaultSessionFactory class
+    */
+   class QMETAORM_LIBRARY_API DefaultSessionFactory: public SessionFactory
+   {
+   public:
+      static SessionFactory::Ptr create(DatabaseFactory::Ptr databaseFactory);
 
-private:
-   DatabaseFactory::Ptr m_databaseFactory;
-};
+   public:
+      DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory);
+      virtual Session::Ptr createSession() const override;
+
+   private:
+      DatabaseFactory::Ptr m_databaseFactory;
+   };
+}

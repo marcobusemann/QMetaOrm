@@ -2,6 +2,8 @@
 #include <QMetaOrm/entitymapper.h>
 #include <QMetaOrm/entitysqlbuilder.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 DefaultSessionFactory::DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory)
     : m_databaseFactory(databaseFactory)

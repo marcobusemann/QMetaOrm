@@ -1,5 +1,7 @@
 #include <QMetaOrm/metaentitybuilder.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 MetaEntityBuilder MetaEntityBuilder::anEntity() {
    return MetaEntityBuilder();

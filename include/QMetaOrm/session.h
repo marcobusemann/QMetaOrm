@@ -10,182 +10,246 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
-/**
- * @brief The Session class
- */
-// TODO: - Add logging (TRACE/DEBUG)
-class QMETAORM_LIBRARY_API Session
-{
-public:
-   typedef QSharedPointer<Session> Ptr;
+namespace QMetaOrm {
 
-public:
-   Session(
-      DatabaseFactory::Ptr databaseFactory,
-      EntitySqlBuilder::Ptr entitySqlBuilder,
-      EntityMapper::Ptr entityMapper);
+   /**
+    * @brief The Session class
+    */
+   // TODO: - Add logging (TRACE/DEBUG)
+   class QMETAORM_LIBRARY_API Session
+   {
+   public:
+      typedef QSharedPointer<Session> Ptr;
 
-   virtual ~Session();
+   public:
+      Session(
+         DatabaseFactory::Ptr databaseFactory,
+         EntitySqlBuilder::Ptr entitySqlBuilder,
+         EntityMapper::Ptr entityMapper);
 
+      virtual ~Session();
+
+      template <class T>
+      T save(T entity, MetaEntity mapping = MetaEntity());
+
+      template <class T>
+      void remove(T entity, MetaEntity mapping = MetaEntity());
+
+      template <class T, typename Key>
+      T selectOne(Key key, MetaEntity mapping = MetaEntity());
+
+      template <class T>
+      QList<T> selectMany(Criterion::Ptr criterion, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
+
+      /*
+      template <class T>
+      void create(T entity, const QString &sql, MetaEntity mapping = MetaEntity());
+
+      template <class T>
+      void update(T entity, const QString &sql, MetaEntity mapping = MetaEntity());
+
+      template <class T, typename Key>
+      T selectOne(Key key, const QString &sql, MetaEntity mapping = MetaEntity());
+
+      template <class T>
+      QList<T> selectMany(const QString &sql, MetaEntity mapping = MetaEntity());
+      */
+
+      void commit();
+      void rollback();
+
+   private:
+
+      // TODO:
+      //  - Check if lastInsertId() works for the current driver.
+      //  - Request sequence when lastInsertId() is not supported
+      //  - another id generation mechanism?
+      template <class T>
+      T create(T entity, MetaEntity mapping = MetaEntity());
+
+      template <class T>
+      T update(T entity, MetaEntity mapping = MetaEntity());
+
+      void setupSession();
+
+      QSqlDatabase m_database;
+      EntityMapper::Ptr m_entityMapper;
+      EntitySqlBuilder::Ptr m_entitySqlBuilder;
+   };
+
+   //-----------------------------------------------------------------------------
    template <class T>
-   T save(T entity, MetaEntity mapping = MetaEntity());
-
-   template <class T>
-   void remove(T entity, MetaEntity mapping = MetaEntity());
-
-   template <class T, typename Key>
-   T selectOne(Key key, MetaEntity mapping = MetaEntity());
-
-   template <class T>
-   QList<T> selectMany(Criterion::Ptr criterion, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
-
-   //void flush();
-
-   void commit();
-   void rollback();
-
-private:
-
-   // TODO:
-   //  - Check if lastInsertId() works for the current driver.
-   //  - Request sequence when lastInsertId() is not supported
-   //  - another id generation mechanism?
-   template <class T>
-   T create(T entity, MetaEntity mapping = MetaEntity());
-
-   template <class T>
-   T update(T entity, MetaEntity mapping = MetaEntity());
-
-   void setupSession();
-
-   QSqlDatabase m_database;
-   EntityMapper::Ptr m_entityMapper;
-   EntitySqlBuilder::Ptr m_entitySqlBuilder;
-};
-
-//-----------------------------------------------------------------------------
-template <class T>
-T Session::save(T entity, MetaEntity mapping) {
-   setupSession();
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
-   if (mapping.hasValidKey(entity))
-      return update(entity, mapping);
-   else
-      return create(entity, mapping);
-}
-
-//-----------------------------------------------------------------------------
-template <class T>
-void Session::remove(T entity, MetaEntity mapping) {
-   setupSession();
-
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
-   Q_ASSERT_X(mapping.hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
-
-   QSqlQuery query(m_database);
-
-   if (!query.prepare(m_entitySqlBuilder->buildRemove(mapping)))
-      throw CouldNotPrepareQueryException(query.lastError());
-
-   query.bindValue(0, mapping.getProperty(entity, mapping.key.first));
-
-   if (!query.exec())
-      throw CouldNotExecuteQueryException(query.lastError());
-}
-
-//-----------------------------------------------------------------------------
-template <class T, typename Key>
-T Session::selectOne(Key key, MetaEntity mapping) {
-   setupSession();
-
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
-
-   QSqlQuery query(m_database);
-
-   if (!query.prepare(m_entitySqlBuilder->buildSelect(mapping)))
-      throw CouldNotPrepareQueryException(query.lastError());
-
-   query.bindValue(0, key);
-
-   if (!query.exec())
-      throw CouldNotExecuteQueryException(query.lastError());
-
-   return query.next() ?
-      m_entityMapper->mapToEntity<T>(mapping, query.record()) :
-      T();
-}
-
-//-----------------------------------------------------------------------------
-template <class T>
-QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity mapping) {
-   setupSession();
-
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
-
-   QSqlQuery query(m_database);
-
-   QVariantList conditions;
-   if (!query.prepare(m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions)))
-      throw CouldNotPrepareQueryException(query.lastError());
-
-   for(int i = 0; i < conditions.size(); i++)
-      query.bindValue(i, conditions[i]);
-
-   if (!query.exec())
-      throw CouldNotExecuteQueryException(query.lastError());
-
-   QList<T> result;
-   while (query.next()) {
-      result.append(m_entityMapper->mapToEntity<T>(mapping, query.record()));
+   T Session::save(T entity, MetaEntity mapping) {
+      setupSession();
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      if (mapping.hasValidKey(entity))
+         return update(entity, mapping);
+      else
+         return create(entity, mapping);
    }
-   return result;
-}
 
-//-----------------------------------------------------------------------------
-template <class T>
-T Session::create(T entity, MetaEntity mapping) {
-   setupSession();
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::remove(T entity, MetaEntity mapping) {
+      setupSession();
 
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      Q_ASSERT_X(mapping.hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
 
-   QSqlQuery query(m_database);
+      QSqlQuery query(m_database);
 
-   QStringList properties;
-   if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
-      throw CouldNotPrepareQueryException(query.lastError());
+      if (!query.prepare(m_entitySqlBuilder->buildRemove(mapping)))
+         throw CouldNotPrepareQueryException(query.lastError());
 
-   for(int i = 0; i < properties.size(); i++)
-      query.bindValue(i, mapping.getProperty(entity, properties[i]));
+      query.bindValue(0, mapping.getProperty(entity, mapping.key.first));
 
-   if (!query.exec())
-      throw CouldNotExecuteQueryException(query.lastError());
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+   }
 
-   if (query.first())
-      mapping.setProperty(entity, mapping.key.first, query.value(0));
+   //-----------------------------------------------------------------------------
+   template <class T, typename Key>
+   T Session::selectOne(Key key, MetaEntity mapping) {
+      setupSession();
 
-   return entity;
-}
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
 
-//-----------------------------------------------------------------------------
-template <class T>
-T Session::update(T entity, MetaEntity mapping) {
-   setupSession();
+      QSqlQuery query(m_database);
 
-   mapping = mapping.isValid() ? mapping : QMetaOrmMappings::mapping<T>();
+      if (!query.prepare(m_entitySqlBuilder->buildSelect(mapping)))
+         throw CouldNotPrepareQueryException(query.lastError());
 
-   QSqlQuery query(m_database);
+      query.bindValue(0, key);
 
-   QStringList properties;
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
 
-   if (!query.prepare(m_entitySqlBuilder->buildUpdate(mapping, properties)))
-      throw CouldNotPrepareQueryException(query.lastError());
+      return query.next() ?
+         m_entityMapper->mapToEntity<T>(mapping, query.record()) :
+         T();
+   }
 
-   for(int i = 0; i < properties.size(); i++)
-      query.bindValue(i, mapping.getProperty(entity, properties[i]));
-   query.bindValue(properties.size(), mapping.getProperty(entity, mapping.key.first));
+   //-----------------------------------------------------------------------------
+   template <class T>
+   QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity mapping) {
+      setupSession();
 
-   if (!query.exec())
-      throw CouldNotExecuteQueryException(query.lastError());
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
 
-   return entity;
+      QSqlQuery query(m_database);
+
+      QVariantList conditions;
+      if (!query.prepare(m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions)))
+         throw CouldNotPrepareQueryException(query.lastError());
+
+      for(int i = 0; i < conditions.size(); i++)
+         query.bindValue(i, conditions[i]);
+
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+
+      QList<T> result;
+      while (query.next()) {
+         result.append(m_entityMapper->mapToEntity<T>(mapping, query.record()));
+      }
+      return result;
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   T Session::create(T entity, MetaEntity mapping) {
+      setupSession();
+
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+
+      QSqlQuery query(m_database);
+
+      QStringList properties;
+      if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
+         throw CouldNotPrepareQueryException(query.lastError());
+
+      for(int i = 0; i < properties.size(); i++)
+         query.bindValue(i, mapping.getProperty(entity, properties[i]));
+
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+
+      if (query.first())
+         mapping.setProperty(entity, mapping.key.first, query.value(0));
+
+      return entity;
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   T Session::update(T entity, MetaEntity mapping) {
+      setupSession();
+
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+
+      QSqlQuery query(m_database);
+
+      QStringList properties;
+
+      if (!query.prepare(m_entitySqlBuilder->buildUpdate(mapping, properties)))
+         throw CouldNotPrepareQueryException(query.lastError());
+
+      for(int i = 0; i < properties.size(); i++)
+         query.bindValue(i, mapping.getProperty(entity, properties[i]));
+      query.bindValue(properties.size(), mapping.getProperty(entity, mapping.key.first));
+
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+
+      return entity;
+   }
+   /*
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::create(T entity, const QString &sql, MetaEntity mapping) {
+      setupSession();
+
+      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+
+      QSqlQuery query(m_database);
+
+      if (!query.prepare(sql))
+         throw CouldNotPrepareQueryException(query.lastError());
+
+      auto bindingParams = mapping.propertyMapping.keys()
+      for(int i = 0; i < bindingParams.size(); i++)
+      {
+         auto bindingParam = bindingParams[i];
+         auto value = mapping.propertyMapping[bindingParam];
+         query.bindValue(bindingParam, mapping.getProperty(entity, value));
+      }
+
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+
+      // Todo extend reverse mapping
+      if (query.first() && !mapping.key.first.isEmpty())
+         mapping.setProperty(entity, mapping.key.first, query.value(0));
+
+      return entity;
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::update(T entity, const QString &sql, MetaEntity mapping) {
+
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T, typename Key>
+   T Session::selectOne(Key key, const QString &sql, MetaEntity mapping) {
+
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   QList<T> Session::selectMany(const QString &sql, MetaEntity mapping) {
+      return QList<T>();
+   }
+   */
 }

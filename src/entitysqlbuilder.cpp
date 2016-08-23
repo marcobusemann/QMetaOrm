@@ -2,6 +2,8 @@
 #include <QMetaOrm/valuecriterion.h>
 #include <QMetaOrm/listcriterion.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 QString EntitySqlBuilder::buildSelect(MetaEntity mapping) {
    QStringList fields = mapping.propertyMapping.values() << mapping.key.second;

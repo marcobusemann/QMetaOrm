@@ -31,18 +31,20 @@ protected:
    }
 };
 
-namespace QMetaOrmMappings {
-   template <> MetaEntity mapping<Todo>()
-   {
-      static const MetaEntity map = MetaEntityBuilder::anEntity()
-            .forSource("cal_todos")
-            .withSequence("cal_items_gen")
-            .withId(Todo::p::id, "id")
-            .withData(Todo::p::title, "title")
-            .withData(Todo::p::start, "todo_start")
-            .withData(Todo::p::end, "todo_due")
-            .build<Todo>();
-      return map;
+namespace QMetaOrm {
+   namespace Mappings {
+      template <> QMetaOrm::MetaEntity mapping<Todo>()
+      {
+         static const MetaEntity map = MetaEntityBuilder::anEntity()
+               .forSource("cal_todos")
+               .withSequence("cal_items_gen")
+               .withId(Todo::p::id, "id")
+               .withData(Todo::p::title, "title")
+               .withData(Todo::p::start, "todo_start")
+               .withData(Todo::p::end, "todo_due")
+               .build<Todo>();
+         return map;
+      }
    }
 }
 
@@ -53,10 +55,10 @@ const QString Todo::p::end = "end";
 
 #include <QMetaOrm/databasefactory.h>
 
-class MyDatabaseFactory: public DatabaseFactory {
+class MyDatabaseFactory: public QMetaOrm::DatabaseFactory {
 public:
-    static DatabaseFactory::Ptr create() {
-        return DatabaseFactory::Ptr(new MyDatabaseFactory());
+    static QMetaOrm::DatabaseFactory::Ptr create() {
+        return QMetaOrm::DatabaseFactory::Ptr(new MyDatabaseFactory());
     }
 
     virtual QSqlDatabase createDatabase() const {
@@ -84,7 +86,7 @@ int main(int argc, char *argv[])
 
     try {
        auto databaseFactory = MyDatabaseFactory::create();
-       auto sessionFactory = DefaultSessionFactory::create(databaseFactory);
+       auto sessionFactory = QMetaOrm::DefaultSessionFactory::create(databaseFactory);
        TodoRepository repo(sessionFactory);
        auto items = repo.find(TodoCriterionBuilder::aTodoWhere()
           .titleEquals("Treesoft ERP:")

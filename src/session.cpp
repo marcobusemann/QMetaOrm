@@ -1,6 +1,8 @@
 #include <QMetaOrm/session.h>
 #include <QMetaOrm/exceptions.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 Session::Session(
    DatabaseFactory::Ptr databaseFactory,

@@ -1,5 +1,7 @@
 #include <QMetaOrm/valuecriterion.h>
 
+using namespace QMetaOrm;
+
 //-----------------------------------------------------------------------------
 ValueCriterion::Ptr ValueCriterion::equals(const QString &prop, const QVariant &value) {
    return ValueCriterion::Ptr(new ValueCriterion(ExpressionType::Equals, prop, value));

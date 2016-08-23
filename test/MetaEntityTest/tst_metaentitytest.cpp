@@ -3,6 +3,8 @@
 
 #include <QMetaOrm/metaentity.h>
 
+using namespace QMetaOrm;
+
 class DummyObject : public QObject
 {
     Q_OBJECT
