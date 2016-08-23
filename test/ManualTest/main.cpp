@@ -2,6 +2,35 @@
 #include "main.h"
 #include <QMetaOrm/metaentitybuilder.h>
 
+#include <qtextcodec.h>
+
+class Win1252Codec: public QTextCodec
+{
+public:
+   virtual QByteArray name() const {
+      return "WIN1252";
+   }
+
+   virtual int mibEnum() const {
+      return 2252;
+   }
+
+   virtual QList<QByteArray> aliases() const {
+      return QList<QByteArray>();
+   }
+
+protected:
+   virtual QByteArray convertFromUnicode(const QChar * input, int number, ConverterState * state) const {
+      auto codec = QTextCodec::codecForName("WINDOWS-1252");
+      return codec->fromUnicode(input, number, state);
+   }
+
+   virtual QString convertToUnicode(const char * chars, int len, ConverterState * state) const {
+      auto codec = QTextCodec::codecForName("WINDOWS-1252");
+      return codec->toUnicode(chars, len, state);
+   }
+};
+
 namespace QMetaOrmMappings {
    template <> MetaEntity mapping<Todo>()
    {
@@ -32,6 +61,8 @@ public:
 
     virtual QSqlDatabase createDatabase() const {
         if (!QSqlDatabase::contains()) {
+            Win1252Codec codec;
+
             QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE");
             db.setHostName("localhost");
             db.setDatabaseName("D:\\Development\\TreesoftOffice\\Version_65_msvc2012\\Database\\Demo\\DATA1.FDB");
@@ -51,16 +82,21 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    auto databaseFactory = MyDatabaseFactory::create();
-    auto sessionFactory = DefaultSessionFactory::create(databaseFactory);
-    TodoRepository repo(sessionFactory);
-    auto items = repo.find(TodoCriterionBuilder::aTodoWhere()
-       .titleEquals("Treesoft ERP:")
-       .idEquals(9391)
-       .build(), 0, 2);
+    try {
+       auto databaseFactory = MyDatabaseFactory::create();
+       auto sessionFactory = DefaultSessionFactory::create(databaseFactory);
+       TodoRepository repo(sessionFactory);
+       auto items = repo.find(TodoCriterionBuilder::aTodoWhere()
+          .titleEquals("Treesoft ERP:")
+          .idEquals(9391)
+          .build(), 0, 2);
 
-    foreach(auto item, items) {
-       item.dump();
+       foreach(auto item, items) {
+          item.dump();
+       }
+    }
+    catch (std::exception e) {
+       qDebug() << e.what();
     }
 
     return a.exec();
