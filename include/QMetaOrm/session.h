@@ -14,8 +14,11 @@ namespace QMetaOrm {
 
    /**
     * @brief The Session class
+    * @todo - Add logging (TRACE/DEBUG)
+    *       - Added identity persistence
+    *       - Add custom sql support 
+    *       - Add object-pointer support (std::shared_ptr, QSharedPointer)
     */
-   // TODO: - Add logging (TRACE/DEBUG)
    class QMETAORM_LIBRARY_API Session
    {
    public:
@@ -60,10 +63,6 @@ namespace QMetaOrm {
 
    private:
 
-      // TODO:
-      //  - Check if lastInsertId() works for the current driver.
-      //  - Request sequence when lastInsertId() is not supported
-      //  - another id generation mechanism?
       template <class T>
       T create(T entity, MetaEntity mapping = MetaEntity());
 
