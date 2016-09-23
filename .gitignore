@@ -13,3 +13,5 @@ build
 /**/*.v11.suo
 /**/*.vcxproj.filters
 /**/*.opensdf
+/**/*.VC.db
+.vs
