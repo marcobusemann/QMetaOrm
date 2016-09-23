@@ -44,6 +44,9 @@ namespace QMetaOrm {
       template <class T>
       QList<T> selectMany(Criterion::Ptr criterion, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
 
+      template <class T>
+      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
+
       /*
       template <class T>
       void create(T entity, const QString &sql, MetaEntity mapping = MetaEntity());
@@ -131,6 +134,17 @@ namespace QMetaOrm {
    //-----------------------------------------------------------------------------
    template <class T>
    QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity mapping) {
+      QList<T> result;
+      std::function<void(T)> func = [&result](T item) -> void {
+         result.append(item);
+      };
+      selectManyByCallback(criterion, func, skip, pageSize, mapping);
+      return result;
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip, int pageSize, MetaEntity mapping) {
       setupSession();
 
       mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -147,11 +161,8 @@ namespace QMetaOrm {
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
 
-      QList<T> result;
-      while (query.next()) {
-         result.append(m_entityMapper->mapToEntity<T>(mapping, query.record()));
-      }
-      return result;
+      while (query.next())
+         callback(m_entityMapper->mapToEntity<T>(mapping, query.record()));
    }
 
    //-----------------------------------------------------------------------------

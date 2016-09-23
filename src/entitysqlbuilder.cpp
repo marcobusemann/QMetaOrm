@@ -1,6 +1,7 @@
 #include <QMetaOrm/entitysqlbuilder.h>
 #include <QMetaOrm/valuecriterion.h>
 #include <QMetaOrm/listcriterion.h>
+#include <QtSql>
 
 using namespace QMetaOrm;
 
@@ -15,6 +16,7 @@ QString EntitySqlBuilder::buildSelect(MetaEntity mapping) {
 
 //-----------------------------------------------------------------------------
 QString EntitySqlBuilder::buildCriterion(MetaEntity mapping, Criterion::Ptr criterion, QVariantList &conditions) {
+   if (!criterion) return "1=1";
    return criterion->stringify([](const Criterion *c, const QString &leftChild, const QString &rightChild) -> QString {
       return QString("((%1) %2 (%3))")
       .arg(leftChild)

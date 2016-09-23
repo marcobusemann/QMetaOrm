@@ -6,7 +6,6 @@
 
 #include <QSharedPointer>
 #include <QStringList>
-#include <QtSql>
 
 #include <algorithm>
 

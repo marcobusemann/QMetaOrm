@@ -2,6 +2,7 @@
 
 #include <QMetaOrm/private.h>
 #include <QMetaOrm/metaentity.h>
+#include <QMetaProperty>
 
 namespace QMetaOrm {
 
