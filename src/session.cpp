@@ -1,14 +1,19 @@
 #include <QMetaOrm/session.h>
 #include <QMetaOrm/exceptions.h>
+#include <qthread.h>
 
 using namespace QMetaOrm;
+
+QString GetThreadIdentifier() {
+   return QString::number((int)QThread::currentThreadId());
+}
 
 //-----------------------------------------------------------------------------
 Session::Session(
    DatabaseFactory::Ptr databaseFactory,
    EntitySqlBuilder::Ptr entitySqlBuilder,
    EntityMapper::Ptr entityMapper)
-   : m_database(databaseFactory->createDatabase())
+   : m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
    , m_entitySqlBuilder(entitySqlBuilder)
    , m_entityMapper(entityMapper)
 {

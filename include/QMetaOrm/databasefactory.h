@@ -18,5 +18,6 @@ namespace QMetaOrm {
    public:
        virtual ~DatabaseFactory() {}
        virtual QSqlDatabase createDatabase() const = 0;
+       virtual QSqlDatabase createDatabase(const QString &name) const = 0;
    };
 }
