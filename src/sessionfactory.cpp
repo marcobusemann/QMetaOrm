@@ -5,19 +5,26 @@
 using namespace QMetaOrm;
 
 //-----------------------------------------------------------------------------
-DefaultSessionFactory::DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory)
+DefaultSessionFactory::DefaultSessionFactory(
+   DatabaseFactory::Ptr databaseFactory,
+   ConverterStoreFactory::Ptr converterStoreFactory)
     : m_databaseFactory(databaseFactory)
+    , m_converterStoreFactory(converterStoreFactory)
 {}
 
 //-----------------------------------------------------------------------------
 Session::Ptr DefaultSessionFactory::createSession() const {
-    return QSharedPointer<Session>(new Session(
-        m_databaseFactory,
-        QSharedPointer<EntitySqlBuilder>(new EntitySqlBuilder()),
-        QSharedPointer<EntityMapper>(new EntityMapper())));
+   auto converterStoreFactory = m_converterStoreFactory != nullptr ? 
+      m_converterStoreFactory : 
+      DefaultConverterStoreFactory::factory();
+   return QSharedPointer<Session>(new Session(
+      m_databaseFactory,
+      QSharedPointer<EntitySqlBuilder>(new EntitySqlBuilder()),
+      QSharedPointer<EntityMapper>(new EntityMapper()),
+      converterStoreFactory));
 }
 
 //-----------------------------------------------------------------------------
-SessionFactory::Ptr DefaultSessionFactory::create(DatabaseFactory::Ptr databaseFactory) {
-    return SessionFactory::Ptr(new DefaultSessionFactory(databaseFactory));
+SessionFactory::Ptr DefaultSessionFactory::create(DatabaseFactory::Ptr databaseFactory, ConverterStoreFactory::Ptr converterStoreFactory) {
+    return SessionFactory::Ptr(new DefaultSessionFactory(databaseFactory, converterStoreFactory));
 }

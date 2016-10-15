@@ -12,10 +12,12 @@ QString GetThreadIdentifier() {
 Session::Session(
    DatabaseFactory::Ptr databaseFactory,
    EntitySqlBuilder::Ptr entitySqlBuilder,
-   EntityMapper::Ptr entityMapper)
+   EntityMapper::Ptr entityMapper,
+   ConverterStoreFactory::Ptr converterStoreFactory)
    : m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
    , m_entitySqlBuilder(entitySqlBuilder)
    , m_entityMapper(entityMapper)
+   , m_converterStoreFactory(converterStoreFactory)
 {
 }
 

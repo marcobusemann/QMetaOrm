@@ -2,12 +2,27 @@
 
 #include <QMetaOrm/private.h>
 
+#include <qstringlist.h>
 #include <qvariant.h>
 #include <qhash.h>
 #include <qpair.h>
 #include <qlist.h>
 
 namespace QMetaOrm {
+
+   /**
+   * @brief The MetaProperty struct
+   */
+   struct MetaProperty 
+   {
+      QString propertyName;
+      QString databaseName;
+      QString converterName;
+
+      bool hasConverter() const {
+         return !converterName.isEmpty();
+      }
+   };
 
    /**
     * @brief The MetaEntity struct
@@ -19,7 +34,7 @@ namespace QMetaOrm {
       QString source;
       QString sequence;
       QPair<QString, QString> key;
-      QHash<QString, QString> propertyMapping;
+      QHash<QString, MetaProperty> propertyMapping;
 
       bool isValid() {
          return !key.first.isEmpty() || !propertyMapping.isEmpty();
@@ -34,6 +49,8 @@ namespace QMetaOrm {
             keyValue.type() == QVariant::LongLong ? keyValue.toLongLong() > 0 :
             keyValue.type() == QVariant::String ? !keyValue.toString().isEmpty() : false;
       }
+
+      QStringList getDatabaseFields() const;
 
       template <class T>
       QVariant getProperty(const T &item, const QString &name) const {

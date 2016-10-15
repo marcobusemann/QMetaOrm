@@ -16,7 +16,7 @@ namespace QMetaOrm {
       MetaEntityBuilder forSource(const QString &source);
       MetaEntityBuilder withSequence(const QString &sequence);
       MetaEntityBuilder withId(const QString &prop, const QString &field);
-      MetaEntityBuilder withData(const QString &prop, const QString &field);
+      MetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
 
       template <class T>
       MetaEntity build() const {

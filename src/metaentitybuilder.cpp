@@ -26,7 +26,11 @@ MetaEntityBuilder MetaEntityBuilder::withId(const QString &prop, const QString &
 }
 
 //-----------------------------------------------------------------------------
-MetaEntityBuilder MetaEntityBuilder::withData(const QString &prop, const QString &field) {
-   m_entity.propertyMapping[prop] = field;
+MetaEntityBuilder MetaEntityBuilder::withData(const QString &prop, const QString &field, const QString &converter) {
+   MetaProperty value;
+   value.propertyName = prop;
+   value.databaseName = field;
+   value.converterName = converter;
+   m_entity.propertyMapping[prop] = value;
    return *this;
 }

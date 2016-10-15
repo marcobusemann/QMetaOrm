@@ -7,7 +7,7 @@ using namespace QMetaOrm;
 
 //-----------------------------------------------------------------------------
 QString EntitySqlBuilder::buildSelect(MetaEntity mapping) {
-   QStringList fields = mapping.propertyMapping.values() << mapping.key.second;
+   QStringList fields = mapping.getDatabaseFields();
    return QString("SELECT %1 FROM %2 WHERE %3=?")
       .arg(fields.join(","))
       .arg(mapping.source)
@@ -45,7 +45,7 @@ QString EntitySqlBuilder::buildCriterion(MetaEntity mapping, Criterion::Ptr crit
 //-----------------------------------------------------------------------------
 QString EntitySqlBuilder::buildSelectMany(MetaEntity mapping, Criterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions) {
    QString condition = buildCriterion(mapping, criterion, conditions);
-   QStringList fields = mapping.propertyMapping.values() << mapping.key.second;
+   QStringList fields = mapping.getDatabaseFields();
    return QString("SELECT %1 %2 %3 FROM %4 WHERE %5")
       .arg(pageSize >= 0 ? QString("FIRST %1").arg(pageSize) : "")
       .arg(skip >= 0 ? QString("SKIP %1").arg(skip) : "")
@@ -70,7 +70,7 @@ QString EntitySqlBuilder::buildInsert(MetaEntity mapping, QStringList &propertie
    QStringList fields;
    fields.append(mapping.key.second);
    foreach(auto prop, properties)
-      fields.append(mapping.propertyMapping[prop]);
+      fields.append(mapping.propertyMapping[prop].databaseName);
 
    QStringList params;
    for(int i = 0; i < fields.size() - 1; i++)
@@ -91,7 +91,7 @@ QString EntitySqlBuilder::buildUpdate(MetaEntity mapping, QStringList &propertie
 
    QStringList fields;
    foreach(auto prop, properties)
-      fields.append(QString("%1=?").arg(mapping.propertyMapping[prop]));
+      fields.append(QString("%1=?").arg(mapping.propertyMapping[prop].databaseName));
 
    return QString("UPDATE %1 SET %2 WHERE %3=?")
       .arg(

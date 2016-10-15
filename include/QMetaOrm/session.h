@@ -5,6 +5,7 @@
 #include <QMetaOrm/entitymapper.h>
 #include <QMetaOrm/databasefactory.h>
 #include <QMetaOrm/exceptions.h>
+#include <QMetaOrm/converterstorefactory.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
@@ -28,7 +29,8 @@ namespace QMetaOrm {
       Session(
          DatabaseFactory::Ptr databaseFactory,
          EntitySqlBuilder::Ptr entitySqlBuilder,
-         EntityMapper::Ptr entityMapper);
+         EntityMapper::Ptr entityMapper,
+         ConverterStoreFactory::Ptr converterStoreFactory);
 
       virtual ~Session();
 
@@ -77,6 +79,7 @@ namespace QMetaOrm {
       QSqlDatabase m_database;
       EntityMapper::Ptr m_entityMapper;
       EntitySqlBuilder::Ptr m_entitySqlBuilder;
+      ConverterStoreFactory::Ptr m_converterStoreFactory;
    };
 
    //-----------------------------------------------------------------------------
@@ -127,7 +130,7 @@ namespace QMetaOrm {
          throw CouldNotExecuteQueryException(query.lastError());
 
       return query.next() ?
-         m_entityMapper->mapToEntity<T>(mapping, query.record()) :
+         m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStoreFactory->createConverterStore()) :
          T();
    }
 
@@ -152,7 +155,8 @@ namespace QMetaOrm {
       QSqlQuery query(m_database);
 
       QVariantList conditions;
-      if (!query.prepare(m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions)))
+      QString sql = m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions);
+      if (!query.prepare(sql))
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < conditions.size(); i++)
@@ -162,7 +166,7 @@ namespace QMetaOrm {
          throw CouldNotExecuteQueryException(query.lastError());
 
       while (query.next())
-         callback(m_entityMapper->mapToEntity<T>(mapping, query.record()));
+         callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStoreFactory->createConverterStore()));
    }
 
    //-----------------------------------------------------------------------------

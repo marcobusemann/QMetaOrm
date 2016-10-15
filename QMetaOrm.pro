@@ -30,7 +30,10 @@ HEADERS += \
     include/QMetaOrm/exceptions.h \
     include/QMetaOrm/session.h \
     include/QMetaOrm/databasefactory.h \
-    include/QMetaOrm/sessionfactory.h
+    include/QMetaOrm/sessionfactory.h \
+    include/QMetaOrm/converter.h \
+    include/QMetaOrm/converterstore.h \
+    include/QMetaOrm/converterstorefactory.h \
 
 SOURCES += \
     src/metaentitybuilder.cpp \
@@ -40,4 +43,7 @@ SOURCES += \
     src/entitysqlbuilder.cpp \
     src/session.cpp \
     src/sessionfactory.cpp \
-    src/metaentity.cpp
+    src/metaentity.cpp \
+    src/converter.cpp \
+    src/converterstore.cpp \
+    src/converterstorefactory.cpp \
