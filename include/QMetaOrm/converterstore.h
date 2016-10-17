@@ -15,7 +15,8 @@ namespace QMetaOrm {
       typedef QSharedPointer<ConverterStore> Ptr;
 
    public:
-      virtual void registerBy(const QString &name, Converter::Ptr converter) = 0;
+	  virtual void registerConverter(Converter::Ptr converter) = 0;
+	  virtual void registerConverterBy(const QString &name, Converter::Ptr converter) = 0;
       virtual Converter::Ptr getConverterFor(const QString &name) const = 0;
       virtual bool hasConverter(const QString &name) const = 0;
    };
@@ -27,9 +28,11 @@ namespace QMetaOrm {
    {
    public:
       typedef QSharedPointer<DefaultConverterStore> Ptr;
+	  static Ptr factory();
 
    public:
-      virtual void registerBy(const QString &name, Converter::Ptr converter) override;
+	  virtual void registerConverter(Converter::Ptr converter) override;
+	  virtual void registerConverterBy(const QString &name, Converter::Ptr converter) override;
       virtual Converter::Ptr getConverterFor(const QString &name) const override;
       virtual bool hasConverter(const QString &name) const override;
 

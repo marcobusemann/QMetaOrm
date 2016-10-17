@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm/converterstorefactory.h>
 #include <QMetaOrm/databasefactory.h>
+#include <QMetaOrm/converterstore.h>
 #include <QMetaOrm/private.h>
 #include <QMetaOrm/session.h>
 
@@ -20,6 +20,7 @@ namespace QMetaOrm {
    public:
       virtual ~SessionFactory() {}
       virtual Session::Ptr createSession() const = 0;
+	  virtual ConverterStore::Ptr getConverterStore() const = 0;
    };
 
    /**
@@ -28,18 +29,15 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API DefaultSessionFactory: public SessionFactory
    {
    public:
-      static SessionFactory::Ptr create(
-         DatabaseFactory::Ptr databaseFactory,
-         ConverterStoreFactory::Ptr converterStoreFactory = ConverterStoreFactory::Ptr());
+      static SessionFactory::Ptr factory(DatabaseFactory::Ptr databaseFactory);
 
    public:
-      DefaultSessionFactory(
-         DatabaseFactory::Ptr databaseFactory, 
-         ConverterStoreFactory::Ptr converterStoreFactory = ConverterStoreFactory::Ptr());
+      DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory);
       virtual Session::Ptr createSession() const override;
+	  virtual ConverterStore::Ptr getConverterStore() const override;
 
    private:
       DatabaseFactory::Ptr m_databaseFactory;
-      ConverterStoreFactory::Ptr m_converterStoreFactory;
+      ConverterStore::Ptr m_converterStore;
    };
 }

@@ -5,7 +5,6 @@
 #include <QMetaOrm/entitymapper.h>
 #include <QMetaOrm/databasefactory.h>
 #include <QMetaOrm/exceptions.h>
-#include <QMetaOrm/converterstorefactory.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
@@ -30,7 +29,7 @@ namespace QMetaOrm {
          DatabaseFactory::Ptr databaseFactory,
          EntitySqlBuilder::Ptr entitySqlBuilder,
          EntityMapper::Ptr entityMapper,
-         ConverterStoreFactory::Ptr converterStoreFactory);
+         ConverterStore::Ptr converterStore);
 
       virtual ~Session();
 
@@ -44,7 +43,7 @@ namespace QMetaOrm {
       T selectOne(Key key, MetaEntity mapping = MetaEntity());
 
       template <class T>
-      QList<T> selectMany(Criterion::Ptr criterion, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
+      QList<T> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
 
       template <class T>
       void selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
@@ -79,7 +78,7 @@ namespace QMetaOrm {
       QSqlDatabase m_database;
       EntityMapper::Ptr m_entityMapper;
       EntitySqlBuilder::Ptr m_entitySqlBuilder;
-      ConverterStoreFactory::Ptr m_converterStoreFactory;
+      ConverterStore::Ptr m_converterStore;
    };
 
    //-----------------------------------------------------------------------------
@@ -130,7 +129,7 @@ namespace QMetaOrm {
          throw CouldNotExecuteQueryException(query.lastError());
 
       return query.next() ?
-         m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStoreFactory->createConverterStore()) :
+         m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore) :
          T();
    }
 
@@ -166,7 +165,7 @@ namespace QMetaOrm {
          throw CouldNotExecuteQueryException(query.lastError());
 
       while (query.next())
-         callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStoreFactory->createConverterStore()));
+         callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
    }
 
    //-----------------------------------------------------------------------------
