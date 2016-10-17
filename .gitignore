@@ -12,6 +12,7 @@ build
 /**/*.sdf
 /**/*.v11.suo
 /**/*.vcxproj.filters
+/**/*.vcxproj.user
 /**/*.opensdf
 /**/*.VC.db
 .vs
