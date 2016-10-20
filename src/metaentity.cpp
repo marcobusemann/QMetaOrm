@@ -13,6 +13,19 @@ QStringList MetaEntity::getDatabaseFields() const
    return result;
 }
 
+MetaEntity::Ptr MetaEntity::copy()
+{
+   return Ptr(new MetaEntity(*this));
+}
+
+MetaEntity::MetaEntity(const MetaEntity &rhs)
+{
+   m_source = rhs.m_source;
+   m_sequence = rhs.m_sequence;
+   m_key = rhs.m_key;
+   m_propertyMapping = rhs.m_propertyMapping;
+}
+
 void MetaEntity::setSource(const QString & aSource)
 {
    m_source = aSource;

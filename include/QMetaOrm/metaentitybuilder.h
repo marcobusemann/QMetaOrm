@@ -29,7 +29,7 @@ namespace QMetaOrm {
 
          // TODO: Add futher property checks
 
-         return m_entity;
+         return m_entity->copy();
       }
 
    private:

@@ -39,6 +39,9 @@ namespace QMetaOrm {
    public:
       static const QList<QVariant::Type> SupportedKeyTypes;
 
+      MetaEntity() {}
+      MetaEntity(const MetaEntity &rhs);
+
       void setSource(const QString &aSource);
       const QString &getSource() const;
       bool hasSource() const;
@@ -77,6 +80,8 @@ namespace QMetaOrm {
       void setProperty(T &item, const QString &name, const QVariant &value) const {
          item.setProperty(name.toStdString().c_str(), value);
       }
+
+      Ptr copy();
 
    private:
       QString m_source;
