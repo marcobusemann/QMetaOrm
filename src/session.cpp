@@ -8,7 +8,6 @@ QString GetThreadIdentifier() {
    return QString::number((int)QThread::currentThreadId());
 }
 
-//-----------------------------------------------------------------------------
 Session::Session(
    DatabaseFactory::Ptr databaseFactory,
    EntitySqlBuilder::Ptr entitySqlBuilder,
@@ -21,25 +20,21 @@ Session::Session(
 {
 }
 
-//-----------------------------------------------------------------------------
 Session::~Session() {
    m_database.rollback();
    m_database.close();
 }
 
-//-----------------------------------------------------------------------------
 void Session::commit() {
    if (!m_database.commit())
       throw TransactionException(m_database.lastError());
 }
 
-//-----------------------------------------------------------------------------
 void Session::rollback() {
    if (!m_database.rollback())
       throw TransactionException(m_database.lastError());
 }
 
-//-----------------------------------------------------------------------------
 void Session::setupSession() {
    if (m_database.isOpen())
       return;

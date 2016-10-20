@@ -2,6 +2,7 @@
 
 #include <QMetaOrm/private.h>
 
+#include <qsharedpointer.h>
 #include <qstringlist.h>
 #include <qvariant.h>
 #include <qhash.h>
@@ -27,22 +28,37 @@ namespace QMetaOrm {
    /**
     * @brief The MetaEntity struct
     */
-   struct QMETAORM_LIBRARY_API MetaEntity
+   class QMETAORM_LIBRARY_API MetaEntity
    {
+   public:
+      typedef QSharedPointer<MetaEntity> Ptr;
+      static Ptr factory() {
+         return Ptr(new MetaEntity());
+      }
+
+   public:
       static const QList<QVariant::Type> SupportedKeyTypes;
 
-      QString source;
-      QString sequence;
-      QPair<QString, QString> key;
-      QHash<QString, MetaProperty> propertyMapping;
+      void setSource(const QString &aSource);
+      const QString &getSource() const;
+      bool hasSource() const;
 
-      bool isValid() {
-         return !key.first.isEmpty() || !propertyMapping.isEmpty();
-      }
+      void setSequence(const QString &aSequence);
+      const QString &getSequence() const;
+      bool hasSequence() const;
+
+      void setKey(const QString &aProperty, const QString &aDatabaseField);
+      const QString &getKeyProperty() const;
+      const QString &getKeyDatabaseField() const;
+      bool hasKey() const;
+
+      QList<QString> getProperties() const;
+      const MetaProperty &getProperty(const QString &aProperty);
+      void addProperty(const MetaProperty &prop);
 
       template <class T>
       bool hasValidKey(const T &item) const {
-         auto keyValue = getProperty(item, key.first);
+         auto keyValue = getProperty(item, getKeyProperty());
          if (!keyValue.isValid()) return false;
          return
             keyValue.type() == QVariant::Int ? keyValue.toInt() > 0 :
@@ -61,10 +77,16 @@ namespace QMetaOrm {
       void setProperty(T &item, const QString &name, const QVariant &value) const {
          item.setProperty(name.toStdString().c_str(), value);
       }
+
+   private:
+      QString m_source;
+      QString m_sequence;
+      QPair<QString, QString> m_key;
+      QHash<QString, MetaProperty> m_propertyMapping;
    };
 
    namespace Mappings {
-      template <class T> MetaEntity mapping() {}
+      template <class T> MetaEntity::Ptr mapping() {}
    }
 }
 

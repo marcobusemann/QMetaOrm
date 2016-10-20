@@ -19,16 +19,16 @@ namespace QMetaOrm {
 
    public:
       template <class T>
-      T mapToEntity(MetaEntity mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
+      T mapToEntity(MetaEntity::Ptr mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
          T result;
 
-         auto resultValue = record.value(mapping.key.second);
+         auto resultValue = record.value(mapping->getKeyDatabaseField());
          if (resultValue.isValid())
-            mapping.setProperty(result, mapping.key.first, resultValue);
+            mapping->setProperty(result, mapping->getKeyProperty(), resultValue);
 
-         auto keys = mapping.propertyMapping.keys();
+         auto keys = mapping->getProperties();
          foreach(auto key, keys) {
-            auto propertie = mapping.propertyMapping[key];
+            auto propertie = mapping->getProperty(key);
             auto resultValue = record.value(propertie.databaseName);
             if (resultValue.isValid()) {
                if (propertie.hasConverter()) {
@@ -42,7 +42,7 @@ namespace QMetaOrm {
                      qDebug() << QString("Converter %1 not registered!").arg(converterName);
                   }
                }
-               mapping.setProperty(result, key, resultValue);
+               mapping->setProperty(result, key, resultValue);
             }
          }
 

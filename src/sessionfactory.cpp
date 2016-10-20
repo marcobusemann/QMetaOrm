@@ -4,13 +4,11 @@
 
 using namespace QMetaOrm;
 
-//-----------------------------------------------------------------------------
 DefaultSessionFactory::DefaultSessionFactory(DatabaseFactory::Ptr databaseFactory)
     : m_databaseFactory(databaseFactory)
     , m_converterStore(DefaultConverterStore::factory())
 {}
 
-//-----------------------------------------------------------------------------
 Session::Ptr DefaultSessionFactory::createSession() const {
    return QSharedPointer<Session>(new Session(
       m_databaseFactory,
@@ -19,13 +17,11 @@ Session::Ptr DefaultSessionFactory::createSession() const {
 	  m_converterStore));
 }
 
-//-----------------------------------------------------------------------------
 ConverterStore::Ptr DefaultSessionFactory::getConverterStore() const
 {
 	return m_converterStore;
 }
 
-//-----------------------------------------------------------------------------
 SessionFactory::Ptr DefaultSessionFactory::factory(DatabaseFactory::Ptr databaseFactory) {
     return SessionFactory::Ptr(new DefaultSessionFactory(databaseFactory));
 }

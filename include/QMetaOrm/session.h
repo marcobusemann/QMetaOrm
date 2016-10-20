@@ -34,19 +34,19 @@ namespace QMetaOrm {
       virtual ~Session();
 
       template <class T>
-      T save(T entity, MetaEntity mapping = MetaEntity());
+      T save(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      void remove(T entity, MetaEntity mapping = MetaEntity());
+      void remove(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T, typename Key>
-      T selectOne(Key key, MetaEntity mapping = MetaEntity());
+      T selectOne(Key key, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      QList<T> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
+      QList<T> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip = -1, int pageSize = -1, MetaEntity mapping = MetaEntity());
+      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       /*
       template <class T>
@@ -68,10 +68,10 @@ namespace QMetaOrm {
    private:
 
       template <class T>
-      T create(T entity, MetaEntity mapping = MetaEntity());
+      T create(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      T update(T entity, MetaEntity mapping = MetaEntity());
+      T update(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       void setupSession();
 
@@ -83,10 +83,10 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::save(T entity, MetaEntity mapping) {
+   T Session::save(T entity, MetaEntity::Ptr mapping) {
       setupSession();
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
-      if (mapping.hasValidKey(entity))
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
+      if (mapping->hasValidKey(entity))
          return update(entity, mapping);
       else
          return create(entity, mapping);
@@ -94,18 +94,18 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   void Session::remove(T entity, MetaEntity mapping) {
+   void Session::remove(T entity, MetaEntity::Ptr mapping) {
       setupSession();
 
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
-      Q_ASSERT_X(mapping.hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
+      Q_ASSERT_X(mapping->hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
 
       QSqlQuery query(m_database);
 
       if (!query.prepare(m_entitySqlBuilder->buildRemove(mapping)))
          throw CouldNotPrepareQueryException(query.lastError());
 
-      query.bindValue(0, mapping.getProperty(entity, mapping.key.first));
+      query.bindValue(0, mapping->getProperty(entity, mapping->getKeyProperty()));
 
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
@@ -113,10 +113,10 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T, typename Key>
-   T Session::selectOne(Key key, MetaEntity mapping) {
+   T Session::selectOne(Key key, MetaEntity::Ptr mapping) {
       setupSession();
 
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
 
       QSqlQuery query(m_database);
 
@@ -135,7 +135,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity mapping) {
+   QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
       QList<T> result;
       std::function<void(T)> func = [&result](T item) -> void {
          result.append(item);
@@ -146,10 +146,10 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip, int pageSize, MetaEntity mapping) {
+   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
       setupSession();
 
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
 
       QSqlQuery query(m_database);
 
@@ -170,10 +170,10 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::create(T entity, MetaEntity mapping) {
+   T Session::create(T entity, MetaEntity::Ptr mapping) {
       setupSession();
 
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
 
       QSqlQuery query(m_database);
 
@@ -182,23 +182,23 @@ namespace QMetaOrm {
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping.getProperty(entity, properties[i]));
+         query.bindValue(i, mapping->getProperty(entity, properties[i]));
 
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
 
       if (query.first())
-         mapping.setProperty(entity, mapping.key.first, query.value(0));
+         mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));
 
       return entity;
    }
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::update(T entity, MetaEntity mapping) {
+   T Session::update(T entity, MetaEntity::Ptr mapping) {
       setupSession();
 
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
 
       QSqlQuery query(m_database);
 
@@ -208,8 +208,8 @@ namespace QMetaOrm {
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping.getProperty(entity, properties[i]));
-      query.bindValue(properties.size(), mapping.getProperty(entity, mapping.key.first));
+         query.bindValue(i, mapping->getProperty(entity, properties[i]));
+      query.bindValue(properties.size(), mapping->getProperty(entity, mapping->getKeyProperty()));
 
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());

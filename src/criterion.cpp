@@ -2,7 +2,6 @@
 
 using namespace QMetaOrm;
 
-//-----------------------------------------------------------------------------
 Criterion::Ptr Criterion::and(Criterion::Ptr left,  Criterion::Ptr right) {
    if (!left && right)
       return right;
@@ -11,7 +10,6 @@ Criterion::Ptr Criterion::and(Criterion::Ptr left,  Criterion::Ptr right) {
    return Criterion::Ptr(new Criterion(CombinationType::And, left, right));
 }
 
-//-----------------------------------------------------------------------------
 Criterion::Ptr Criterion::or(Criterion::Ptr left,  Criterion::Ptr right) {
    if (!left && right)
       return right;
@@ -20,7 +18,6 @@ Criterion::Ptr Criterion::or(Criterion::Ptr left,  Criterion::Ptr right) {
    return Criterion::Ptr(new Criterion(CombinationType::Or, left, right));
 }
 
-//-----------------------------------------------------------------------------
 QString Criterion::dump() const {
    return QString("((%1) %2 (%3))")
       .arg(left ? left->dump() : "")
@@ -30,7 +27,6 @@ QString Criterion::dump() const {
       .arg(right ? right->dump() : "");
 }
 
-//-----------------------------------------------------------------------------
 QString Criterion::stringify(
    std::function<QString(const Criterion *, const QString &leftChild, const QString &rightChild)> containerDelegate,
    std::function<QString(const class ValueCriterion *)> valueDelegate,
@@ -40,7 +36,6 @@ QString Criterion::stringify(
    return containerDelegate(this, leftString, rightString);
 }
 
-//-----------------------------------------------------------------------------
 Criterion::Criterion(CombinationType atype, Criterion::Ptr aleft, Criterion::Ptr aright)
    : combinationtype(atype)
    , left(aleft)
@@ -48,7 +43,6 @@ Criterion::Criterion(CombinationType atype, Criterion::Ptr aleft, Criterion::Ptr
 {
 }
 
-//-----------------------------------------------------------------------------
 Criterion::Criterion()
    : combinationtype(CombinationType::Leaf)
 {

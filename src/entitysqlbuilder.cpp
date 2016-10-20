@@ -5,17 +5,15 @@
 
 using namespace QMetaOrm;
 
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildSelect(MetaEntity mapping) {
-   QStringList fields = mapping.getDatabaseFields();
+QString EntitySqlBuilder::buildSelect(MetaEntity::Ptr mapping) {
+   QStringList fields = mapping->getDatabaseFields();
    return QString("SELECT %1 FROM %2 WHERE %3=?")
       .arg(fields.join(","))
-      .arg(mapping.source)
-      .arg(mapping.key.second);
+      .arg(mapping->getSource())
+      .arg(mapping->getKeyDatabaseField());
 }
 
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildCriterion(MetaEntity mapping, Criterion::Ptr criterion, QVariantList &conditions) {
+QString EntitySqlBuilder::buildCriterion(MetaEntity::Ptr mapping, Criterion::Ptr criterion, QVariantList &conditions) {
    if (!criterion) return "1=1";
    return criterion->stringify([](const Criterion *c, const QString &leftChild, const QString &rightChild) -> QString {
       return QString("((%1) %2 (%3))")
@@ -42,35 +40,32 @@ QString EntitySqlBuilder::buildCriterion(MetaEntity mapping, Criterion::Ptr crit
 }
 
 // TODO: - Cache build condition
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildSelectMany(MetaEntity mapping, Criterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions) {
+QString EntitySqlBuilder::buildSelectMany(MetaEntity::Ptr mapping, Criterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions) {
    QString condition = buildCriterion(mapping, criterion, conditions);
-   QStringList fields = mapping.getDatabaseFields();
+   QStringList fields = mapping->getDatabaseFields();
    return QString("SELECT %1 %2 %3 FROM %4 WHERE %5")
       .arg(pageSize >= 0 ? QString("FIRST %1").arg(pageSize) : "")
       .arg(skip >= 0 ? QString("SKIP %1").arg(skip) : "")
       .arg(fields.join(","))
-      .arg(mapping.source)
+      .arg(mapping->getSource())
       .arg(condition);
 }
 
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildRemove(MetaEntity mapping) {
+QString EntitySqlBuilder::buildRemove(MetaEntity::Ptr mapping) {
    return QString("DELETE FROM %1 WHERE %2=?")
-      .arg(mapping.source)
-      .arg(mapping.key.first);
+      .arg(mapping->getSource())
+      .arg(mapping->getKeyProperty());
 }
 
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildInsert(MetaEntity mapping, QStringList &properties) {
-   Q_ASSERT_X(!mapping.sequence.isEmpty(), "buildInsert", "actually inserting entities requires a sequence");
+QString EntitySqlBuilder::buildInsert(MetaEntity::Ptr mapping, QStringList &properties) {
+   Q_ASSERT_X(mapping->hasSequence(), "buildInsert", "actually inserting entities requires a sequence");
 
-   properties = mapping.propertyMapping.keys();
+   properties = mapping->getProperties();
 
    QStringList fields;
-   fields.append(mapping.key.second);
+   fields.append(mapping->getKeyDatabaseField());
    foreach(auto prop, properties)
-      fields.append(mapping.propertyMapping[prop].databaseName);
+      fields.append(mapping->getProperty(prop).databaseName);
 
    QStringList params;
    for(int i = 0; i < fields.size() - 1; i++)
@@ -78,24 +73,23 @@ QString EntitySqlBuilder::buildInsert(MetaEntity mapping, QStringList &propertie
 
    return QString("INSERT INTO %1 (%2) VALUES (gen_id(%3, 1), %4) RETURNING %5")
       .arg(
-         mapping.source,
+         mapping->getSource(),
          fields.join(","),
-         mapping.sequence,
+         mapping->getSequence(),
          params.join(","),
-         mapping.key.second);
+         mapping->getKeyDatabaseField());
 }
 
-//-----------------------------------------------------------------------------
-QString EntitySqlBuilder::buildUpdate(MetaEntity mapping, QStringList &properties) {
-   properties = mapping.propertyMapping.keys();
+QString EntitySqlBuilder::buildUpdate(MetaEntity::Ptr mapping, QStringList &properties) {
+   properties = mapping->getProperties();
 
    QStringList fields;
    foreach(auto prop, properties)
-      fields.append(QString("%1=?").arg(mapping.propertyMapping[prop].databaseName));
+      fields.append(QString("%1=?").arg(mapping->getProperty(prop).databaseName));
 
    return QString("UPDATE %1 SET %2 WHERE %3=?")
       .arg(
-         mapping.source,
+         mapping->getSource(),
          fields.join(","),
-         mapping.key.second);
+         mapping->getKeyDatabaseField());
 }
