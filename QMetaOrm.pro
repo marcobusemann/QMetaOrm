@@ -45,3 +45,4 @@ SOURCES += \
     src/metaentity.cpp \
     src/converter.cpp \
     src/converterstore.cpp \
+    src/entitymapper.cpp \

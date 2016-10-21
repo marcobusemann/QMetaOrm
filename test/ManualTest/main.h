@@ -88,7 +88,7 @@ signals:
 
 namespace QMetaOrm {
    namespace Mappings {
-      template <> MetaEntity mapping<Todo>();
+      template <> MetaEntity::Ptr mapping<Todo>();
    }
 }
 

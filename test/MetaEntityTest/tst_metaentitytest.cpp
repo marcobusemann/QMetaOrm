@@ -8,11 +8,6 @@ using namespace QMetaOrm;
 class DummyObject : public QObject
 {
     Q_OBJECT
-public:
-    DummyObject() {}
-    DummyObject(const DummyObject &) {}
-    DummyObject &operator=(const DummyObject &) { return *this; }
-    virtual ~DummyObject() {}
 };
 
 #define IDPROP "id"
@@ -31,32 +26,14 @@ private Q_SLOTS:
       */
     MetaEntity metaEntityFromKey(const QString &prop, const QString &field) {
         MetaEntity metaEntity;
-        metaEntity.key = qMakePair(prop, field);
+        metaEntity.setKey(prop, field);
         return metaEntity;
     }
 
-    DummyObject objectWithProperty(const QString &name, const QVariant &value) {
-        DummyObject o;
-        o.setProperty(name.toLocal8Bit(), value);
+    QSharedPointer<DummyObject> objectWithProperty(const QString &name, const QVariant &value) {
+        QSharedPointer<DummyObject> o(new DummyObject());
+        o->setProperty(name.toLocal8Bit(), value);
         return o;
-    }
-
-    /**
-     * isValid
-     */
-    void isValid_noKeyAndNoProperties_false() {
-        QCOMPARE(MetaEntity().isValid(), false);
-    }
-
-    void isValid_noKeyAndAProperty_true() {
-        MetaEntity e;
-        e.propertyMapping[IDPROP] = IDPROP;
-        QCOMPARE(e.isValid(), true);
-    }
-
-    void isValid_aKeyAndNoProperty_true() {
-        auto metaEntity = metaEntityFromKey(IDPROP, IDPROP);
-        QCOMPARE(metaEntity.isValid(), true);
     }
 
     /**

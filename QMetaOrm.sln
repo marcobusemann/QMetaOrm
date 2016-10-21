@@ -1,18 +1,25 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 14.00
-# Visual Studio 2015
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QMetaOrm", "QMetaOrm.vcxproj", "{6C16B459-7B49-3159-84CD-6BB2F2A1613C}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QMetaOrm", "QMetaOrm.vcxproj", "{92E5982F-5603-3B27-B3DF-19F755DF5DEE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6AC8BEE8-C801-434D-B763-26C0662D3D2E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ManualTest", "test\ManualTest\ManualTest.vcxproj", "{4932B659-D165-3C77-9D40-F75D6B8F9D3F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ManualTest", "test\ManualTest\ManualTest.vcxproj", "{2EE375EB-0A22-3E01-99AF-444301752446}"
 	ProjectSection(ProjectDependencies) = postProject
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C} = {6C16B459-7B49-3159-84CD-6BB2F2A1613C}
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE} = {92E5982F-5603-3B27-B3DF-19F755DF5DEE}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tst_metaentitytest", "test\MetaEntityTest\tst_metaentitytest.vcxproj", "{BCF984E5-B100-3109-9FFF-EAF7E65E08DD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tst_metaentitytest", "test\MetaEntityTest\tst_metaentitytest.vcxproj", "{D399AFE4-963A-34E3-9CEF-8D62166D3D57}"
 	ProjectSection(ProjectDependencies) = postProject
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C} = {6C16B459-7B49-3159-84CD-6BB2F2A1613C}
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE} = {92E5982F-5603-3B27-B3DF-19F755DF5DEE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tst_entitymappertest", "test\EntityMapperTest\tst_entitymappertest.vcxproj", "{D84F2178-3B72-382E-859E-03D2E31C0FC8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE} = {92E5982F-5603-3B27-B3DF-19F755DF5DEE}
 	EndProjectSection
 EndProject
 Global
@@ -21,24 +28,29 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C}.Debug|Win32.Build.0 = Debug|Win32
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C}.Release|Win32.ActiveCfg = Release|Win32
-		{6C16B459-7B49-3159-84CD-6BB2F2A1613C}.Release|Win32.Build.0 = Release|Win32
-		{4932B659-D165-3C77-9D40-F75D6B8F9D3F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4932B659-D165-3C77-9D40-F75D6B8F9D3F}.Debug|Win32.Build.0 = Debug|Win32
-		{4932B659-D165-3C77-9D40-F75D6B8F9D3F}.Release|Win32.ActiveCfg = Release|Win32
-		{4932B659-D165-3C77-9D40-F75D6B8F9D3F}.Release|Win32.Build.0 = Release|Win32
-		{BCF984E5-B100-3109-9FFF-EAF7E65E08DD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{BCF984E5-B100-3109-9FFF-EAF7E65E08DD}.Debug|Win32.Build.0 = Debug|Win32
-		{BCF984E5-B100-3109-9FFF-EAF7E65E08DD}.Release|Win32.ActiveCfg = Release|Win32
-		{BCF984E5-B100-3109-9FFF-EAF7E65E08DD}.Release|Win32.Build.0 = Release|Win32
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE}.Debug|Win32.Build.0 = Debug|Win32
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE}.Release|Win32.ActiveCfg = Release|Win32
+		{92E5982F-5603-3B27-B3DF-19F755DF5DEE}.Release|Win32.Build.0 = Release|Win32
+		{2EE375EB-0A22-3E01-99AF-444301752446}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2EE375EB-0A22-3E01-99AF-444301752446}.Debug|Win32.Build.0 = Debug|Win32
+		{2EE375EB-0A22-3E01-99AF-444301752446}.Release|Win32.ActiveCfg = Release|Win32
+		{2EE375EB-0A22-3E01-99AF-444301752446}.Release|Win32.Build.0 = Release|Win32
+		{D399AFE4-963A-34E3-9CEF-8D62166D3D57}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D399AFE4-963A-34E3-9CEF-8D62166D3D57}.Debug|Win32.Build.0 = Debug|Win32
+		{D399AFE4-963A-34E3-9CEF-8D62166D3D57}.Release|Win32.ActiveCfg = Release|Win32
+		{D399AFE4-963A-34E3-9CEF-8D62166D3D57}.Release|Win32.Build.0 = Release|Win32
+		{D84F2178-3B72-382E-859E-03D2E31C0FC8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D84F2178-3B72-382E-859E-03D2E31C0FC8}.Debug|Win32.Build.0 = Debug|Win32
+		{D84F2178-3B72-382E-859E-03D2E31C0FC8}.Release|Win32.ActiveCfg = Release|Win32
+		{D84F2178-3B72-382E-859E-03D2E31C0FC8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{4932B659-D165-3C77-9D40-F75D6B8F9D3F} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
-		{BCF984E5-B100-3109-9FFF-EAF7E65E08DD} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
+		{2EE375EB-0A22-3E01-99AF-444301752446} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
+		{D399AFE4-963A-34E3-9CEF-8D62166D3D57} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
+		{D84F2178-3B72-382E-859E-03D2E31C0FC8} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
 	EndGlobalSection
 EndGlobal
