@@ -1,80 +1,72 @@
 #include <QCoreApplication>
 #include "main.h"
 #include <QMetaOrm/metaentitybuilder.h>
+#include <QMetaOrm/databasefactory.h>
 
-#include <qtextcodec.h>
+const QString Person::p::id = "id";
+const QString Person::p::surname = "surname";
+const QString Person::p::lastname = "lastname";
+const QString Person::p::birthdate = "birthdate";
+const QString Person::p::address = "address";
 
-class Win1252Codec: public QTextCodec
-{
-public:
-   virtual QByteArray name() const {
-      return "WIN1252";
-   }
-
-   virtual int mibEnum() const {
-      return 2252;
-   }
-
-   virtual QList<QByteArray> aliases() const {
-      return QList<QByteArray>();
-   }
-
-protected:
-   virtual QByteArray convertFromUnicode(const QChar * input, int number, ConverterState * state) const {
-      auto codec = QTextCodec::codecForName("WINDOWS-1252");
-      return codec->fromUnicode(input, number, state);
-   }
-
-   virtual QString convertToUnicode(const char * chars, int len, ConverterState * state) const {
-      auto codec = QTextCodec::codecForName("WINDOWS-1252");
-      return codec->toUnicode(chars, len, state);
-   }
-};
+const QString Address::p::id = "id";
+const QString Address::p::country = "country";
+const QString Address::p::street = "street";
+const QString Address::p::plz = "plz";
 
 namespace QMetaOrm {
-   namespace Mappings {
-      template <> QMetaOrm::MetaEntity mapping<Todo>()
-      {
-         static const MetaEntity map = MetaEntityBuilder::anEntity()
-               .forSource("cal_todos")
-               .withSequence("cal_items_gen")
-               .withId(Todo::p::id, "id")
-               .withData(Todo::p::title, "title")
-               .withData(Todo::p::start, "todo_start")
-               .withData(Todo::p::end, "todo_due")
-               .build<Todo>();
-         return map;
-      }
-   }
+	namespace Mappings {
+		template <> QMetaOrm::MetaEntity::Ptr mapping<Address>() {
+			static const MetaEntity::Ptr map = MetaEntityBuilder::anEntity()
+				.forSource("address")
+				.withSequence("address_gen")
+				.withId(Address::p::id, "ID")
+				.withData(Address::p::country, "COUNTRY")
+				.withData(Address::p::street, "STREET")
+				.withData(Address::p::plz, "PLZ")
+				.build<Address>();
+			return map;
+		}
+	}
 }
 
-const QString Todo::p::id = "id";
-const QString Todo::p::title = "title";
-const QString Todo::p::start = "start";
-const QString Todo::p::end = "end";
-
-#include <QMetaOrm/databasefactory.h>
+namespace QMetaOrm {
+	namespace Mappings {
+		template <> QMetaOrm::MetaEntity::Ptr mapping<Person>() {
+			static const MetaEntity::Ptr map = MetaEntityBuilder::anEntity()
+				.forSource("person")
+				.withSequence("person_gen")
+				.withId(Person::p::id, "ID")
+				.withData(Person::p::surname, "SURNAME")
+				.withData(Person::p::lastname, "NAME")
+				.withData(Person::p::birthdate, "BIRTHDATE")
+				.withReference(Person::p::address, "id_address", mapping<Address>())
+				.withReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
+					return QVariant::fromValue(static_cast<Address::Ptr>(obj.objectCast<Address>()));
+				})
+				.build<Person>();
+			return map;
+		}
+	}
+}
 
 class MyDatabaseFactory: public QMetaOrm::DatabaseFactory {
 public:
     static QMetaOrm::DatabaseFactory::Ptr create() {
         return QMetaOrm::DatabaseFactory::Ptr(new MyDatabaseFactory());
     }
-
-    virtual QSqlDatabase createDatabase() const {
-        if (!QSqlDatabase::contains()) {
-            Win1252Codec codec;
-
-            QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE");
+	
+    virtual QSqlDatabase createDatabase(const QString &name = QString()) const {
+        if (!QSqlDatabase::contains(name)) {
+            QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE", name);
             db.setHostName("localhost");
-            db.setDatabaseName("D:\\Development\\TreesoftOffice\\Version_65_msvc2012\\Database\\Demo\\DATA1.FDB");
+            db.setDatabaseName("D:\\Development\\OrmExample\\Database\\test.fdb");
             db.setUserName("sysdba");
             db.setPassword("masterkey");
-            db.setConnectOptions("ISC_DPB_LC_CTYPE=WIN1252");
             return db;
         }
         else
-            return QSqlDatabase::database();
+            return QSqlDatabase::database(name);
     }
 };
 
@@ -84,18 +76,18 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+	qDebug() << QSqlDatabase::drivers();
+	qDebug() << QCoreApplication::libraryPaths();
+
     try {
        auto databaseFactory = MyDatabaseFactory::create();
-       auto sessionFactory = QMetaOrm::DefaultSessionFactory::create(databaseFactory);
-       TodoRepository repo(sessionFactory);
-       auto items = repo.find(TodoCriterionBuilder::aTodoWhere()
-          .titleEquals("Treesoft ERP:")
-          .idEquals(9391)
-          .build(), 0, 2);
+       auto sessionFactory = QMetaOrm::DefaultSessionFactory::factory(databaseFactory);
 
-       foreach(auto item, items) {
-          item.dump();
-       }
+	   auto session = sessionFactory->createSession();
+	   auto items = session->selectMany<Person>();
+
+	   for (auto item : items)
+		   item.dump();
     }
     catch (std::exception e) {
        qDebug() << e.what();
