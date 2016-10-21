@@ -9,6 +9,8 @@
 #include <qpair.h>
 #include <qlist.h>
 
+#include <functional>
+
 namespace QMetaOrm {
 
    /**
@@ -19,9 +21,14 @@ namespace QMetaOrm {
       QString propertyName;
       QString databaseName;
       QString converterName;
+      QSharedPointer<class MetaEntity> reference;
 
       bool hasConverter() const {
          return !converterName.isEmpty();
+      }
+
+      bool isReference() {
+         return reference != nullptr;
       }
    };
 
@@ -31,6 +38,7 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API MetaEntity
    {
    public:
+      typedef std::function<QVariant(const QSharedPointer<QObject> &)> ReferenceCaster;
       typedef QSharedPointer<MetaEntity> Ptr;
       static Ptr factory() {
          return Ptr(new MetaEntity());
@@ -39,7 +47,6 @@ namespace QMetaOrm {
    public:
       static const QList<QVariant::Type> SupportedKeyTypes;
 
-      MetaEntity() {}
       MetaEntity(const MetaEntity &rhs);
 
       void setSource(const QString &aSource);
@@ -58,6 +65,16 @@ namespace QMetaOrm {
       QList<QString> getProperties() const;
       const MetaProperty &getProperty(const QString &aProperty);
       void addProperty(const MetaProperty &prop);
+
+      QList<MetaProperty> getReferences() const;
+
+      QSharedPointer<QObject> createReferenceObject() const;
+
+      const QMetaObject &getMetaObject() const;
+      void setMetaObject(const QMetaObject &metaObject);
+
+      ReferenceCaster getReferenceCaster() const;
+      void setReferenceCaster(ReferenceCaster func);
 
       template <class T>
       bool hasValidKey(const T &item) const {
@@ -81,13 +98,23 @@ namespace QMetaOrm {
          item.setProperty(name.toStdString().c_str(), value);
       }
 
+      template <class T>
+      void setProperty(T *item, const QString &name, const QVariant &value) const {
+         item->setProperty(name.toStdString().c_str(), value);
+      }
+
       Ptr copy();
 
    private:
+      friend class MetaEntityBuilder;
+      MetaEntity() {}
+
       QString m_source;
       QString m_sequence;
       QPair<QString, QString> m_key;
       QHash<QString, MetaProperty> m_propertyMapping;
+      QMetaObject m_metaObject;
+      ReferenceCaster m_referenceCaster;
    };
 
    namespace Mappings {

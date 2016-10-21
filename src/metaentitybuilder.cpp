@@ -34,3 +34,19 @@ MetaEntityBuilder MetaEntityBuilder::withData(const QString &prop, const QString
    m_entity->addProperty(value);
    return *this;
 }
+
+MetaEntityBuilder MetaEntityBuilder::withReference(const QString & prop, const QString & field, MetaEntity::Ptr referenceEntity)
+{
+   MetaProperty value;
+   value.propertyName = prop;
+   value.databaseName = field;
+   value.reference = referenceEntity;
+   m_entity->addProperty(value);
+   return *this;
+}
+
+MetaEntityBuilder MetaEntityBuilder::withReferenceCaster(MetaEntity::ReferenceCaster func)
+{
+   m_entity->setReferenceCaster(func);
+   return *this;
+}

@@ -18,6 +18,8 @@ namespace QMetaOrm {
       MetaEntityBuilder withSequence(const QString &sequence);
       MetaEntityBuilder withId(const QString &prop, const QString &field);
       MetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
+      MetaEntityBuilder withReference(const QString &prop, const QString &field, MetaEntity::Ptr referenceEntity);
+      MetaEntityBuilder withReferenceCaster(MetaEntity::ReferenceCaster func);
 
       template <class T>
       MetaEntity::Ptr build() const {
@@ -29,7 +31,15 @@ namespace QMetaOrm {
 
          // TODO: Add futher property checks
 
-         return m_entity->copy();
+         if (m_entity->getReferenceCaster() == nullptr)
+            m_entity->setReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
+               return QVariant::fromValue(obj.objectCast<T>());
+            });
+
+         auto cpy = m_entity->copy();
+         cpy->setMetaObject(T::staticMetaObject);
+
+         return cpy;
       }
 
    private:

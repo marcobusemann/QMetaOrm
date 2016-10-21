@@ -1,4 +1,5 @@
 #include <QMetaOrm/metaentity.h>
+#include <QMetaOrm\exceptions.h>
 
 using namespace QMetaOrm;
 
@@ -24,6 +25,8 @@ MetaEntity::MetaEntity(const MetaEntity &rhs)
    m_sequence = rhs.m_sequence;
    m_key = rhs.m_key;
    m_propertyMapping = rhs.m_propertyMapping;
+   m_referenceCaster = rhs.m_referenceCaster;
+   m_metaObject = rhs.m_metaObject;
 }
 
 void MetaEntity::setSource(const QString & aSource)
@@ -89,4 +92,42 @@ const MetaProperty &MetaEntity::getProperty(const QString &aProperty)
 void MetaEntity::addProperty(const MetaProperty &prop)
 {
    m_propertyMapping[prop.propertyName] = prop;
+}
+
+QList<MetaProperty> MetaEntity::getReferences() const
+{
+   QList<MetaProperty> references;
+   for (auto prop : m_propertyMapping) {
+      if (prop.isReference())
+         references.append(prop);
+   }
+   return references;
+}
+
+QSharedPointer<QObject> QMetaOrm::MetaEntity::createReferenceObject() const
+{
+   auto newObject = getMetaObject().newInstance();
+   if (newObject == nullptr)
+      throw CreatingObjectByMetaObjectException(getMetaObject().className());
+   return QSharedPointer<QObject>(newObject);
+}
+
+const QMetaObject &MetaEntity::getMetaObject() const
+{
+   return m_metaObject;
+}
+
+void MetaEntity::setMetaObject(const QMetaObject &metaObject)
+{
+   m_metaObject = metaObject;
+}
+
+MetaEntity::ReferenceCaster MetaEntity::getReferenceCaster() const
+{
+   return m_referenceCaster;
+}
+
+void MetaEntity::setReferenceCaster(ReferenceCaster func)
+{
+   m_referenceCaster = func;
 }

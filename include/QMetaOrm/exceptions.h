@@ -58,4 +58,29 @@ namespace QMetaOrm {
    public:
       CouldNotExecuteQueryException(const QSqlError &error): QueryException(error){}
    };
+
+   /**
+   * @brief The CreatingObjectByMetaObjectException class
+   */
+   class CreatingObjectByMetaObjectException : public std::runtime_error
+   {
+   public:
+      CreatingObjectByMetaObjectException(const char *type) 
+         : std::runtime_error(QString("Creating an instance of %1 was not possible. We need a std ctor which is flagged with Q_INVOKABLE.").arg(type).toLocal8Bit()) 
+      {}
+   };
+
+   /**
+   * @brief The ConverterNotFoundException class
+   */
+   class ConverterNotFoundException : public std::runtime_error
+   {
+   public:
+      ConverterNotFoundException(const char *type)
+         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit())
+      {}
+      ConverterNotFoundException(const QString &type)
+         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit())
+      {}
+   };
 }

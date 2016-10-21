@@ -5,23 +5,204 @@
 
 using namespace QMetaOrm;
 
+QString EmbeddAlias(const QString &alias, const QString &field) {
+   return QString("%1.%2").arg(alias, field);
+}
+
+QStringList EmbeddAlias(const QString &alias, const QStringList &fields) {
+   QStringList result;
+   for (auto field : fields)
+      result.append(QString("%1.%2").arg(alias, field));
+   return result;
+}
+
+template<class T>
+QList<T> map(const QList<T> &container, std::function<T(const T&)> handler) {
+   QList<T> result;
+   for (auto field : container)
+      result.append(handler(field));
+   return result;
+}
+
+QStringList map(const QStringList &container, std::function<QString(const QString&)> handler) {
+   QStringList result;
+   for (auto field : container)
+      result.append(handler(field));
+   return result;
+}
+
+class SelectBuilder {
+public:
+   static SelectBuilder aStatementFor(const QString &table) {
+      return SelectBuilder(table);
+   }
+
+   SelectBuilder withFields(const QStringList &fields) {
+      auto alias = aliasFor(m_table);
+      m_fields.append(map(fields, [&](const QString &field) -> QString {
+         return QString("%1.%2 AS %2").arg(alias, field);
+      }));
+      return *this;
+   }
+
+   SelectBuilder withCondition(const QString &condition) {
+      m_condition = condition;
+      return *this;
+   }
+
+   SelectBuilder withParameter(const QString &field) {
+      auto alias = aliasFor(m_table);
+      m_condition = QString("%1=?").arg(EmbeddAlias(alias, field));
+      return *this;
+   }
+
+   SelectBuilder withJoin(const QString &table, const QString &tableField, const QString &referenceTable, const QString &referenceField, const QStringList &fields, const QString &fieldPrefix) {
+      auto alias = aliasFor(table);
+      auto aliasRef = aliasFor(referenceTable);
+      m_joins.append(QString("LEFT JOIN %1 %2 ON (%3 = %4)")
+         .arg(table)
+         .arg(alias)
+         .arg(EmbeddAlias(alias, tableField))
+         .arg(EmbeddAlias(aliasRef, referenceField)));
+      m_fields.append(map(fields, [&](const QString &field) -> QString {
+         return QString("%1 AS %2_%3")
+            .arg(EmbeddAlias(alias, field))
+            .arg(fieldPrefix)
+            .arg(field);
+      }));
+      return *this;
+   }
+
+   SelectBuilder withCriterion(MetaEntity::Ptr mapping, Criterion::Ptr criterion, QVariantList &conditions) {
+      QString condition;
+      if (!criterion) 
+         condition = "1=1";
+      else 
+         condition = criterion->stringify([](const Criterion *c, const QString &leftChild, const QString &rightChild) -> QString {
+            return QString("((%1) %2 (%3))")
+               .arg(leftChild)
+               .arg(c->combinationtype == Criterion::CombinationType::Leaf ? "" :
+                  c->combinationtype == Criterion::CombinationType::And ? " AND " :
+                  c->combinationtype == Criterion::CombinationType::Or ? " OR " : "")
+               .arg(rightChild);
+         }, [&conditions, &mapping, this](const ValueCriterion *c) -> QString {
+            conditions.append(c->value);
+            return QString("%1 %2 ?")
+               .arg(resolveRecursiveProperty(c->prop, mapping))
+               .arg(c->expressiontype == ValueCriterion::ExpressionType::Equals ? " = " : "");
+         }, [&conditions](const ListCriterion *c) -> QString {
+            conditions.append(c->values);
+            QStringList params;
+            for (int i = 0; i < c->values.size(); i++)
+               params << "?";
+
+            return QString(" %1 %2 %3 ")
+               .arg(c->prop)
+               .arg(c->expressiontype == ListCriterion::ExpressionType::In ? QString(" in (%1)").arg(params.join(",")) : "");
+         });
+      m_condition = condition;
+      return *this;
+   }
+
+   SelectBuilder skip(int skipCount) {
+      m_skip = skipCount;
+      return *this;
+   }
+
+   SelectBuilder startWith(int startWithIndex) {
+      m_first = startWithIndex;
+      return *this;
+   }
+
+   QString build() {
+      if (m_fields.isEmpty())
+         throw std::runtime_error("Building an select statement requires fields."); // TODO: Replace by custom exception
+
+      return QString("SELECT %1 %2 %3 FROM %4 %5 %6")
+         .arg(m_first >= 0 ? QString("FIRST %1").arg(m_first) : "")
+         .arg(m_skip >= 0 ? QString("SKIP %1").arg(m_skip) : "")
+         .arg(m_fields.join(", "))
+         .arg(QString("%1 %2").arg(m_table, aliasFor(m_table)))
+         .arg(m_joins.join(" "))
+         .arg(m_condition.isEmpty() ? "" : QString("WHERE %1").arg(m_condition))
+         ;
+   }
+
+private:
+   SelectBuilder(const QString &table)
+      : m_nextAliasNumber(0)
+      , m_table(table)
+      , m_first(-1)
+      , m_skip(-1)
+   {}
+
+   QString aliasFor(const QString &table) {
+      if (!m_aliasCache.contains(table))
+         m_aliasCache[table] = QString("a%1").arg(m_nextAliasNumber++);
+      return m_aliasCache[table];
+   }
+
+   QString resolveRecursiveProperty(const QString &prop, MetaEntity::Ptr entity) {
+      int index = prop.indexOf(".");
+      if (index == -1)
+         return EmbeddAlias(aliasFor(entity->getSource()), prop);
+      QString referenceProperty = prop.left(index);
+      auto referencePropertyEntity = entity->getProperty(referenceProperty);
+      if (!referencePropertyEntity.isReference()) {
+         qDebug() << "No reference! " << prop;
+         return prop;
+      }
+      return resolveRecursiveProperty(prop.mid(index + 1), referencePropertyEntity.reference);
+   }
+
+   QHash<QString, QString> m_aliasCache; // Key = Table-Name, Value = Alias
+   int m_nextAliasNumber;
+   QStringList m_fields;
+   QString m_table;
+   QString m_condition;
+   QStringList m_joins;
+   int m_first;
+   int m_skip;
+};
+
+SelectBuilder ConstructSelect(MetaEntity::Ptr mapping) {
+   auto references = mapping->getReferences();
+
+   auto builder = SelectBuilder::aStatementFor(mapping->getSource())
+      .withFields(mapping->getDatabaseFields());
+
+   for (int i = 0; i < references.size(); i++) {
+      auto refType = references[i].reference;
+
+      builder = builder
+         .withJoin(
+            refType->getSource(), 
+            refType->getKeyDatabaseField(), 
+            mapping->getSource(), 
+            references[i].databaseName, 
+            refType->getDatabaseFields(), 
+            references[i].databaseName);
+   }
+
+   return builder;
+}
+
 QString EntitySqlBuilder::buildSelect(MetaEntity::Ptr mapping) {
-   QStringList fields = mapping->getDatabaseFields();
-   return QString("SELECT %1 FROM %2 WHERE %3=?")
-      .arg(fields.join(","))
-      .arg(mapping->getSource())
-      .arg(mapping->getKeyDatabaseField());
+   
+   return ConstructSelect(mapping)
+      .withParameter(mapping->getKeyDatabaseField())
+      .build();
 }
 
 QString EntitySqlBuilder::buildCriterion(MetaEntity::Ptr mapping, Criterion::Ptr criterion, QVariantList &conditions) {
    if (!criterion) return "1=1";
    return criterion->stringify([](const Criterion *c, const QString &leftChild, const QString &rightChild) -> QString {
       return QString("((%1) %2 (%3))")
-      .arg(leftChild)
-      .arg(c->combinationtype == Criterion::CombinationType::Leaf ? "" :
-           c->combinationtype == Criterion::CombinationType::And ? " AND " :
-           c->combinationtype == Criterion::CombinationType::Or ? " OR " : "")
-      .arg(rightChild);
+               .arg(leftChild)
+               .arg(c->combinationtype == Criterion::CombinationType::Leaf ? "" :
+                    c->combinationtype == Criterion::CombinationType::And ? " AND " :
+                    c->combinationtype == Criterion::CombinationType::Or ? " OR " : "")
+               .arg(rightChild);
    }, [&conditions](const ValueCriterion *c) -> QString {
       conditions.append(c->value);
       return QString("%1 %2 ?")
@@ -34,21 +215,18 @@ QString EntitySqlBuilder::buildCriterion(MetaEntity::Ptr mapping, Criterion::Ptr
          params << "?";
 
       return QString(" %1 %2 %3 ")
-         .arg(c->prop)
-         .arg(c->expressiontype == ListCriterion::ExpressionType::In ? QString(" in (%1)").arg(params.join(",")) : "");
+               .arg(c->prop)
+               .arg(c->expressiontype == ListCriterion::ExpressionType::In ? QString(" in (%1)").arg(params.join(",")) : "");
    });
 }
 
 // TODO: - Cache build condition
 QString EntitySqlBuilder::buildSelectMany(MetaEntity::Ptr mapping, Criterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions) {
-   QString condition = buildCriterion(mapping, criterion, conditions);
-   QStringList fields = mapping->getDatabaseFields();
-   return QString("SELECT %1 %2 %3 FROM %4 WHERE %5")
-      .arg(pageSize >= 0 ? QString("FIRST %1").arg(pageSize) : "")
-      .arg(skip >= 0 ? QString("SKIP %1").arg(skip) : "")
-      .arg(fields.join(","))
-      .arg(mapping->getSource())
-      .arg(condition);
+   return ConstructSelect(mapping)
+      .startWith(pageSize)
+      .skip(skip)
+      .withCriterion(mapping, criterion, conditions)
+      .build();
 }
 
 QString EntitySqlBuilder::buildRemove(MetaEntity::Ptr mapping) {
