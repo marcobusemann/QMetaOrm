@@ -66,7 +66,7 @@ namespace QMetaOrm {
    {
    public:
       CreatingObjectByMetaObjectException(const char *type) 
-         : std::runtime_error(QString("Creating an instance of %1 was not possible. We need a std ctor which is flagged with Q_INVOKABLE.").arg(type).toLocal8Bit()) 
+         : std::runtime_error(QString("Creating an instance of %1 was not possible. We need a std ctor.").arg(type).toLocal8Bit()) 
       {}
    };
 
