@@ -15,4 +15,5 @@ build
 /**/*.vcxproj.user
 /**/*.opensdf
 /**/*.VC.db
+/**/*.VC.VC.opendb
 .vs
