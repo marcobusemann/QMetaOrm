@@ -83,8 +83,16 @@ namespace QMetaOrm {
          }
       }
 
-      QVariant createReference(const MetaEntity::Ptr &mapping, ConverterStore::Ptr converterStore, std::function<QVariant(const QString &)> getRecord) {
-         auto newObject = mapping->createReferenceObject();
+	  bool isValidObject(const MetaEntity::Ptr &mapping, PropertyPrefixer::Handler getRecord) {
+		  QVariant key = getRecord(mapping->getKeyDatabaseField());
+		  return key.isValid() && !key.isNull();
+	  }
+
+      QVariant createReference(const MetaEntity::Ptr &mapping, ConverterStore::Ptr converterStore, PropertyPrefixer::Handler getRecord) {
+		 if (!isValidObject(mapping, getRecord))
+			return QVariant();
+
+		 auto newObject = mapping->createReferenceObject();
          if (newObject == nullptr)
             return QVariant();
          mapToEntity(mapping, converterStore, getRecord, [&newObject](const QString &prop, const QVariant &value) {

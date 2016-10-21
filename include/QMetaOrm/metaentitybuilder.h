@@ -31,15 +31,16 @@ namespace QMetaOrm {
 
          // TODO: Add futher property checks
 
+		 m_entity->setObjectConstructor([]() -> QObject* {
+			 return new T();
+		 });
+
          if (m_entity->getReferenceCaster() == nullptr)
             m_entity->setReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
                return QVariant::fromValue(obj.objectCast<T>());
             });
 
-         auto cpy = m_entity->copy();
-         cpy->setMetaObject(T::staticMetaObject);
-
-         return cpy;
+         return m_entity->copy();
       }
 
    private:

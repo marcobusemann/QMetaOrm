@@ -39,6 +39,7 @@ namespace QMetaOrm {
    {
    public:
       typedef std::function<QVariant(const QSharedPointer<QObject> &)> ReferenceCaster;
+	  typedef std::function<QObject*()> ObjectConstructor;
       typedef QSharedPointer<MetaEntity> Ptr;
       static Ptr factory() {
          return Ptr(new MetaEntity());
@@ -70,11 +71,11 @@ namespace QMetaOrm {
 
       QSharedPointer<QObject> createReferenceObject() const;
 
-      const QMetaObject &getMetaObject() const;
-      void setMetaObject(const QMetaObject &metaObject);
-
       ReferenceCaster getReferenceCaster() const;
       void setReferenceCaster(ReferenceCaster func);
+
+	  ObjectConstructor getObjectConstructor() const;
+	  void setObjectConstructor(ObjectConstructor constructor);
 
       template <class T>
       bool hasValidKey(const T &item) const {
@@ -113,7 +114,7 @@ namespace QMetaOrm {
       QString m_sequence;
       QPair<QString, QString> m_key;
       QHash<QString, MetaProperty> m_propertyMapping;
-      QMetaObject m_metaObject;
+	  ObjectConstructor m_objectConstructor;
       ReferenceCaster m_referenceCaster;
    };
 

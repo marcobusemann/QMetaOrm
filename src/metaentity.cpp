@@ -26,7 +26,7 @@ MetaEntity::MetaEntity(const MetaEntity &rhs)
    m_key = rhs.m_key;
    m_propertyMapping = rhs.m_propertyMapping;
    m_referenceCaster = rhs.m_referenceCaster;
-   m_metaObject = rhs.m_metaObject;
+   m_objectConstructor = rhs.m_objectConstructor;
 }
 
 void MetaEntity::setSource(const QString & aSource)
@@ -106,20 +106,10 @@ QList<MetaProperty> MetaEntity::getReferences() const
 
 QSharedPointer<QObject> QMetaOrm::MetaEntity::createReferenceObject() const
 {
-   auto newObject = getMetaObject().newInstance();
+   auto newObject = m_objectConstructor();
    if (newObject == nullptr)
-      throw CreatingObjectByMetaObjectException(getMetaObject().className());
+      throw CreatingObjectByMetaObjectException(m_source.toLocal8Bit());
    return QSharedPointer<QObject>(newObject);
-}
-
-const QMetaObject &MetaEntity::getMetaObject() const
-{
-   return m_metaObject;
-}
-
-void MetaEntity::setMetaObject(const QMetaObject &metaObject)
-{
-   m_metaObject = metaObject;
 }
 
 MetaEntity::ReferenceCaster MetaEntity::getReferenceCaster() const
@@ -130,4 +120,14 @@ MetaEntity::ReferenceCaster MetaEntity::getReferenceCaster() const
 void MetaEntity::setReferenceCaster(ReferenceCaster func)
 {
    m_referenceCaster = func;
+}
+
+MetaEntity::ObjectConstructor MetaEntity::getObjectConstructor() const
+{
+	return m_objectConstructor;
+}
+
+void MetaEntity::setObjectConstructor(ObjectConstructor constructor)
+{
+	m_objectConstructor = constructor;
 }
