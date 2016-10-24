@@ -5,6 +5,12 @@ using namespace QMetaOrm;
 
 const QList<QVariant::Type> MetaEntity::SupportedKeyTypes = (QList<QVariant::Type>() << QVariant::Int << QVariant::LongLong << QVariant::String);
 
+struct MetaEntityBasicMetaTypeRegistration {
+   MetaEntityBasicMetaTypeRegistration() {
+      qRegisterMetaType<QSharedPointer<QObject>>();
+   }
+} metaEntityBasicMetaTypeRegistration;
+
 QStringList MetaEntity::getDatabaseFields() const
 {
    QStringList result;
@@ -25,9 +31,7 @@ MetaEntity::MetaEntity(const MetaEntity &rhs)
    m_sequence = rhs.m_sequence;
    m_key = rhs.m_key;
    m_propertyMapping = rhs.m_propertyMapping;
-   m_referenceCaster = rhs.m_referenceCaster;
-   m_objectConstructor = rhs.m_objectConstructor;
-   m_variantToReferenceCaster = rhs.m_variantToReferenceCaster;
+   m_entityFactory = rhs.m_entityFactory;
 }
 
 void MetaEntity::setSource(const QString & aSource)
@@ -105,40 +109,12 @@ QList<MetaProperty> MetaEntity::getReferences() const
    return references;
 }
 
-QSharedPointer<QObject> QMetaOrm::MetaEntity::createReferenceObject() const
+EntityFactory::Ptr MetaEntity::getEntityFactory() const
 {
-   auto newObject = m_objectConstructor();
-   if (newObject == nullptr)
-      throw CreatingObjectByMetaObjectException(m_source.toLocal8Bit());
-   return QSharedPointer<QObject>(newObject);
+   return m_entityFactory;
 }
 
-MetaEntity::ReferenceCaster MetaEntity::getReferenceCaster() const
+void MetaEntity::setEntityFactory(const EntityFactory::Ptr &entityFactory)
 {
-   return m_referenceCaster;
-}
-
-void MetaEntity::setReferenceCaster(ReferenceCaster func)
-{
-   m_referenceCaster = func;
-}
-
-MetaEntity::VariantToReferenceCaster MetaEntity::getVariantToReferenceCaster() const
-{
-   return m_variantToReferenceCaster;
-}
-
-void MetaEntity::setVariantToReferenceCaster(VariantToReferenceCaster func)
-{
-   m_variantToReferenceCaster = func;
-}
-
-MetaEntity::ObjectConstructor MetaEntity::getObjectConstructor() const
-{
-	return m_objectConstructor;
-}
-
-void MetaEntity::setObjectConstructor(ObjectConstructor constructor)
-{
-	m_objectConstructor = constructor;
+   m_entityFactory = entityFactory;
 }

@@ -21,7 +21,8 @@ namespace QMetaOrm {
       MetaEntityBuilder withId(const QString &prop, const QString &field);
       MetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
       MetaEntityBuilder withReference(const QString &prop, const QString &field, MetaEntity::Ptr referenceEntity);
-      MetaEntityBuilder withReferenceCaster(MetaEntity::ReferenceCaster func);
+      MetaEntityBuilder withEntityFactory(const EntityFactory::Ptr &entityFactory);
+      MetaEntityBuilder withEmbeddedPtrNamingScheme();
 
       template <class T>
       MetaEntity::Ptr build() const {
@@ -32,7 +33,7 @@ namespace QMetaOrm {
          Q_ASSERT_X(MetaEntity::SupportedKeyTypes.contains(keyType), "build", "actually only int, long or string key types are allowed!");
 
          // TODO: Add futher property checks
-
+         /*
          m_entity->setObjectConstructor([]() -> QObject* {
             return new T();
          });
@@ -44,12 +45,16 @@ namespace QMetaOrm {
          if (m_entity->getVariantToReferenceCaster() == nullptr)
             m_entity->setVariantToReferenceCaster([](const QVariant &value) -> QSharedPointer<QObject> {
             QSharedPointer<QObject> result;
-            qDebug() << value.userType();
             result = *reinterpret_cast<const T::Ptr *>(value.constData());
             if (result == nullptr)
                result = *reinterpret_cast<const QSharedPointer<T> *>(value.constData());
             return result;
          });
+         */
+         if (m_useEmbeddedPtrEntityFactoryNamingScheme)
+            m_entity->setEntityFactory(EmbeddedPtrNamingSchemeEntityFactory<T>::factory());
+         else if (m_entity->getEntityFactory() == nullptr)
+            m_entity->setEntityFactory(DefaultEntityFactory<T>::factory());
 
          qRegisterMetaType<QSharedPointer<T>>();
          qRegisterMetaType<T::Ptr>();
@@ -69,5 +74,6 @@ namespace QMetaOrm {
       }
 
       MetaEntity::Ptr m_entity;
+      bool m_useEmbeddedPtrEntityFactoryNamingScheme;
    };
 }

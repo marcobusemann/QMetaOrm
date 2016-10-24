@@ -35,10 +35,19 @@ namespace QMetaOrm {
       template <class T>
       QSharedPointer<T> mapToEntity(MetaEntity::Ptr mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
          QSharedPointer<T> result(new T());
-         mapToEntity(mapping, converterStore, m_prefixer.getRecordValuePrefixer(record), [&](const QString &prop, const QVariant &value) {
-            result->setProperty(prop.toStdString().c_str(), value);
-         });
+         mapToEntity(mapping, converterStore, m_prefixer.getRecordValuePrefixer(record), applyTo(result.objectCast<QObject>()));
          return result;
+      }
+
+      ApplyHandler applyTo(QSharedPointer<QObject> &obj) {
+         return [&](const QString &prop, const QVariant &value) {
+            if (!obj->setProperty(prop.toStdString().c_str(), value)) {
+               if (value.isValid()) {
+                  qWarning() << "Could not apply " << value << " to " << prop;
+                  qWarning() << "\tNote that the variants type and the type used in Q_PROPERTY must match exactly!";
+               }
+            }
+         };
       }
 
       void mapToEntity(
@@ -92,14 +101,12 @@ namespace QMetaOrm {
          if (!isValidObject(mapping, getRecord))
             return QVariant();
 
-         auto newObject = mapping->createReferenceObject();
-         if (newObject == nullptr)
-            return QVariant();
-         mapToEntity(mapping, converterStore, getRecord, [&newObject](const QString &prop, const QVariant &value) {
-            newObject->setProperty(prop.toStdString().c_str(), value);
-         });
-         auto refCaster = mapping->getReferenceCaster();
-         return refCaster == nullptr ? QVariant() : refCaster(newObject); // TODO: proper error handling
+         auto entityFactory = mapping->getEntityFactory();
+         auto entity = entityFactory->construct();
+
+         mapToEntity(mapping, converterStore, getRecord, applyTo(entity));
+
+         return entityFactory->pack(entity);
       }
 
       QVariant applyConverter(const QString &converterName, const QVariant &value, const ConverterStore::Ptr &store) {
@@ -113,5 +120,3 @@ namespace QMetaOrm {
       PropertyPrefixer m_prefixer;
    };
 }
-
-Q_DECLARE_METATYPE(QSharedPointer<QObject>);

@@ -8,6 +8,7 @@ MetaEntityBuilder MetaEntityBuilder::anEntity() {
 
 MetaEntityBuilder::MetaEntityBuilder()
    : m_entity(MetaEntity::factory())
+   , m_useEmbeddedPtrEntityFactoryNamingScheme(false)
 {
 }
 
@@ -45,8 +46,14 @@ MetaEntityBuilder MetaEntityBuilder::withReference(const QString & prop, const Q
    return *this;
 }
 
-MetaEntityBuilder MetaEntityBuilder::withReferenceCaster(MetaEntity::ReferenceCaster func)
+MetaEntityBuilder MetaEntityBuilder::withEntityFactory(const EntityFactory::Ptr &entityFactory)
 {
-   m_entity->setReferenceCaster(func);
+   m_entity->setEntityFactory(entityFactory);
+   return *this;
+}
+
+MetaEntityBuilder MetaEntityBuilder::withEmbeddedPtrNamingScheme()
+{
+   m_useEmbeddedPtrEntityFactoryNamingScheme = true;
    return *this;
 }

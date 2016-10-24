@@ -14,10 +14,63 @@
 
 namespace QMetaOrm {
 
+   class EntityFactory {
+   public:
+      typedef QSharedPointer<EntityFactory> Ptr;
+
+   public:
+      virtual ~EntityFactory() {}
+      virtual QSharedPointer<QObject> construct() const = 0;
+      virtual QVariant pack(const QSharedPointer<QObject> &entity) const = 0;
+      virtual QSharedPointer<QObject> unpack(const QVariant &value) const = 0;
+   };
+
+   template <class T>
+   class DefaultEntityFactory : public EntityFactory {
+   public:
+      static EntityFactory::Ptr factory() {
+         return EntityFactory::Ptr(new DefaultEntityFactory());
+      }
+
+   public:
+      virtual QSharedPointer<QObject> construct() const override {
+         return QSharedPointer<T>(new T());
+      }
+
+      virtual QVariant pack(const QSharedPointer<QObject> &entity) const override {
+         return QVariant::fromValue(entity);
+      }
+
+      virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
+         return packetValue.value<QSharedPointer<QObject>>();
+      }
+   };
+
+   template <class T>
+   class EmbeddedPtrNamingSchemeEntityFactory : public EntityFactory {
+   public:
+      static EntityFactory::Ptr factory() {
+         return EntityFactory::Ptr(new EmbeddedPtrNamingSchemeEntityFactory());
+      }
+
+   public:
+      virtual QSharedPointer<QObject> construct() const override {
+         return T::Ptr(new T());
+      }
+
+      virtual QVariant pack(const QSharedPointer<QObject> &entity) const override {
+         return QVariant::fromValue(static_cast<T::Ptr>(entity.objectCast<T>()));
+      }
+
+      virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
+         return *reinterpret_cast<const T::Ptr *>(packetValue.constData());
+      }
+   };
+
    /**
    * @brief The MetaProperty struct
    */
-   struct MetaProperty 
+   struct MetaProperty
    {
       QString propertyName;
       QString databaseName;
@@ -40,8 +93,8 @@ namespace QMetaOrm {
    {
    public:
       typedef std::function<QVariant(const QSharedPointer<QObject> &)> ReferenceCaster;
-      typedef std::function<QSharedPointer<QObject> (const QVariant &)> VariantToReferenceCaster;
-	  typedef std::function<QObject*()> ObjectConstructor;
+      typedef std::function<QSharedPointer<QObject>(const QVariant &)> VariantToReferenceCaster;
+      typedef std::function<QObject*()> ObjectConstructor;
       typedef QSharedPointer<MetaEntity> Ptr;
       static Ptr factory() {
          return Ptr(new MetaEntity());
@@ -71,16 +124,8 @@ namespace QMetaOrm {
 
       QList<MetaProperty> getReferences() const;
 
-      QSharedPointer<QObject> createReferenceObject() const;
-
-      ReferenceCaster getReferenceCaster() const;
-      void setReferenceCaster(ReferenceCaster func);
-
-      VariantToReferenceCaster getVariantToReferenceCaster() const;
-      void setVariantToReferenceCaster(VariantToReferenceCaster func);
-      
-      ObjectConstructor getObjectConstructor() const;
-	  void setObjectConstructor(ObjectConstructor constructor);
+      EntityFactory::Ptr getEntityFactory() const;
+      void setEntityFactory(const EntityFactory::Ptr &entityFactory);
 
       template <class T>
       bool hasValidKey(const QSharedPointer<T> &item) const {
@@ -88,15 +133,15 @@ namespace QMetaOrm {
          if (!keyValue.isValid()) return false;
          return
             keyValue.type() == QVariant::Int ? keyValue.toInt() > 0 :
-            keyValue.type() == QVariant::LongLong ? keyValue.toLongLong() > 0 :
-            keyValue.type() == QVariant::String ? !keyValue.toString().isEmpty() : false;
+         keyValue.type() == QVariant::LongLong ? keyValue.toLongLong() > 0 :
+         keyValue.type() == QVariant::String ? !keyValue.toString().isEmpty() : false;
       }
 
       QStringList getDatabaseFields() const;
 
       template <class T>
       QVariant getProperty(const QSharedPointer<T> &item, const QString &name) const {
-         return item->property(name.toStdString().c_str());
+         return item == nullptr ? QVariant() : item->property(name.toStdString().c_str());
       }
 
       template <class T>
@@ -105,14 +150,9 @@ namespace QMetaOrm {
          QVariant result;
          if (propMeta.isReference())
          {
-            if (m_variantToReferenceCaster == nullptr)
-               result = QVariant();
-            else {
-               auto refItemVariant = getProperty(item, prop);
-               auto refItem = m_variantToReferenceCaster(refItemVariant);
-               auto keyProperty = propMeta.reference->getKeyProperty();
-               result = refItem == nullptr ? QVariant() : refItem->property(keyProperty.toStdString().c_str());
-            }
+            auto referencedItem = m_entityFactory->unpack(getProperty(item, prop));
+            auto keyProperty = propMeta.reference->getKeyProperty();
+            result = getProperty(referencedItem, keyProperty);
          }
          else
             result = getProperty(item, prop);
@@ -141,15 +181,15 @@ namespace QMetaOrm {
 
    private:
       friend class MetaEntityBuilder;
-      MetaEntity() {}
+      MetaEntity() {
+      }
 
       QString m_source;
       QString m_sequence;
       QPair<QString, QString> m_key;
       QHash<QString, MetaProperty> m_propertyMapping;
-	  ObjectConstructor m_objectConstructor;
-      ReferenceCaster m_referenceCaster;
-      VariantToReferenceCaster m_variantToReferenceCaster;
+
+      EntityFactory::Ptr m_entityFactory;
    };
 
    namespace Mappings {
@@ -157,3 +197,4 @@ namespace QMetaOrm {
    }
 }
 
+Q_DECLARE_METATYPE(QSharedPointer<QObject>)
