@@ -24,7 +24,7 @@ public:
 namespace QMetaOrm {
 
    /**
-     * 
+     *
      */
    class QMETAORM_LIBRARY_API EntityMapper {
    public:
@@ -52,7 +52,7 @@ namespace QMetaOrm {
       }
 
       void mapKeyToEntity(
-         const MetaEntity::Ptr &mapping, 
+         const MetaEntity::Ptr &mapping,
          PropertyPrefixer::Handler getRecord,
          ApplyHandler applyHandler) {
 
@@ -83,16 +83,16 @@ namespace QMetaOrm {
          }
       }
 
-	  bool isValidObject(const MetaEntity::Ptr &mapping, PropertyPrefixer::Handler getRecord) {
-		  QVariant key = getRecord(mapping->getKeyDatabaseField());
-		  return key.isValid() && !key.isNull();
-	  }
+      bool isValidObject(const MetaEntity::Ptr &mapping, PropertyPrefixer::Handler getRecord) {
+         QVariant key = getRecord(mapping->getKeyDatabaseField());
+         return key.isValid() && !key.isNull();
+      }
 
       QVariant createReference(const MetaEntity::Ptr &mapping, ConverterStore::Ptr converterStore, PropertyPrefixer::Handler getRecord) {
-		 if (!isValidObject(mapping, getRecord))
-			return QVariant();
+         if (!isValidObject(mapping, getRecord))
+            return QVariant();
 
-		 auto newObject = mapping->createReferenceObject();
+         auto newObject = mapping->createReferenceObject();
          if (newObject == nullptr)
             return QVariant();
          mapToEntity(mapping, converterStore, getRecord, [&newObject](const QString &prop, const QVariant &value) {
