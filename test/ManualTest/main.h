@@ -32,7 +32,7 @@ public:
 	typedef QSharedPointer<Address> Ptr;
 
 public:
-	Q_INVOKABLE Address() : m_id(0) {}
+	Address() : m_id(0) {}
 	Address(const Address &rhs)
 		: m_id(rhs.m_id)
 		, m_country(rhs.m_country)

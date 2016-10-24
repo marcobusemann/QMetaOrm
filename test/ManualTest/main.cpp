@@ -24,6 +24,7 @@ namespace QMetaOrm {
 				.withData(Address::p::country, "COUNTRY")
 				.withData(Address::p::street, "STREET")
 				.withData(Address::p::plz, "PLZ")
+				.withEmbeddedPtrNamingScheme()
 				.build<Address>();
 			return map;
 		}
@@ -41,9 +42,7 @@ namespace QMetaOrm {
 				.withData(Person::p::lastname, "NAME")
 				.withData(Person::p::birthdate, "BIRTHDATE")
 				.withReference(Person::p::address, "id_address", mapping<Address>())
-				.withReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
-					return QVariant::fromValue(static_cast<Address::Ptr>(obj.objectCast<Address>()));
-				})
+				.withEmbeddedPtrNamingScheme()
 				.build<Person>();
 			return map;
 		}
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
 	   auto items = session->selectMany<Person>();
 
 	   for (auto item : items)
-		   item.dump();
+		   item->dump();
     }
     catch (std::exception e) {
        qDebug() << e.what();

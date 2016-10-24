@@ -137,10 +137,10 @@ namespace QMetaOrm {
    template <class T>
    QList<QSharedPointer<T>> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
       QList<QSharedPointer<T>> result;
-      std::function<void(T)> func = [&result](const QSharedPointer<T> &item) -> void {
+      auto func = [&result](const QSharedPointer<T> &item) -> void {
          result.append(item);
       };
-      selectManyByCallback(criterion, func, skip, pageSize, mapping);
+      selectManyByCallback<T>(criterion, func, skip, pageSize, mapping);
       return result;
    }
 
