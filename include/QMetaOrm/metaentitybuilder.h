@@ -33,26 +33,27 @@ namespace QMetaOrm {
 
          // TODO: Add futher property checks
 
-		 m_entity->setObjectConstructor([]() -> QObject* {
-			 return new T();
-		 });
+         m_entity->setObjectConstructor([]() -> QObject* {
+            return new T();
+         });
 
          if (m_entity->getReferenceCaster() == nullptr)
             m_entity->setReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
-               return QVariant::fromValue(obj.objectCast<T>());
-            });
+            return QVariant::fromValue(obj.objectCast<T>());
+         });
          if (m_entity->getVariantToReferenceCaster() == nullptr)
             m_entity->setVariantToReferenceCaster([](const QVariant &value) -> QSharedPointer<QObject> {
-               QSharedPointer<QObject> result;
-               qDebug() << value.userType();
-               result = *reinterpret_cast<const T::Ptr *>(value.constData());
-               if (result == nullptr)
-                  result = *reinterpret_cast<const QSharedPointer<T> *>(value.constData());
-               return result;
-            });
+            QSharedPointer<QObject> result;
+            qDebug() << value.userType();
+            result = *reinterpret_cast<const T::Ptr *>(value.constData());
+            if (result == nullptr)
+               result = *reinterpret_cast<const QSharedPointer<T> *>(value.constData());
+            return result;
+         });
 
-         qDebug() << m_entity->getSource() << "T::Ptr" << qRegisterMetaType<T::Ptr>();
-         qDebug() << m_entity->getSource() << "T" << qRegisterMetaType<T>();
+         qRegisterMetaType<QSharedPointer<T>>();
+         qRegisterMetaType<T::Ptr>();
+         qRegisterMetaType<T>();
 
          return m_entity->copy();
       }

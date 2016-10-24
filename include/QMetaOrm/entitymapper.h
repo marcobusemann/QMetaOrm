@@ -33,10 +33,10 @@ namespace QMetaOrm {
 
    public:
       template <class T>
-      T mapToEntity(MetaEntity::Ptr mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
-         T result;
-         mapToEntity(mapping, converterStore, m_prefixer.getRecordValuePrefixer(record), [&result](const QString &prop, const QVariant &value) {
-            result.setProperty(prop.toStdString().c_str(), value);
+      QSharedPointer<T> mapToEntity(MetaEntity::Ptr mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
+         QSharedPointer<T> result(new T());
+         mapToEntity(mapping, converterStore, m_prefixer.getRecordValuePrefixer(record), [&](const QString &prop, const QVariant &value) {
+            result->setProperty(prop.toStdString().c_str(), value);
          });
          return result;
       }

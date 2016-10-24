@@ -83,7 +83,7 @@ namespace QMetaOrm {
 	  void setObjectConstructor(ObjectConstructor constructor);
 
       template <class T>
-      bool hasValidKey(const T &item) const {
+      bool hasValidKey(const QSharedPointer<T> &item) const {
          auto keyValue = getProperty(item, getKeyProperty());
          if (!keyValue.isValid()) return false;
          return
@@ -95,12 +95,12 @@ namespace QMetaOrm {
       QStringList getDatabaseFields() const;
 
       template <class T>
-      QVariant getProperty(const T &item, const QString &name) const {
-         return item.property(name.toStdString().c_str());
+      QVariant getProperty(const QSharedPointer<T> &item, const QString &name) const {
+         return item->property(name.toStdString().c_str());
       }
 
       template <class T>
-      QVariant getFlatPropertyValue(const T &item, const QString &prop, ConverterStore::Ptr converterStore) const {
+      QVariant getFlatPropertyValue(const QSharedPointer<T> &item, const QString &prop, ConverterStore::Ptr converterStore) const {
          auto propMeta = m_propertyMapping[prop];
          QVariant result;
          if (propMeta.isReference())
@@ -128,8 +128,8 @@ namespace QMetaOrm {
       }
 
       template <class T>
-      void setProperty(T &item, const QString &name, const QVariant &value) const {
-         item.setProperty(name.toStdString().c_str(), value);
+      void setProperty(QSharedPointer<T> &item, const QString &name, const QVariant &value) const {
+         item->setProperty(name.toStdString().c_str(), value);
       }
 
       template <class T>

@@ -34,19 +34,19 @@ namespace QMetaOrm {
       virtual ~Session();
 
       template <class T>
-      T save(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void save(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      void remove(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void remove(const QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T, typename Key>
-      T selectOne(Key key, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      QSharedPointer<T> selectOne(Key key, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      QList<T> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      QList<QSharedPointer<T>> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(const QSharedPointer<T>&)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       /*
       template <class T>
@@ -68,10 +68,10 @@ namespace QMetaOrm {
    private:
 
       template <class T>
-      T create(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void create(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      T update(T entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void update(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       void setupSession();
 
@@ -83,7 +83,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::save(T entity, MetaEntity::Ptr mapping) {
+   void Session::save(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
       setupSession();
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
       if (mapping->hasValidKey(entity))
@@ -94,7 +94,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   void Session::remove(T entity, MetaEntity::Ptr mapping) {
+   void Session::remove(const QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -113,7 +113,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T, typename Key>
-   T Session::selectOne(Key key, MetaEntity::Ptr mapping) {
+   QSharedPointer<T> Session::selectOne(Key key, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -130,14 +130,14 @@ namespace QMetaOrm {
 
       return query.next() ?
          m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore) :
-         T();
+         QSharedPointer<T>();
    }
 
    //-----------------------------------------------------------------------------
    template <class T>
-   QList<T> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
-      QList<T> result;
-      std::function<void(T)> func = [&result](T item) -> void {
+   QList<QSharedPointer<T>> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
+      QList<QSharedPointer<T>> result;
+      std::function<void(T)> func = [&result](const QSharedPointer<T> &item) -> void {
          result.append(item);
       };
       selectManyByCallback(criterion, func, skip, pageSize, mapping);
@@ -146,7 +146,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(T)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
+   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(const QSharedPointer<T>&)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -170,7 +170,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::create(T entity, MetaEntity::Ptr mapping) {
+   void Session::create(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -178,7 +178,6 @@ namespace QMetaOrm {
       QSqlQuery query(m_database);
 
       QStringList properties;
-      qDebug() << m_entitySqlBuilder->buildInsert(mapping, properties);
       if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
          throw CouldNotPrepareQueryException(query.lastError());
 
@@ -188,17 +187,13 @@ namespace QMetaOrm {
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
 
-      if (query.first()) {
+      if (query.first())
          mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));
-         qDebug() << query.value(0);
-      }
-
-      return entity;
    }
 
    //-----------------------------------------------------------------------------
    template <class T>
-   T Session::update(T entity, MetaEntity::Ptr mapping) {
+   void Session::update(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -216,8 +211,6 @@ namespace QMetaOrm {
 
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
-
-      return entity;
    }
    /*
    //-----------------------------------------------------------------------------
