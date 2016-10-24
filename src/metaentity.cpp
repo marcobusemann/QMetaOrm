@@ -27,6 +27,7 @@ MetaEntity::MetaEntity(const MetaEntity &rhs)
    m_propertyMapping = rhs.m_propertyMapping;
    m_referenceCaster = rhs.m_referenceCaster;
    m_objectConstructor = rhs.m_objectConstructor;
+   m_variantToReferenceCaster = rhs.m_variantToReferenceCaster;
 }
 
 void MetaEntity::setSource(const QString & aSource)
@@ -120,6 +121,16 @@ MetaEntity::ReferenceCaster MetaEntity::getReferenceCaster() const
 void MetaEntity::setReferenceCaster(ReferenceCaster func)
 {
    m_referenceCaster = func;
+}
+
+MetaEntity::VariantToReferenceCaster MetaEntity::getVariantToReferenceCaster() const
+{
+   return m_variantToReferenceCaster;
+}
+
+void MetaEntity::setVariantToReferenceCaster(VariantToReferenceCaster func)
+{
+   m_variantToReferenceCaster = func;
 }
 
 MetaEntity::ObjectConstructor MetaEntity::getObjectConstructor() const

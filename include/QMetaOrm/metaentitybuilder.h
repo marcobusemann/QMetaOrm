@@ -3,6 +3,8 @@
 #include <QMetaOrm/private.h>
 #include <QMetaOrm/metaentity.h>
 #include <QMetaProperty>
+#include <QSharedPointer>
+#include <QDebug>
 
 namespace QMetaOrm {
 
@@ -39,6 +41,18 @@ namespace QMetaOrm {
             m_entity->setReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
                return QVariant::fromValue(obj.objectCast<T>());
             });
+         if (m_entity->getVariantToReferenceCaster() == nullptr)
+            m_entity->setVariantToReferenceCaster([](const QVariant &value) -> QSharedPointer<QObject> {
+               QSharedPointer<QObject> result;
+               qDebug() << value.userType();
+               result = *reinterpret_cast<const T::Ptr *>(value.constData());
+               if (result == nullptr)
+                  result = *reinterpret_cast<const QSharedPointer<T> *>(value.constData());
+               return result;
+            });
+
+         qDebug() << m_entity->getSource() << "T::Ptr" << qRegisterMetaType<T::Ptr>();
+         qDebug() << m_entity->getSource() << "T" << qRegisterMetaType<T>();
 
          return m_entity->copy();
       }

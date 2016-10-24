@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMetaOrm/private.h>
+#include <QMetaOrm\converterstore.h>
 
 #include <qsharedpointer.h>
 #include <qstringlist.h>
@@ -39,6 +40,7 @@ namespace QMetaOrm {
    {
    public:
       typedef std::function<QVariant(const QSharedPointer<QObject> &)> ReferenceCaster;
+      typedef std::function<QSharedPointer<QObject> (const QVariant &)> VariantToReferenceCaster;
 	  typedef std::function<QObject*()> ObjectConstructor;
       typedef QSharedPointer<MetaEntity> Ptr;
       static Ptr factory() {
@@ -74,7 +76,10 @@ namespace QMetaOrm {
       ReferenceCaster getReferenceCaster() const;
       void setReferenceCaster(ReferenceCaster func);
 
-	  ObjectConstructor getObjectConstructor() const;
+      VariantToReferenceCaster getVariantToReferenceCaster() const;
+      void setVariantToReferenceCaster(VariantToReferenceCaster func);
+      
+      ObjectConstructor getObjectConstructor() const;
 	  void setObjectConstructor(ObjectConstructor constructor);
 
       template <class T>
@@ -92,6 +97,34 @@ namespace QMetaOrm {
       template <class T>
       QVariant getProperty(const T &item, const QString &name) const {
          return item.property(name.toStdString().c_str());
+      }
+
+      template <class T>
+      QVariant getFlatPropertyValue(const T &item, const QString &prop, ConverterStore::Ptr converterStore) const {
+         auto propMeta = m_propertyMapping[prop];
+         QVariant result;
+         if (propMeta.isReference())
+         {
+            if (m_variantToReferenceCaster == nullptr)
+               result = QVariant();
+            else {
+               auto refItemVariant = getProperty(item, prop);
+               auto refItem = m_variantToReferenceCaster(refItemVariant);
+               auto keyProperty = propMeta.reference->getKeyProperty();
+               result = refItem == nullptr ? QVariant() : refItem->property(keyProperty.toStdString().c_str());
+            }
+         }
+         else
+            result = getProperty(item, prop);
+
+         if (propMeta.hasConverter()) {
+            if (!converterStore->hasConverter(propMeta.converterName))
+               qDebug() << "Converter " << propMeta.converterName << " not found!";
+            else
+               result = converterStore->getConverterFor(propMeta.converterName)->convert(result);
+         }
+
+         return result;
       }
 
       template <class T>
@@ -116,6 +149,7 @@ namespace QMetaOrm {
       QHash<QString, MetaProperty> m_propertyMapping;
 	  ObjectConstructor m_objectConstructor;
       ReferenceCaster m_referenceCaster;
+      VariantToReferenceCaster m_variantToReferenceCaster;
    };
 
    namespace Mappings {

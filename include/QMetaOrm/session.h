@@ -178,17 +178,20 @@ namespace QMetaOrm {
       QSqlQuery query(m_database);
 
       QStringList properties;
+      qDebug() << m_entitySqlBuilder->buildInsert(mapping, properties);
       if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping->getProperty(entity, properties[i]));
+         query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
 
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
 
-      if (query.first())
+      if (query.first()) {
          mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));
+         qDebug() << query.value(0);
+      }
 
       return entity;
    }
@@ -208,7 +211,7 @@ namespace QMetaOrm {
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping->getProperty(entity, properties[i]));
+         query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
       query.bindValue(properties.size(), mapping->getProperty(entity, mapping->getKeyProperty()));
 
       if (!query.exec())
