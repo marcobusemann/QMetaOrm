@@ -2,6 +2,7 @@
 
 #include <QMetaOrm/private.h>
 #include <QSqlError>
+#include <qdebug.h>
 
 namespace QMetaOrm {
 
@@ -20,7 +21,10 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API ConnectToDatabaseException: public DatabaseException
    {
    public:
-      ConnectToDatabaseException(const QSqlError &error): DatabaseException(error){}
+      ConnectToDatabaseException(const QSqlError &error): DatabaseException(error)
+      {
+         qDebug() << error;
+      }
    };
 
    /**
@@ -38,7 +42,10 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API QueryException: public DatabaseException
    {
    public:
-      QueryException(const QSqlError &error): DatabaseException(error){}
+      QueryException(const QSqlError &error): DatabaseException(error)
+      {
+         qDebug() << error;
+      }
    };
 
    /**
@@ -47,7 +54,7 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API CouldNotPrepareQueryException: public QueryException
    {
    public:
-      CouldNotPrepareQueryException(const QSqlError &error): QueryException(error){}
+      CouldNotPrepareQueryException(const QSqlError &error): QueryException(error) {}
    };
 
    /**
@@ -56,7 +63,7 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API CouldNotExecuteQueryException: public QueryException
    {
    public:
-      CouldNotExecuteQueryException(const QSqlError &error): QueryException(error){}
+      CouldNotExecuteQueryException(const QSqlError &error): QueryException(error) {}
    };
 
    /**
