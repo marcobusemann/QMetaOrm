@@ -44,6 +44,11 @@ namespace QMetaOrm {
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
          return packetValue.value<QSharedPointer<QObject>>();
       }
+
+   private:
+      DefaultEntityFactory() {
+         qRegisterMetaType<QSharedPointer<T>>();
+      }
    };
 
    template <class T>
@@ -64,6 +69,11 @@ namespace QMetaOrm {
 
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
          return *reinterpret_cast<const T::Ptr *>(packetValue.constData());
+      }
+
+   private:
+      EmbeddedPtrNamingSchemeEntityFactory() {
+         qRegisterMetaType<T::Ptr>();
       }
    };
 

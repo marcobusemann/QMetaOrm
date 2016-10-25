@@ -32,33 +32,10 @@ namespace QMetaOrm {
          auto keyType = gatherKeyType<T>(m_entity);
          Q_ASSERT_X(MetaEntity::SupportedKeyTypes.contains(keyType), "build", "actually only int, long or string key types are allowed!");
 
-         // TODO: Add futher property checks
-         /*
-         m_entity->setObjectConstructor([]() -> QObject* {
-            return new T();
-         });
-
-         if (m_entity->getReferenceCaster() == nullptr)
-            m_entity->setReferenceCaster([](const QSharedPointer<QObject> &obj) -> QVariant {
-            return QVariant::fromValue(obj.objectCast<T>());
-         });
-         if (m_entity->getVariantToReferenceCaster() == nullptr)
-            m_entity->setVariantToReferenceCaster([](const QVariant &value) -> QSharedPointer<QObject> {
-            QSharedPointer<QObject> result;
-            result = *reinterpret_cast<const T::Ptr *>(value.constData());
-            if (result == nullptr)
-               result = *reinterpret_cast<const QSharedPointer<T> *>(value.constData());
-            return result;
-         });
-         */
          if (m_useEmbeddedPtrEntityFactoryNamingScheme)
             m_entity->setEntityFactory(EmbeddedPtrNamingSchemeEntityFactory<T>::factory());
          else if (m_entity->getEntityFactory() == nullptr)
             m_entity->setEntityFactory(DefaultEntityFactory<T>::factory());
-
-         qRegisterMetaType<QSharedPointer<T>>();
-         qRegisterMetaType<T::Ptr>();
-         qRegisterMetaType<T>();
 
          return m_entity->copy();
       }
