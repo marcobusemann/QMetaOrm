@@ -36,7 +36,7 @@ MetaEntityBuilder MetaEntityBuilder::withData(const QString &prop, const QString
    return *this;
 }
 
-MetaEntityBuilder MetaEntityBuilder::withReference(const QString & prop, const QString & field, MetaEntity::Ptr referenceEntity)
+MetaEntityBuilder MetaEntityBuilder::withOneToMany(const QString & prop, const QString & field, MetaEntity::Ptr referenceEntity)
 {
    MetaProperty value;
    value.propertyName = prop;

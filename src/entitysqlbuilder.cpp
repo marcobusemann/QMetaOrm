@@ -56,18 +56,23 @@ public:
       return *this;
    }
 
-   SelectBuilder withJoin(const QString &table, const QString &tableField, const QString &referenceTable, const QString &referenceField, const QStringList &fields, const QString &fieldPrefix) {
-      auto alias = aliasFor(table);
-      auto aliasRef = aliasFor(referenceTable);
+   QString ExtractPropertyPrevousPropertyFrom(const QString &prop) {
+      int index = prop.lastIndexOf(".");
+      return index == -1 ? QString() : prop.left(index);
+   }
+
+   SelectBuilder withJoin(const QString &table, const QString &tableField, const QString &referenceTable, const QString &referenceDatabaseField, const QStringList &fields, const QString &fieldPrefix) {
+      auto alias = aliasFor(table, fieldPrefix);
+      auto aliasRef = aliasFor(referenceTable, ExtractPropertyPrevousPropertyFrom(fieldPrefix));
       m_joins.append(QString("LEFT JOIN %1 %2 ON (%3 = %4)")
          .arg(table)
          .arg(alias)
          .arg(EmbeddAlias(alias, tableField))
-         .arg(EmbeddAlias(aliasRef, referenceField)));
+         .arg(EmbeddAlias(aliasRef, referenceDatabaseField)));
       m_fields.append(map(fields, [&](const QString &field) -> QString {
          return QString("%1 AS %2_%3")
             .arg(EmbeddAlias(alias, field))
-            .arg(fieldPrefix)
+            .arg(QString(fieldPrefix).replace(".", "_"))
             .arg(field);
       }));
       return *this;
@@ -118,7 +123,7 @@ public:
       if (m_fields.isEmpty())
          throw std::runtime_error("Building an select statement requires fields."); // TODO: Replace by custom exception
 
-      return QString("SELECT %1 %2 %3 FROM %4 %5 %6")
+      auto statement = QString("SELECT %1 %2 %3 FROM %4 %5 %6")
          .arg(m_first >= 0 ? QString("FIRST %1").arg(m_first) : "")
          .arg(m_skip >= 0 ? QString("SKIP %1").arg(m_skip) : "")
          .arg(m_fields.join(", "))
@@ -126,6 +131,8 @@ public:
          .arg(m_joins.join(" "))
          .arg(m_condition.isEmpty() ? "" : QString("WHERE %1").arg(m_condition))
          ;
+      qDebug() << statement;
+      return statement;
    }
 
 private:
@@ -136,16 +143,17 @@ private:
       , m_skip(-1)
    {}
 
-   QString aliasFor(const QString &table) {
-      if (!m_aliasCache.contains(table))
-         m_aliasCache[table] = QString("a%1").arg(m_nextAliasNumber++);
-      return m_aliasCache[table];
+   QString aliasFor(const QString &table, const QString &prop = QString()) {
+      auto value = qMakePair(table, prop);
+      if (!m_aliasCache.contains(value))
+         m_aliasCache[value] = QString("a%1").arg(m_nextAliasNumber++);
+      return m_aliasCache[value];
    }
 
    QString resolveRecursiveProperty(const QString &prop, MetaEntity::Ptr entity) {
       int index = prop.indexOf(".");
       if (index == -1)
-         return EmbeddAlias(aliasFor(entity->getSource()), prop);
+         return EmbeddAlias(aliasFor(entity->getSource(), prop), prop);
       QString referenceProperty = prop.left(index);
       auto referencePropertyEntity = entity->getProperty(referenceProperty);
       if (!referencePropertyEntity.isReference()) {
@@ -155,7 +163,7 @@ private:
       return resolveRecursiveProperty(prop.mid(index + 1), referencePropertyEntity.reference);
    }
 
-   QHash<QString, QString> m_aliasCache; // Key = Table-Name, Value = Alias
+   QHash<QPair<QString, QString>, QString> m_aliasCache; // Key = Table-Name, Value = Alias
    int m_nextAliasNumber;
    QStringList m_fields;
    QString m_table;
@@ -165,25 +173,32 @@ private:
    int m_skip;
 };
 
-SelectBuilder ConstructSelect(MetaEntity::Ptr mapping) {
+void ConstructSelectRecursive(SelectBuilder &builder, MetaEntity::Ptr mapping, const QString &prefix = QString()) {
    auto references = mapping->getReferences();
-
-   auto builder = SelectBuilder::aStatementFor(mapping->getSource())
-      .withFields(mapping->getDatabaseFields());
-
    for (int i = 0; i < references.size(); i++) {
       auto refType = references[i].reference;
+      auto refPrefix = prefix.isEmpty() ? 
+         references[i].databaseName : 
+         QString("%1.%2").arg(prefix, references[i].databaseName);
+      qDebug() << refPrefix;
 
-      builder = builder
+      builder
          .withJoin(
-            refType->getSource(), 
-            refType->getKeyDatabaseField(), 
-            mapping->getSource(), 
-            references[i].databaseName, 
-            refType->getDatabaseFields(), 
-            references[i].databaseName);
-   }
+            refType->getSource(),
+            refType->getKeyDatabaseField(),
+            mapping->getSource(),
+            references[i].databaseName,
+            refType->getDatabaseFields(),
+            refPrefix);
 
+      ConstructSelectRecursive(builder, refType, refPrefix);
+   }
+}
+
+SelectBuilder ConstructSelect(MetaEntity::Ptr mapping) {
+   auto builder = SelectBuilder::aStatementFor(mapping->getSource())
+      .withFields(mapping->getDatabaseFields());
+   ConstructSelectRecursive(builder, mapping);
    return builder;
 }
 

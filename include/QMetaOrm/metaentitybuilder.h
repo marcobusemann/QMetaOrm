@@ -20,7 +20,7 @@ namespace QMetaOrm {
       MetaEntityBuilder withSequence(const QString &sequence);
       MetaEntityBuilder withId(const QString &prop, const QString &field);
       MetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
-      MetaEntityBuilder withReference(const QString &prop, const QString &field, MetaEntity::Ptr referenceEntity);
+      MetaEntityBuilder withOneToMany(const QString &prop, const QString &field, MetaEntity::Ptr referenceEntity);
       MetaEntityBuilder withEntityFactory(const EntityFactory::Ptr &entityFactory);
       MetaEntityBuilder withEmbeddedPtrNamingScheme();
 
