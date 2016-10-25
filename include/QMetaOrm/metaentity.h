@@ -38,11 +38,11 @@ namespace QMetaOrm {
       }
 
       virtual QVariant pack(const QSharedPointer<QObject> &entity) const override {
-         return QVariant::fromValue(entity);
+         return QVariant::fromValue(static_cast<QSharedPointer<T>>(entity.objectCast<T>()));
       }
 
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
-         return packetValue.value<QSharedPointer<QObject>>();
+         return *reinterpret_cast<const QSharedPointer<T> *>(packetValue.constData());
       }
 
    private:
