@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QMetaOrm/converterstore.h>
-#include <QMetaOrm/metaentity.h>
+#include <QMetaOrm\converterstore.h>
+#include <QMetaOrm\metaentity.h>
 #include <QMetaOrm\exceptions.h>
-#include <QMetaOrm/private.h>
+#include <QMetaOrm\private.h>
+#include <QMetaOrm\logger.h>
 
 #include <QSharedPointer>
 #include <QSqlRecord>
@@ -32,6 +33,8 @@ namespace QMetaOrm {
       typedef std::function<void(const QString &key, const QVariant &value)> ApplyHandler;
 
    public:
+      EntityMapper(Logger::Ptr logger);
+
       template <class T>
       QSharedPointer<T> mapToEntity(MetaEntity::Ptr mapping, const QSqlRecord &record, ConverterStore::Ptr converterStore) {
          QSharedPointer<T> result(new T());
@@ -106,6 +109,8 @@ namespace QMetaOrm {
 
          mapToEntity(mapping, converterStore, getRecord, applyTo(entity));
 
+         m_logger->trace(QString("Created reference for %1").arg(mapping->getSource()));
+
          return entityFactory->pack(entity);
       }
 
@@ -118,5 +123,6 @@ namespace QMetaOrm {
 
    private:
       PropertyPrefixer m_prefixer;
+      Logger::Ptr m_logger;
    };
 }

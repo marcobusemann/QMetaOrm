@@ -33,6 +33,7 @@ HEADERS += \
     include/QMetaOrm/sessionfactory.h \
     include/QMetaOrm/converter.h \
     include/QMetaOrm/converterstore.h \
+    include/QMetaOrm/logger.h \
 
 SOURCES += \
     src/metaentitybuilder.cpp \
@@ -46,3 +47,4 @@ SOURCES += \
     src/converter.cpp \
     src/converterstore.cpp \
     src/entitymapper.cpp \
+	src/logger.cpp \

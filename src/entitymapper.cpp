@@ -18,3 +18,8 @@ QString PropertyPrefixer::prepend(const QString & value, const QString & prefixS
 {
    return prefixString.isEmpty() ? value : QString("%1_%2").arg(prefixString, value);
 }
+
+QMetaOrm::EntityMapper::EntityMapper(Logger::Ptr logger)
+   : m_logger(logger)
+{
+}
