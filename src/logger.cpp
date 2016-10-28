@@ -2,6 +2,8 @@
 #include <QtGlobal>
 #include <QDebug>
 
+using namespace QMetaOrm;
+
 Logger::Ptr StandardQtLogger::factory()
 {
    return Logger::Ptr(new StandardQtLogger());
