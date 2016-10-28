@@ -34,6 +34,8 @@ HEADERS += \
     include/QMetaOrm/converter.h \
     include/QMetaOrm/converterstore.h \
     include/QMetaOrm/logger.h \
+    include/QMetaOrm/cache.h \
+    include/QMetaOrm/cachefactory.h \
 
 SOURCES += \
     src/metaentitybuilder.cpp \
@@ -48,3 +50,5 @@ SOURCES += \
     src/converterstore.cpp \
     src/entitymapper.cpp \
 	src/logger.cpp \
+	src/cache.cpp \
+	src/cachefactory.cpp \

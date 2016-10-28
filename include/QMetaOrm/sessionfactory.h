@@ -1,7 +1,8 @@
 #pragma once
 
 #include <QMetaOrm/databasefactory.h>
-#include <QMetaOrm/converterstore.h>
+#include <QMetaOrm/databasefactory.h>
+#include <QMetaOrm/cachefactory.h>
 #include <QMetaOrm/private.h>
 #include <QMetaOrm/session.h>
 #include <QMetaOrm/logger.h>
@@ -30,10 +31,16 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API DefaultSessionFactory : public SessionFactory
    {
    public:
-      static SessionFactory::Ptr factory(const DatabaseFactory::Ptr &databaseFactory, const Logger::Ptr &logger = Logger::Ptr());
+      static SessionFactory::Ptr factory(
+         const DatabaseFactory::Ptr &databaseFactory, 
+         const Logger::Ptr &logger = Logger::Ptr(),
+         const EntityCacheFactory::Ptr &cacheFactory = EntityCacheFactory::Ptr());
 
    public:
-      DefaultSessionFactory(const DatabaseFactory::Ptr &databaseFactory, const Logger::Ptr &logger);
+      DefaultSessionFactory(
+         const DatabaseFactory::Ptr &databaseFactory, 
+         const Logger::Ptr &logger,
+         const EntityCacheFactory::Ptr &cacheFactory);
       virtual Session::Ptr createSession() const override;
       virtual ConverterStore::Ptr getConverterStore() const override;
 
@@ -41,5 +48,6 @@ namespace QMetaOrm {
       DatabaseFactory::Ptr m_databaseFactory;
       ConverterStore::Ptr m_converterStore;
       Logger::Ptr m_logger;
+      EntityCacheFactory::Ptr m_cacheFactory;
    };
 }

@@ -1,5 +1,7 @@
 #include <QMetaOrm/entitymapper.h>
 
+using namespace QMetaOrm;
+
 PropertyPrefixer::Handler PropertyPrefixer::getRecordValuePrefixer(const QSqlRecord & record, const QString & prefixString)
 {
    return [record, prefixString, this](const QString &prop) -> QVariant {
@@ -19,7 +21,8 @@ QString PropertyPrefixer::prepend(const QString & value, const QString & prefixS
    return prefixString.isEmpty() ? value : QString("%1_%2").arg(prefixString, value);
 }
 
-QMetaOrm::EntityMapper::EntityMapper(Logger::Ptr logger)
+EntityMapper::EntityMapper(const Logger::Ptr &logger, const EntityCache::Ptr &entityCache)
    : m_logger(logger)
+   , m_entityCache(entityCache)
 {
 }

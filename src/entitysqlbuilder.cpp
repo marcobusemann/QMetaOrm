@@ -179,7 +179,6 @@ void ConstructSelectRecursive(SelectBuilder &builder, MetaEntity::Ptr mapping, c
       auto refPrefix = prefix.isEmpty() ? 
          references[i].databaseName : 
          QString("%1.%2").arg(prefix, references[i].databaseName);
-      qDebug() << refPrefix;
 
       builder
          .withJoin(

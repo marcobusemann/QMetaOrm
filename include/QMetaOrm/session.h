@@ -5,6 +5,7 @@
 #include <QMetaOrm/entitymapper.h>
 #include <QMetaOrm/databasefactory.h>
 #include <QMetaOrm/exceptions.h>
+#include <QMetaOrm/cache.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
