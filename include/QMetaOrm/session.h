@@ -46,7 +46,7 @@ namespace QMetaOrm {
       QList<QSharedPointer<T>> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       template <class T>
-      void selectManyByCallback(Criterion::Ptr criterion, std::function<void(const QSharedPointer<T>&)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void selectManyByCallback(Criterion::Ptr criterion, std::function<bool(const QSharedPointer<T>&)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
 
       /*
       template <class T>
@@ -137,8 +137,9 @@ namespace QMetaOrm {
    template <class T>
    QList<QSharedPointer<T>> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
       QList<QSharedPointer<T>> result;
-      auto func = [&result](const QSharedPointer<T> &item) -> void {
+      auto func = [&result](const QSharedPointer<T> &item) -> bool {
          result.append(item);
+         return true;
       };
       selectManyByCallback<T>(criterion, func, skip, pageSize, mapping);
       return result;
@@ -146,7 +147,7 @@ namespace QMetaOrm {
 
    //-----------------------------------------------------------------------------
    template <class T>
-   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<void(const QSharedPointer<T>&)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
+   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<bool(const QSharedPointer<T>&)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
       setupSession();
 
       mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
@@ -164,8 +165,9 @@ namespace QMetaOrm {
       if (!query.exec())
          throw CouldNotExecuteQueryException(query.lastError());
 
-      while (query.next())
-         callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
+      bool continueWork = true;
+      while (query.next() && continueWork)
+         continueWork = callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
    }
 
    //-----------------------------------------------------------------------------
