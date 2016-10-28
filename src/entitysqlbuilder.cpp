@@ -131,7 +131,6 @@ public:
          .arg(m_joins.join(" "))
          .arg(m_condition.isEmpty() ? "" : QString("WHERE %1").arg(m_condition))
          ;
-      qDebug() << statement;
       return statement;
    }
 
