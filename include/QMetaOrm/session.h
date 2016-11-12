@@ -63,6 +63,18 @@ namespace QMetaOrm {
       QList<T> selectMany(const QString &sql, MetaEntity mapping = MetaEntity());
       */
 
+      template <class T>
+      QList<QSharedPointer<T>> selectMany(const QString &sql, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+
+      template <class T>
+      QList<QSharedPointer<T>> selectMany(const QString &sql, const QVariantList &parameters, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+
+      template <class T>
+      void selectManyByCallback(const QString &sql, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+
+      template <class T>
+      void selectManyByCallback(const QString &sql, const QVariantList &parameters, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+
       void commit();
       void rollback();
 
@@ -161,6 +173,58 @@ namespace QMetaOrm {
          throw CouldNotPrepareQueryException(query.lastError());
 
       for(int i = 0; i < conditions.size(); i++)
+         query.bindValue(i, conditions[i]);
+
+      if (!query.exec())
+         throw CouldNotExecuteQueryException(query.lastError());
+
+      bool continueWork = true;
+      while (query.next() && continueWork) {
+         continueWork = callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
+      }
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   QList<QSharedPointer<T>> Session::selectMany(const QString &sql, MetaEntity::Ptr mapping)
+   {
+      return selectMany<T>(sql, QVariantList(), mapping);
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   QList<QSharedPointer<T>> Session::selectMany(const QString &sql, const QVariantList &parameters, MetaEntity::Ptr mapping)
+   {
+      QList<QSharedPointer<T>> result;
+      auto func = [&result](const QSharedPointer<T> &item) -> bool {
+         result.append(item);
+         return true;
+      };
+      selectManyByCallback<T>(sql, parameters, mapping);
+      return result;
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::selectManyByCallback(const QString &sql, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping)
+   {
+      selectManyByCallback<T>(sql, QVariantList(), callback, mapping);
+   }
+
+   //-----------------------------------------------------------------------------
+   template <class T>
+   void Session::selectManyByCallback(const QString &sql, const QVariantList &conditions, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping)
+   {
+      setupSession();
+
+      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
+
+      QSqlQuery query(m_database);
+
+      if (!query.prepare(sql))
+         throw CouldNotPrepareQueryException(query.lastError());
+
+      for (int i = 0; i < conditions.size(); i++)
          query.bindValue(i, conditions[i]);
 
       if (!query.exec())
