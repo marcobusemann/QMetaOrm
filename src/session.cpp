@@ -21,8 +21,6 @@ Session::Session(
 }
 
 Session::~Session() {
-   m_database.rollback();
-   m_database.close();
 }
 
 void Session::commit() {
