@@ -93,7 +93,7 @@ public:
          }, [&conditions, &mapping, this](const ValueCriterion *c) -> QString {
             conditions.append(c->value);
             return QString("%1 %2 ?")
-               .arg(resolveRecursiveProperty(c->prop, mapping))
+               .arg(resolveRecursiveProperty(c->prop.indexOf(".") == -1 ? "" : c->prop, c->prop, mapping))
                .arg(c->expressiontype == ValueCriterion::ExpressionType::Equals ? " = " : "");
          }, [&conditions](const ListCriterion *c) -> QString {
             conditions.append(c->values);
@@ -149,17 +149,17 @@ private:
       return m_aliasCache[value];
    }
 
-   QString resolveRecursiveProperty(const QString &prop, MetaEntity::Ptr entity) {
+   QString resolveRecursiveProperty(const QString &rawProperty, const QString &prop, MetaEntity::Ptr entity) {
       int index = prop.indexOf(".");
       if (index == -1)
-         return EmbeddAlias(aliasFor(entity->getSource(), prop), prop);
+         return EmbeddAlias(aliasFor(entity->getSource(), rawProperty), entity->getProperty(prop).databaseName);
       QString referenceProperty = prop.left(index);
       auto referencePropertyEntity = entity->getProperty(referenceProperty);
       if (!referencePropertyEntity.isReference()) {
          qDebug() << "No reference! " << prop;
          return prop;
       }
-      return resolveRecursiveProperty(prop.mid(index + 1), referencePropertyEntity.reference);
+      return resolveRecursiveProperty(rawProperty, prop.mid(index + 1), referencePropertyEntity.reference);
    }
 
    QHash<QPair<QString, QString>, QString> m_aliasCache; // Key = Table-Name, Value = Alias
@@ -205,32 +205,6 @@ QString EntitySqlBuilder::buildSelect(MetaEntity::Ptr mapping) {
    return ConstructSelect(mapping)
       .withParameter(mapping->getKeyDatabaseField())
       .build();
-}
-
-QString EntitySqlBuilder::buildCriterion(MetaEntity::Ptr mapping, Criterion::Ptr criterion, QVariantList &conditions) {
-   if (!criterion) return "1=1";
-   return criterion->stringify([](const Criterion *c, const QString &leftChild, const QString &rightChild) -> QString {
-      return QString("((%1) %2 (%3))")
-               .arg(leftChild)
-               .arg(c->combinationtype == Criterion::CombinationType::Leaf ? "" :
-                    c->combinationtype == Criterion::CombinationType::And ? " AND " :
-                    c->combinationtype == Criterion::CombinationType::Or ? " OR " : "")
-               .arg(rightChild);
-   }, [&conditions](const ValueCriterion *c) -> QString {
-      conditions.append(c->value);
-      return QString("%1 %2 ?")
-               .arg(c->prop)
-               .arg(c->expressiontype == ValueCriterion::ExpressionType::Equals ? " = " : "");
-   }, [&conditions](const ListCriterion *c) -> QString {
-      conditions.append(c->values);
-      QStringList params;
-      for(int i = 0; i < c->values.size(); i++)
-         params << "?";
-
-      return QString(" %1 %2 %3 ")
-               .arg(c->prop)
-               .arg(c->expressiontype == ListCriterion::ExpressionType::In ? QString(" in (%1)").arg(params.join(",")) : "");
-   });
 }
 
 // TODO: - Cache build condition

@@ -23,7 +23,6 @@ namespace QMetaOrm {
       virtual ~EntitySqlBuilder() {}
 
       virtual QString buildSelect(MetaEntity::Ptr mapping);
-      virtual QString buildCriterion(MetaEntity::Ptr mapping, Criterion::Ptr criterion, QVariantList &conditions);
       virtual QString buildSelectMany(MetaEntity::Ptr mapping, Criterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions);
       virtual QString buildRemove(MetaEntity::Ptr mapping);
       virtual QString buildInsert(MetaEntity::Ptr mapping, QStringList &properties);
