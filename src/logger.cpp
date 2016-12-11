@@ -1,4 +1,4 @@
-#include <QMetaOrm\logger.h>
+#include <QMetaOrm\Logger.h>
 #include <QtGlobal>
 #include <QDebug>
 

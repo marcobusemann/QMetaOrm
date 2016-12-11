@@ -1,4 +1,4 @@
-#include <QMetaOrm/entitymapper.h>
+#include <QMetaOrm/EntityMapper.h>
 
 using namespace QMetaOrm;
 

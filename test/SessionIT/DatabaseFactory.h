@@ -1,4 +1,4 @@
-#include <QMetaOrm\databasefactory.h>
+#include <QMetaOrm\DatabaseFactory.h>
 
 #include <qstringlist.h>
 #include <quuid.h>
@@ -42,7 +42,7 @@ public:
    void cleanup() {
       for (auto name : QSqlDatabase::connectionNames())
          QSqlDatabase::removeDatabase(name);
-      bool ok = QFile::remove(m_file);
+      QFile::remove(m_file);
    }
 
 private:

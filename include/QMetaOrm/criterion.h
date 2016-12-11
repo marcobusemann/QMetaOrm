@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
+#include <QMetaOrm/Private.h>
 
 #include <QSharedPointer>
 #include <functional>

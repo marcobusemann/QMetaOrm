@@ -1,4 +1,4 @@
-#include <QMetaOrm\metaentity.h>
+#include <QMetaOrm\MetaEntity.h>
 
 #include <qstring.h>
 #include <qsharedpointer.h>

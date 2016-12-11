@@ -1,7 +1,7 @@
 #include <QString>
 #include <QtTest>
 
-#include <QMetaOrm/metaentity.h>
+#include <QMetaOrm/MetaEntity.h>
 
 using namespace QMetaOrm;
 

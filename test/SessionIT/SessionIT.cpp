@@ -3,10 +3,10 @@
 
 #include <QtTest>
 
-#include <QMetaOrm/metaentitybuilder.h>
-#include <QMetaOrm/valuecriterion.h>
-#include <QMetaOrm/sessionfactory.h>
-#include <QMetaOrm/session.h>
+#include <QMetaOrm/MetaEntityBuilder.h>
+#include <QMetaOrm/ValueCriterion.h>
+#include <QMetaOrm/SessionFactory.h>
+#include <QMetaOrm/Session.h>
 
 using namespace QMetaOrm;
 

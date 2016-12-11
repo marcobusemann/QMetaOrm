@@ -1,5 +1,5 @@
-#include <QMetaOrm/metaentity.h>
-#include <QMetaOrm\exceptions.h>
+#include <QMetaOrm/MetaEntity.h>
+#include <QMetaOrm\Exceptions.h>
 
 using namespace QMetaOrm;
 

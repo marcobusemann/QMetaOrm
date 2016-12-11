@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
-#include <QMetaOrm\converterstore.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm\ConverterStore.h>
 
 #include <qsharedpointer.h>
 #include <qstringlist.h>

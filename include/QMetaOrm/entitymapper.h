@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QMetaOrm\converterstore.h>
-#include <QMetaOrm\metaentity.h>
-#include <QMetaOrm\exceptions.h>
-#include <QMetaOrm\private.h>
-#include <QMetaOrm\logger.h>
-#include <QMetaOrm\cache.h>
+#include <QMetaOrm\ConverterStore.h>
+#include <QMetaOrm\MetaEntity.h>
+#include <QMetaOrm\Exceptions.h>
+#include <QMetaOrm\Private.h>
+#include <QMetaOrm\Logger.h>
+#include <QMetaOrm\Cache.h>
 
 #include <QSharedPointer>
 #include <QSqlRecord>

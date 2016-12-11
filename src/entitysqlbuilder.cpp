@@ -1,6 +1,6 @@
-#include <QMetaOrm/entitysqlbuilder.h>
-#include <QMetaOrm/valuecriterion.h>
-#include <QMetaOrm/listcriterion.h>
+#include <QMetaOrm/EntitySqlBuilder.h>
+#include <QMetaOrm/ValueCriterion.h>
+#include <QMetaOrm/ListCriterion.h>
 #include <QtSql>
 
 using namespace QMetaOrm;

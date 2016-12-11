@@ -1,11 +1,10 @@
 #pragma once
 
-#include <QMetaOrm/databasefactory.h>
-#include <QMetaOrm/databasefactory.h>
-#include <QMetaOrm/cachefactory.h>
-#include <QMetaOrm/private.h>
-#include <QMetaOrm/session.h>
-#include <QMetaOrm/logger.h>
+#include <QMetaOrm/DatabaseFactory.h>
+#include <QMetaOrm/CacheFactory.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm/Session.h>
+#include <QMetaOrm/Logger.h>
 
 #include <QSharedPointer>
 

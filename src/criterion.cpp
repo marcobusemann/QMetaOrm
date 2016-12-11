@@ -1,4 +1,4 @@
-#include <QMetaOrm/criterion.h>
+#include <QMetaOrm/Criterion.h>
 
 using namespace QMetaOrm;
 

@@ -1,5 +1,5 @@
-#include <QMetaOrm/session.h>
-#include <QMetaOrm/exceptions.h>
+#include <QMetaOrm/Session.h>
+#include <QMetaOrm/Exceptions.h>
 #include <qthread.h>
 
 using namespace QMetaOrm;

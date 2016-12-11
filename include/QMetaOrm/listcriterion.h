@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
-#include <QMetaOrm/criterion.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm/Criterion.h>
 
 #include <QSharedPointer>
 #include <QVariantList>

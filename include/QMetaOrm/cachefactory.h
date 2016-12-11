@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm\private.h>
-#include <QMetaOrm\cache.h>
+#include <QMetaOrm\Private.h>
+#include <QMetaOrm\Cache.h>
 
 namespace QMetaOrm {
 

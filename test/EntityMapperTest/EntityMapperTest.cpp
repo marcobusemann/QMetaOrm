@@ -3,9 +3,9 @@
 
 #include <qsqlfield.h>
 
-#include <QMetaOrm\metaentity.h>
-#include <QMetaOrm/entitymapper.h>
-#include <QMetaOrm\metaentitybuilder.h>
+#include <QMetaOrm\MetaEntity.h>
+#include <QMetaOrm/EntityMapper.h>
+#include <QMetaOrm\MetaEntityBuilder.h>
 
 #define QVERIFY_THROW(expression, ExpectedExceptionType) \
 do \
@@ -81,7 +81,7 @@ class DummyObjectWithoutStdCtor : public QObject
 Q_OBJECT
 Q_PROPERTY(int id READ getId WRITE setId)
 public:
-   DummyObjectWithoutStdCtor(int i) {};
+   DummyObjectWithoutStdCtor(int) {};
 
    void setId(int id) { m_id = id; }
    int getId() const { return m_id; }
@@ -173,7 +173,7 @@ private Q_SLOTS:
 
       auto prefixer = PropertyPrefixer().getRecordValuePrefixer(record);
 
-      aMapper()->mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &prop, const QVariant &value) {
+      aMapper()->mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &, const QVariant &) {
          QFAIL("Mapping should not have been correct!");
       });
    }

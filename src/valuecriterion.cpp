@@ -1,4 +1,4 @@
-#include <QMetaOrm/valuecriterion.h>
+#include <QMetaOrm/ValueCriterion.h>
 
 using namespace QMetaOrm;
 

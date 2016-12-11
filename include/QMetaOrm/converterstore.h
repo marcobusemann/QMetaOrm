@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm/converter.h>
-#include <QMetaOrm/private.h>
+#include <QMetaOrm/Converter.h>
+#include <QMetaOrm/Private.h>
 #include <qsharedpointer.h>
 
 namespace QMetaOrm {

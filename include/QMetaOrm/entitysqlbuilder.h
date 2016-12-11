@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
-#include <QMetaOrm/metaentity.h>
-#include <QMetaOrm/criterion.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm/MetaEntity.h>
+#include <QMetaOrm/Criterion.h>
 
 #include <QSharedPointer>
 #include <QStringList>

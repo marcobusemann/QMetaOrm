@@ -1,4 +1,4 @@
-#include <QMetaOrm\metaentitybuilder.h>
+#include <QMetaOrm\MetaEntityBuilder.h>
 
 #include "Person.h"
 

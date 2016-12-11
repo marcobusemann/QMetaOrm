@@ -1,4 +1,4 @@
-#include <QMetaOrm/converterstore.h>
+#include <QMetaOrm/ConverterStore.h>
 
 using namespace QMetaOrm;
 

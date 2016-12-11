@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QMetaOrm/metaentity.h>
-#include <QMetaOrm/criterion.h>
-#include <QMetaOrm/valuecriterion.h>
-#include <QMetaOrm/listcriterion.h>
-#include <QMetaOrm/sessionfactory.h>
-#include <QMetaOrm\metaentitybuilder.h>
+#include <QMetaOrm/MetaEntity.h>
+#include <QMetaOrm/Criterion.h>
+#include <QMetaOrm/ValueCriterion.h>
+#include <QMetaOrm/ListCriterion.h>
+#include <QMetaOrm/SessionFactory.h>
+#include <QMetaOrm\MetaEntityBuilder.h>
 
 #include <QObject>
 #include <QDateTime>

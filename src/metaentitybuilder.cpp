@@ -1,4 +1,4 @@
-#include <QMetaOrm/metaentitybuilder.h>
+#include <QMetaOrm/MetaEntityBuilder.h>
 
 using namespace QMetaOrm;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
-#include <QMetaOrm/metaentity.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm/MetaEntity.h>
 #include <QMetaProperty>
 #include <QSharedPointer>
 #include <QDebug>

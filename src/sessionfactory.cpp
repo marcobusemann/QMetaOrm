@@ -1,6 +1,6 @@
-#include <QMetaOrm/sessionfactory.h>
-#include <QMetaOrm/entitymapper.h>
-#include <QMetaOrm/entitysqlbuilder.h>
+#include <QMetaOrm/SessionFactory.h>
+#include <QMetaOrm/EntityMapper.h>
+#include <QMetaOrm/EntitySqlBuilder.h>
 
 using namespace QMetaOrm;
 

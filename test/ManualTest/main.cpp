@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 #include "main.h"
-#include <QMetaOrm/metaentitybuilder.h>
-#include <QMetaOrm/databasefactory.h>
+#include <QMetaOrm/MetaEntityBuilder.h>
+#include <QMetaOrm/DatabaseFactory.h>
 
 const QString PersonSimple::p::id = "id";
 const QString PersonSimple::p::surname = "surname";

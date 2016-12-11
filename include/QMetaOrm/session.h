@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QMetaOrm/private.h>
-#include <QMetaOrm/entitysqlbuilder.h>
-#include <QMetaOrm/entitymapper.h>
-#include <QMetaOrm/databasefactory.h>
-#include <QMetaOrm/exceptions.h>
-#include <QMetaOrm/cache.h>
+#include <QMetaOrm/Private.h>
+#include <QMetaOrm/EntitySqlBuilder.h>
+#include <QMetaOrm/EntityMapper.h>
+#include <QMetaOrm/DatabaseFactory.h>
+#include <QMetaOrm/Exceptions.h>
+#include <QMetaOrm/Cache.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
