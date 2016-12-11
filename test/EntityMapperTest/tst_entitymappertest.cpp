@@ -118,8 +118,8 @@ private Q_SLOTS:
     /**
       * Utils
       */
-    EntityMapper aMapper() {
-       return EntityMapper();
+    EntityMapper::Ptr aMapper() {
+       return EntityMapper::Ptr(new EntityMapper(StandardQtLogger::factory(), StandardEntityCache::factory()));
     }
 
     QMetaOrm::MetaEntity::Ptr aDummyMapping() {
@@ -156,7 +156,7 @@ private Q_SLOTS:
       auto prefixer = PropertyPrefixer().getRecordValuePrefixer(record);
 
       bool applied = false;
-      aMapper().mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &prop, const QVariant &value) {
+      aMapper()->mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &prop, const QVariant &value) {
          applied = true;
          QCOMPARE(prop, QString("id"));
          QCOMPARE(value, QVariant(1));
@@ -173,7 +173,7 @@ private Q_SLOTS:
 
       auto prefixer = PropertyPrefixer().getRecordValuePrefixer(record);
 
-      aMapper().mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &prop, const QVariant &value) {
+      aMapper()->mapKeyToEntity(aDummyMapping(), prefixer, [&](const QString &prop, const QVariant &value) {
          QFAIL("Mapping should not have been correct!");
       });
    }
@@ -183,13 +183,13 @@ private Q_SLOTS:
      */
    void applyConverter_noConverterSpecified_exception() {
       auto store = QMetaOrm::DefaultConverterStore::factory();
-      QVERIFY_THROW(aMapper().applyConverter("A", QVariant(), store), QMetaOrm::ConverterNotFoundException);
+      QVERIFY_THROW(aMapper()->applyConverter("A", QVariant(), store), QMetaOrm::ConverterNotFoundException);
    }
 
    void applyConverter_converterSpecified_valueTransformedCorrectly() {
       auto store = QMetaOrm::DefaultConverterStore::factory();
       store->registerConverter(QSharedPointer<UpperConverter>(new UpperConverter()));
-      QCOMPARE(aMapper().applyConverter("UpperConverter", QVariant("abc"), store), QVariant("ABC"));
+      QCOMPARE(aMapper()->applyConverter("UpperConverter", QVariant("abc"), store), QVariant("ABC"));
    }
 
 

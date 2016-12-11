@@ -19,6 +19,7 @@ namespace QMetaOrm {
     *       - Added identity persistence
     *       - Add custom sql support 
     *       - Add object-pointer support (std::shared_ptr, QSharedPointer)
+    *       - Add selectOneByMapping (The template based variant actually does not support passing a custom mapping)
     */
    class QMETAORM_LIBRARY_API Session
    {
@@ -35,57 +36,102 @@ namespace QMetaOrm {
       virtual ~Session();
 
       template <class T>
-      void save(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void save(QSharedPointer<T> &entity);
+      void save(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
 
-      template <class T>
-      void remove(const QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+	     template <class T>
+      void remove(const QSharedPointer<T> &entity);
+      void remove(const QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
 
+      /**
+        * See the template less variant for more information.
+        * This one uses the default mapping for T (QMetaOrm::Mappings::mapping<T>()).
+        */
       template <class T, typename Key>
-      QSharedPointer<T> selectOne(Key key, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      QSharedPointer<T> selectOne(Key key);
+
+      /**
+        * Returns one object from the database which matches the given key.
+        * Data will be mapped according to the given mapping.
+        * If the result object contains a key as specified in the mapping, the object will be cached per session.
+        * \throws MoreThanOneResultException
+        */
+      QSharedPointer<QObject> selectOne(const QVariant &key, MetaEntity::Ptr mapping);
+
+      /**
+       * See the template less variant for more information.
+       * This one uses the default mapping for T (QMetaOrm::Mappings::mapping<T>()).
+       */
+      template <class T>
+      QSharedPointer<T> selectOneBySql(const QString &sql, const QVariantList &parameters = QVariantList());
+
+      /**
+       * Returns one object from the database which matches the given sql statement. 
+       * Data will be mapped according to the given mapping.
+       * If the result object contains a key as specified in the mapping, the object will be cached per session.
+       * \throws MoreThanOneResultException
+       */
+      QSharedPointer<QObject> selectOneBySql(const QString &sql, MetaEntity::Ptr mapping, const QVariantList &parameters = QVariantList());
 
       template <class T>
-      QList<QSharedPointer<T>> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void selectManyByCallback(
+         std::function<bool(const QSharedPointer<T> &)> callback, 
+         Criterion::Ptr criterion = Criterion::Ptr(), 
+         int skip = -1, 
+         int pageSize = -1);
+      void selectManyByCallback(
+         MetaEntity::Ptr mapping,
+         std::function<bool(const QSharedPointer<QObject> &)> callback,
+         Criterion::Ptr criterion = Criterion::Ptr(), 
+         int skip = -1, 
+         int pageSize = -1);
 
       template <class T>
-      void selectManyByCallback(Criterion::Ptr criterion, std::function<bool(const QSharedPointer<T>&)> callback, int skip = -1, int pageSize = -1, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      void selectManyByCallbackBySql(
+         const QString &sql, 
+         std::function<bool(const QSharedPointer<T> &)> callback, 
+         const QVariantList &parameters = QVariantList());
+      void selectManyByCallbackBySql(
+         const QString &sql, 
+         MetaEntity::Ptr mapping,
+         std::function<bool(const QSharedPointer<QObject> &)> callback,
+         const QVariantList &parameters = QVariantList());
 
-      /*
+      /**
+        * See the template less variant for more information.
+        * This one uses the default mapping for T (QMetaOrm::Mappings::mapping<T>()).
+        */
       template <class T>
-      void create(T entity, const QString &sql, MetaEntity mapping = MetaEntity());
+      QList<QSharedPointer<T>> selectMany(Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1);
 
+      /**
+        * Returns multiple objects from the database matching the given criterion.
+        * Data will be mapped according to the given mapping.
+        * If the result object contains a key as specified in the mapping, the object will be cached per session.
+        */
+      QList<QSharedPointer<QObject>> selectMany(MetaEntity::Ptr mapping, Criterion::Ptr criterion = Criterion::Ptr(), int skip = -1, int pageSize = -1);
+
+
+      /**
+        * See the template less variant for more information.
+        * This one uses the default mapping for T (QMetaOrm::Mappings::mapping<T>()).
+        */
       template <class T>
-      void update(T entity, const QString &sql, MetaEntity mapping = MetaEntity());
+      QList<QSharedPointer<T>> selectManyBySql(const QString &sql, const QVariantList &parameters = QVariantList());
 
-      template <class T, typename Key>
-      T selectOne(Key key, const QString &sql, MetaEntity mapping = MetaEntity());
-
-      template <class T>
-      QList<T> selectMany(const QString &sql, MetaEntity mapping = MetaEntity());
-      */
-
-      template <class T>
-      QList<QSharedPointer<T>> selectMany(const QString &sql, MetaEntity::Ptr mapping = MetaEntity::Ptr());
-
-      template <class T>
-      QList<QSharedPointer<T>> selectMany(const QString &sql, const QVariantList &parameters, MetaEntity::Ptr mapping = MetaEntity::Ptr());
-
-      template <class T>
-      void selectManyByCallback(const QString &sql, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping = MetaEntity::Ptr());
-
-      template <class T>
-      void selectManyByCallback(const QString &sql, const QVariantList &parameters, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping = MetaEntity::Ptr());
+      /**
+        * Returns multiple objects from the database which matche the given sql statement.
+        * Data will be mapped according to the given mapping.
+        * If the result object contains a key as specified in the mapping, the object will be cached per session.
+        */
+      QList<QSharedPointer<QObject>> selectManyBySql(const QString &sql, MetaEntity::Ptr mapping, const QVariantList &parameters = QVariantList());
 
       void commit();
       void rollback();
 
    private:
-
-      template <class T>
-      void create(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
-
-      template <class T>
-      void update(QSharedPointer<T> &entity, MetaEntity::Ptr mapping = MetaEntity::Ptr());
-
+      void create(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
+      void update(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
       void setupSession();
 
       QSqlDatabase m_database;
@@ -94,238 +140,63 @@ namespace QMetaOrm {
       ConverterStore::Ptr m_converterStore;
    };
 
-   //-----------------------------------------------------------------------------
    template <class T>
-   void Session::save(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
-      setupSession();
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-      if (mapping->hasValidKey(entity))
-         return update(entity, mapping);
-      else
-         return create(entity, mapping);
+   void Session::save(QSharedPointer<T> &entity) {
+      save(entity.objectCast<QObject>(), QMetaOrm::Mappings::mapping<T>());
+   }
+   
+   template <class T>
+   void Session::remove(const QSharedPointer<T> &entity) {
+      remove(entity, QMetaOrm::Mappings::mapping<T>());
    }
 
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::remove(const QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-      Q_ASSERT_X(mapping->hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
-
-      QSqlQuery query(m_database);
-
-      if (!query.prepare(m_entitySqlBuilder->buildRemove(mapping)))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      query.bindValue(0, mapping->getProperty(entity, mapping->getKeyProperty()));
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-   }
-
-   //-----------------------------------------------------------------------------
    template <class T, typename Key>
-   QSharedPointer<T> Session::selectOne(Key key, MetaEntity::Ptr mapping) {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      if (!query.prepare(m_entitySqlBuilder->buildSelect(mapping)))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      query.bindValue(0, key);
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-
-      return query.next() ?
-         m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore) :
-         QSharedPointer<T>();
+   QSharedPointer<T> Session::selectOne(Key key) {
+      return selectOne(key, QMetaOrm::Mappings::mapping<T>()).objectCast<T>();
    }
 
-   //-----------------------------------------------------------------------------
    template <class T>
-   QList<QSharedPointer<T>> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize, MetaEntity::Ptr mapping) {
+   QSharedPointer<T> Session::selectOneBySql(const QString &sql, const QVariantList &parameters) {
+      return selectOneBySql(sql, QMetaOrm::Mappings::mapping<T>(), parameters).objectCast<T>();
+   }
+
+   template <class T>
+   void Session::selectManyByCallback(
+      std::function<bool(const QSharedPointer<T> &)> callback,
+      Criterion::Ptr criterion,
+      int skip,
+      int pageSize) {
+      selectManyByCallback(QMetaOrm::Mappings::mapping<T>(), callback, criterion, skip, pageSize);
+   }
+
+   template <class T>
+   void Session::selectManyByCallbackBySql(
+      const QString &sql,
+      std::function<bool(const QSharedPointer<T> &)> callback,
+      const QVariantList &parameters) {
+      selectManyByCallbackBySql(sql, QMetaOrm::Mappings::mapping<T>(), callback, parameters);
+   }
+
+   template <class T>
+   QList<QSharedPointer<T>> Session::selectMany(Criterion::Ptr criterion, int skip, int pageSize) {
       QList<QSharedPointer<T>> result;
-      auto func = [&result](const QSharedPointer<T> &item) -> bool {
-         result.append(item);
+      auto func = [&result](const QSharedPointer<QObject> &item) -> bool {
+         result.append(item.objectCast<T>());
          return true;
       };
-      selectManyByCallback<T>(criterion, func, skip, pageSize, mapping);
+      selectManyByCallback(QMetaOrm::Mappings::mapping<T>(), func, criterion, skip, pageSize);
       return result;
    }
 
-   //-----------------------------------------------------------------------------
    template <class T>
-   void Session::selectManyByCallback(Criterion::Ptr criterion, std::function<bool(const QSharedPointer<T>&)> callback, int skip, int pageSize, MetaEntity::Ptr mapping) {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      QVariantList conditions;
-      QString sql = m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions);
-      if (!query.prepare(sql))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      for(int i = 0; i < conditions.size(); i++)
-         query.bindValue(i, conditions[i]);
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-
-      bool continueWork = true;
-      while (query.next() && continueWork) {
-         continueWork = callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
-      }
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   QList<QSharedPointer<T>> Session::selectMany(const QString &sql, MetaEntity::Ptr mapping)
-   {
-      return selectMany<T>(sql, QVariantList(), mapping);
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   QList<QSharedPointer<T>> Session::selectMany(const QString &sql, const QVariantList &parameters, MetaEntity::Ptr mapping)
+   QList<QSharedPointer<T>> Session::selectManyBySql(const QString &sql, const QVariantList &parameters)
    {
       QList<QSharedPointer<T>> result;
-      auto func = [&result](const QSharedPointer<T> &item) -> bool {
-         result.append(item);
+      auto func = [&result](const QSharedPointer<QObject> &item) -> bool {
+         result.append(item.objectCast<T>());
          return true;
       };
-      selectManyByCallback<T>(sql, parameters, mapping);
+      selectManyByCallbackBySql(sql, QMetaOrm::Mappings::mapping<T>(), func, parameters);
       return result;
    }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::selectManyByCallback(const QString &sql, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping)
-   {
-      selectManyByCallback<T>(sql, QVariantList(), callback, mapping);
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::selectManyByCallback(const QString &sql, const QVariantList &conditions, std::function<bool(const QSharedPointer<T>&)> callback, MetaEntity::Ptr mapping)
-   {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      if (!query.prepare(sql))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      for (int i = 0; i < conditions.size(); i++)
-         query.bindValue(i, conditions[i]);
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-
-      bool continueWork = true;
-      while (query.next() && continueWork)
-         continueWork = callback(m_entityMapper->mapToEntity<T>(mapping, query.record(), m_converterStore));
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::create(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      QStringList properties;
-      if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-
-      if (query.first())
-         mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::update(QSharedPointer<T> &entity, MetaEntity::Ptr mapping) {
-      setupSession();
-
-      mapping = mapping != nullptr ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      QStringList properties;
-
-      if (!query.prepare(m_entitySqlBuilder->buildUpdate(mapping, properties)))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      for(int i = 0; i < properties.size(); i++)
-         query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
-      query.bindValue(properties.size(), mapping->getProperty(entity, mapping->getKeyProperty()));
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-   }
-   /*
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::create(T entity, const QString &sql, MetaEntity mapping) {
-      setupSession();
-
-      mapping = mapping.isValid() ? mapping : QMetaOrm::Mappings::mapping<T>();
-
-      QSqlQuery query(m_database);
-
-      if (!query.prepare(sql))
-         throw CouldNotPrepareQueryException(query.lastError());
-
-      auto bindingParams = mapping.propertyMapping.keys()
-      for(int i = 0; i < bindingParams.size(); i++)
-      {
-         auto bindingParam = bindingParams[i];
-         auto value = mapping.propertyMapping[bindingParam];
-         query.bindValue(bindingParam, mapping.getProperty(entity, value));
-      }
-
-      if (!query.exec())
-         throw CouldNotExecuteQueryException(query.lastError());
-
-      // Todo extend reverse mapping
-      if (query.first() && !mapping.key.first.isEmpty())
-         mapping.setProperty(entity, mapping.key.first, query.value(0));
-
-      return entity;
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   void Session::update(T entity, const QString &sql, MetaEntity mapping) {
-
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T, typename Key>
-   T Session::selectOne(Key key, const QString &sql, MetaEntity mapping) {
-
-   }
-
-   //-----------------------------------------------------------------------------
-   template <class T>
-   QList<T> Session::selectMany(const QString &sql, MetaEntity mapping) {
-      return QList<T>();
-   }
-   */
 }

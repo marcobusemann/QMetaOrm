@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QMetaOrm", "QMetaOrm.vcxproj", "{5538E952-F5AB-3D6F-9154-5E9E4FC5F3B1}"
 EndProject
@@ -18,6 +18,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tst_metaentitytest", "test\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tst_entitymappertest", "test\EntityMapperTest\tst_entitymappertest.vcxproj", "{384B520D-D0DF-3D20-8508-DA524EBCFC18}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5538E952-F5AB-3D6F-9154-5E9E4FC5F3B1} = {5538E952-F5AB-3D6F-9154-5E9E4FC5F3B1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SessionIT", "test\SessionIT\SessionIT.vcxproj", "{279D0C32-5234-3644-9D2D-30E0902CAFF2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5538E952-F5AB-3D6F-9154-5E9E4FC5F3B1} = {5538E952-F5AB-3D6F-9154-5E9E4FC5F3B1}
 	EndProjectSection
@@ -44,6 +49,10 @@ Global
 		{384B520D-D0DF-3D20-8508-DA524EBCFC18}.Debug|Win32.Build.0 = Debug|Win32
 		{384B520D-D0DF-3D20-8508-DA524EBCFC18}.Release|Win32.ActiveCfg = Release|Win32
 		{384B520D-D0DF-3D20-8508-DA524EBCFC18}.Release|Win32.Build.0 = Release|Win32
+		{279D0C32-5234-3644-9D2D-30E0902CAFF2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{279D0C32-5234-3644-9D2D-30E0902CAFF2}.Debug|Win32.Build.0 = Debug|Win32
+		{279D0C32-5234-3644-9D2D-30E0902CAFF2}.Release|Win32.ActiveCfg = Release|Win32
+		{279D0C32-5234-3644-9D2D-30E0902CAFF2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,5 +61,6 @@ Global
 		{60C12B66-D34C-323D-91CF-4C31FFFE64C6} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
 		{F1766997-969D-3E7C-9D66-A222030F477D} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
 		{384B520D-D0DF-3D20-8508-DA524EBCFC18} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
+		{279D0C32-5234-3644-9D2D-30E0902CAFF2} = {6AC8BEE8-C801-434D-B763-26C0662D3D2E}
 	EndGlobalSection
 EndGlobal

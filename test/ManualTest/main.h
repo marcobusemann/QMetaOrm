@@ -14,62 +14,62 @@
 
 class Address : public QObject
 {
-	Q_OBJECT
+   Q_OBJECT
 
-	Q_PROPERTY(int id           READ getId      WRITE setId      )
-	Q_PROPERTY(QString country  READ getCountry WRITE setCountry )
-	Q_PROPERTY(QString street   READ getStreet  WRITE setStreet  )
-	Q_PROPERTY(QString plz      READ getPlz     WRITE setPlz     )
-
-public:
-	struct p {
-		static const QString id;
-		static const QString country;
-		static const QString street;
-		static const QString plz;
-	};
-
-	typedef QSharedPointer<Address> Ptr;
+      Q_PROPERTY(int id           READ getId      WRITE setId)
+      Q_PROPERTY(QString country  READ getCountry WRITE setCountry)
+      Q_PROPERTY(QString street   READ getStreet  WRITE setStreet)
+      Q_PROPERTY(QString plz      READ getPlz     WRITE setPlz)
 
 public:
-	Address() : m_id(0) {}
-	Address(const Address &rhs)
-		: m_id(rhs.m_id)
-		, m_country(rhs.m_country)
-		, m_street(rhs.m_street)
-		, m_plz(rhs.m_plz)
-	{
-	}
+   struct p {
+      static const QString id;
+      static const QString country;
+      static const QString street;
+      static const QString plz;
+   };
 
-	Address &operator=(const Address &rhs) {
-		m_id = rhs.m_id;
-		m_country = rhs.m_country;
-		m_street = rhs.m_street;
-		m_plz = rhs.m_plz;
-		return *this;
-	}
+   typedef QSharedPointer<Address> Ptr;
 
-	int getId() const { return m_id; }
-	void setId(int id) { m_id = id; }
+public:
+   Address() : m_id(0) {}
+   Address(const Address &rhs)
+      : m_id(rhs.m_id)
+      , m_country(rhs.m_country)
+      , m_street(rhs.m_street)
+      , m_plz(rhs.m_plz)
+   {
+   }
 
-	const QString &getCountry() const { return m_country; }
-	void setCountry(const QString &country) { m_country = country; }
+   Address &operator=(const Address &rhs) {
+      m_id = rhs.m_id;
+      m_country = rhs.m_country;
+      m_street = rhs.m_street;
+      m_plz = rhs.m_plz;
+      return *this;
+   }
 
-	const QString &getStreet() const { return m_street; }
-	void setStreet(const QString &street) { m_street = street; }
+   int getId() const { return m_id; }
+   void setId(int id) { m_id = id; }
 
-	const QString &getPlz() const { return m_plz; }
-	void setPlz(const QString &plz) { m_plz = plz; }
+   const QString &getCountry() const { return m_country; }
+   void setCountry(const QString &country) { m_country = country; }
 
-	void dump() {
-		qDebug() << "Address: " << m_id << m_country << m_street << m_plz;
-	}
+   const QString &getStreet() const { return m_street; }
+   void setStreet(const QString &street) { m_street = street; }
+
+   const QString &getPlz() const { return m_plz; }
+   void setPlz(const QString &plz) { m_plz = plz; }
+
+   void dump() {
+      qDebug() << "Address: " << m_id << m_country << m_street << m_plz;
+   }
 
 private:
-	int m_id;
-	QString m_country;
-	QString m_street;
-	QString m_plz;
+   int m_id;
+   QString m_country;
+   QString m_street;
+   QString m_plz;
 
 
 };
@@ -78,49 +78,49 @@ Q_DECLARE_METATYPE(Address);
 Q_DECLARE_METATYPE(Address::Ptr);
 
 namespace QMetaOrm {
-	namespace Mappings {
-		template <> QMetaOrm::MetaEntity::Ptr mapping<Address>();
-	}
+   namespace Mappings {
+      template <> QMetaOrm::MetaEntity::Ptr mapping<Address>();
+   }
 }
 
-class Person : public QObject
+class PersonSimple : public QObject
 {
    Q_OBJECT
 
-   Q_PROPERTY(int id               READ getId        WRITE setId)
-   Q_PROPERTY(QString surname      READ getSurname   WRITE setSurname)
-   Q_PROPERTY(QString lastname     READ getLastname  WRITE setLastname)
-   Q_PROPERTY(QDateTime birthdate  READ getBirthdate WRITE setBirthdate)
-   Q_PROPERTY(Address::Ptr address READ getAddress   WRITE setAddress)
+      Q_PROPERTY(int id               READ getId        WRITE setId)
+      Q_PROPERTY(QString surname      READ getSurname   WRITE setSurname)
+      Q_PROPERTY(QString lastname     READ getLastname  WRITE setLastname)
+      Q_PROPERTY(QDateTime birthdate  READ getBirthdate WRITE setBirthdate)
+      Q_PROPERTY(Address::Ptr address READ getAddress   WRITE setAddress)
 
 public:
    struct p {
       static const QString id;
       static const QString surname;
       static const QString lastname;
-	  static const QString birthdate;
-	  static const QString address;
+      static const QString birthdate;
+      static const QString address;
    };
 
-   typedef QSharedPointer<Person> Ptr;
+   typedef QSharedPointer<PersonSimple> Ptr;
 
 public:
-   Person(): m_id(0) {}
-   Person(const Person &rhs)
+   PersonSimple() : m_id(0) {}
+   PersonSimple(const PersonSimple &rhs)
       : m_id(rhs.m_id)
       , m_surname(rhs.m_surname)
       , m_lastname(rhs.m_lastname)
       , m_birthdate(rhs.m_birthdate)
-	  , m_address(rhs.m_address)
+      , m_address(rhs.m_address)
    {
    }
 
-   Person &operator=(const Person &rhs) {
+   PersonSimple &operator=(const PersonSimple &rhs) {
       m_id = rhs.m_id;
-	  m_surname = rhs.m_surname;
-	  m_lastname = rhs.m_lastname;
-	  m_birthdate = rhs.m_birthdate;
-	  m_address = rhs.m_address;
+      m_surname = rhs.m_surname;
+      m_lastname = rhs.m_lastname;
+      m_birthdate = rhs.m_birthdate;
+      m_address = rhs.m_address;
       return *this;
    }
 
@@ -140,9 +140,9 @@ public:
    void setAddress(const Address::Ptr &address) { m_address = address; }
 
    void dump() {
-	  qDebug() << "Person: " << m_id << m_surname << m_lastname << m_birthdate;
-	  if (m_address != nullptr)
-		  m_address->dump();
+      qDebug() << "Person: " << m_id << m_surname << m_lastname << m_birthdate;
+      if (m_address != nullptr)
+         m_address->dump();
    }
 
 private:
@@ -156,11 +156,11 @@ signals:
    void propertyChanged();
 };
 
-Q_DECLARE_METATYPE(Person);
-Q_DECLARE_METATYPE(Person::Ptr);
+Q_DECLARE_METATYPE(PersonSimple);
+Q_DECLARE_METATYPE(PersonSimple::Ptr);
 
 namespace QMetaOrm {
-	namespace Mappings {
-		template <> QMetaOrm::MetaEntity::Ptr mapping<Person>();
-	}
+   namespace Mappings {
+      template <> QMetaOrm::MetaEntity::Ptr mapping<PersonSimple>();
+   }
 }

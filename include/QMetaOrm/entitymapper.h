@@ -38,11 +38,19 @@ namespace QMetaOrm {
          const Logger::Ptr &logger,
          const EntityCache::Ptr &entityCache);
 
+      QSharedPointer<QObject> mapToEntity(const MetaEntity::Ptr &mapping, const QSqlRecord &record, const ConverterStore::Ptr &converterStore) {
+         auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record);
+         QVariant result;
+         if (isValidObject(mapping, getRecordFunc))
+            result = createCachedReference(mapping, converterStore, getRecordFunc);
+         else
+            result = createReference(mapping, converterStore, getRecordFunc);
+         return mapping->getEntityFactory()->unpack(result);
+      }
+
       template <class T>
       QSharedPointer<T> mapToEntity(const MetaEntity::Ptr &mapping, const QSqlRecord &record, const ConverterStore::Ptr &converterStore) {
-         auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record);
-         auto item = createReference(mapping, converterStore, getRecordFunc);
-         return mapping->getEntityFactory()->unpack(item).objectCast<T>();
+         return mapToEntity(mapping, record, converterStore).objectCast<T>();
       }
 
       ApplyHandler applyTo(QSharedPointer<QObject> &obj) {
@@ -51,6 +59,7 @@ namespace QMetaOrm {
                if (value.isValid()) {
                   qWarning() << "Could not apply " << value << " to " << prop;
                   qWarning() << "\tNote that the variants type and the type used in Q_PROPERTY must match exactly!";
+                  qWarning() << "\tIf you use a typedef, be sure that Q_DECLARE_METATYPE is used for that type.";
                }
             }
          };
@@ -90,7 +99,7 @@ namespace QMetaOrm {
          foreach(auto key, keys) {
             auto propertie = mapping->getProperty(key);
             QVariant value;
-            if (propertie.isReference()) {
+            if (propertie.isReference() && isValidObject(mapping, getRecord)) {
                value = createCachedReference(propertie.reference, converterStore, m_prefixer.getEmbeddedRecordValuePrefixer(getRecord, propertie.databaseName));
             }
             else {
@@ -108,9 +117,6 @@ namespace QMetaOrm {
       }
 
       QVariant createReference(const MetaEntity::Ptr &mapping, const ConverterStore::Ptr &converterStore, PropertyPrefixer::Handler getRecord) {
-         if (!isValidObject(mapping, getRecord))
-            return QVariant();
-         
          auto entityFactory = mapping->getEntityFactory();
          auto entity = entityFactory->construct();
          mapToEntity(mapping, converterStore, getRecord, applyTo(entity));
@@ -118,9 +124,6 @@ namespace QMetaOrm {
       }
 
       QVariant createCachedReference(const MetaEntity::Ptr &mapping, const ConverterStore::Ptr &converterStore, PropertyPrefixer::Handler getRecord) {
-         if (!isValidObject(mapping, getRecord))
-            return QVariant();
-
          auto entityFactory = mapping->getEntityFactory();
          auto key = getKeyFor(mapping, getRecord);
 

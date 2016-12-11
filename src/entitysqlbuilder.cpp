@@ -152,7 +152,13 @@ private:
    QString resolveRecursiveProperty(const QString &rawProperty, const QString &prop, MetaEntity::Ptr entity) {
       int index = prop.indexOf(".");
       if (index == -1)
-         return EmbeddAlias(aliasFor(entity->getSource(), rawProperty), entity->getProperty(prop).databaseName);
+      {
+         QString alias = aliasFor(entity->getSource(), rawProperty);
+         QString databaseName = 
+            prop == entity->getKeyProperty() ? entity->getKeyDatabaseField() :
+            entity->getProperty(prop).databaseName;
+         return EmbeddAlias(alias, databaseName);
+      }
       QString referenceProperty = prop.left(index);
       auto referencePropertyEntity = entity->getProperty(referenceProperty);
       if (!referencePropertyEntity.isReference()) {

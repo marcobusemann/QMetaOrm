@@ -12,6 +12,19 @@
 
 #include <functional>
 
+// General utility: if_<Condition, Then, Else>::type
+// Selects 'Then' or 'Else' type based on the value of 
+// the 'Condition'
+template <bool Condition, typename Then, typename Else = void>
+struct if_ {
+   typedef Then type;
+};
+
+template <typename Then, typename Else>
+struct if_<false, Then, Else > {
+   typedef Else type;
+};
+
 namespace QMetaOrm {
 
    class EntityFactory {
@@ -25,14 +38,12 @@ namespace QMetaOrm {
       virtual QSharedPointer<QObject> unpack(const QVariant &value) const = 0;
    };
 
-   template <class T>
+   template <class T, typename _ = void>
    class DefaultEntityFactory : public EntityFactory {
    public:
-      static EntityFactory::Ptr factory() {
-         return EntityFactory::Ptr(new DefaultEntityFactory());
+      DefaultEntityFactory() {
+         qRegisterMetaType<QSharedPointer<T>>();
       }
-
-   public:
       virtual QSharedPointer<QObject> construct() const override {
          return QSharedPointer<T>(new T());
       }
@@ -44,21 +55,15 @@ namespace QMetaOrm {
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
          return *reinterpret_cast<const QSharedPointer<T> *>(packetValue.constData());
       }
-
-   private:
-      DefaultEntityFactory() {
-         qRegisterMetaType<QSharedPointer<T>>();
-      }
    };
 
    template <class T>
-   class EmbeddedPtrNamingSchemeEntityFactory : public EntityFactory {
+   class DefaultEntityFactory<T, typename if_<false, typename T::Ptr>::type> : public EntityFactory {
    public:
-      static EntityFactory::Ptr factory() {
-         return EntityFactory::Ptr(new EmbeddedPtrNamingSchemeEntityFactory());
+      DefaultEntityFactory() {
+         qRegisterMetaType<T::Ptr>();
       }
 
-   public:
       virtual QSharedPointer<QObject> construct() const override {
          return T::Ptr(new T());
       }
@@ -69,11 +74,6 @@ namespace QMetaOrm {
 
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
          return *reinterpret_cast<const T::Ptr *>(packetValue.constData());
-      }
-
-   private:
-      EmbeddedPtrNamingSchemeEntityFactory() {
-         qRegisterMetaType<T::Ptr>();
       }
    };
 
@@ -149,8 +149,7 @@ namespace QMetaOrm {
 
       QStringList getDatabaseFields() const;
 
-      template <class T>
-      QVariant getProperty(const QSharedPointer<T> &item, const QString &name) const {
+      QVariant getProperty(const QSharedPointer<QObject> &item, const QString &name) const {
          return item == nullptr ? QVariant() : item->property(name.toStdString().c_str());
       }
 

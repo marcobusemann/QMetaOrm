@@ -32,10 +32,7 @@ namespace QMetaOrm {
          auto keyType = gatherKeyType<T>(m_entity);
          Q_ASSERT_X(MetaEntity::SupportedKeyTypes.contains(keyType), "build", "actually only int, long or string key types are allowed!");
 
-         if (m_useEmbeddedPtrEntityFactoryNamingScheme)
-            m_entity->setEntityFactory(EmbeddedPtrNamingSchemeEntityFactory<T>::factory());
-         else if (m_entity->getEntityFactory() == nullptr)
-            m_entity->setEntityFactory(DefaultEntityFactory<T>::factory());
+         m_entity->setEntityFactory(EntityFactory::Ptr(new DefaultEntityFactory<T>()));
 
          return m_entity->copy();
       }

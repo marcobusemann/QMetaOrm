@@ -7,7 +7,6 @@
 namespace QMetaOrm {
 
    /**
-    * @brief The DatabaseException class
     */
    class QMETAORM_LIBRARY_API DatabaseException: public std::runtime_error
    {
@@ -16,7 +15,6 @@ namespace QMetaOrm {
    };
 
    /**
-    * @brief The ConnectToDatabaseException class
     */
    class QMETAORM_LIBRARY_API ConnectToDatabaseException: public DatabaseException
    {
@@ -28,7 +26,6 @@ namespace QMetaOrm {
    };
 
    /**
-    * @brief The TransactionException class
     */
    class QMETAORM_LIBRARY_API TransactionException: public DatabaseException
    {
@@ -37,7 +34,6 @@ namespace QMetaOrm {
    };
 
    /**
-    * @brief The QueryException class
     */
    class QMETAORM_LIBRARY_API QueryException: public DatabaseException
    {
@@ -49,7 +45,6 @@ namespace QMetaOrm {
    };
 
    /**
-    * @brief The CouldNotPrepareQueryException class
     */
    class QMETAORM_LIBRARY_API CouldNotPrepareQueryException: public QueryException
    {
@@ -58,7 +53,6 @@ namespace QMetaOrm {
    };
 
    /**
-    * @brief The CouldNotExecuteQueryException class
     */
    class QMETAORM_LIBRARY_API CouldNotExecuteQueryException: public QueryException
    {
@@ -67,7 +61,6 @@ namespace QMetaOrm {
    };
 
    /**
-   * @brief The CreatingObjectByMetaObjectException class
    */
    class CreatingObjectByMetaObjectException : public std::runtime_error
    {
@@ -78,7 +71,6 @@ namespace QMetaOrm {
    };
 
    /**
-   * @brief The ConverterNotFoundException class
    */
    class ConverterNotFoundException : public std::runtime_error
    {
@@ -88,6 +80,16 @@ namespace QMetaOrm {
       {}
       ConverterNotFoundException(const QString &type)
          : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit())
+      {}
+   };
+
+   /**
+   */
+   class MoreThanOneResultException : public std::runtime_error
+   {
+   public:
+      MoreThanOneResultException()
+         : std::runtime_error("A statement returned more than one result where only was was expected.")
       {}
    };
 }
