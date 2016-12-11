@@ -1,7 +1,6 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
   <qresource>
-      <file>schema.sql</file>
 	  <file>database.fdb</file>
   </qresource>
 </RCC>

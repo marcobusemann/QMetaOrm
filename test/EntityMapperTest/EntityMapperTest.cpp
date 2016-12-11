@@ -197,4 +197,4 @@ private Q_SLOTS:
 
 QTEST_APPLESS_MAIN(EntityMapperTest)
 
-#include "tst_entitymappertest.moc"
+#include "EntityMapperTest.moc"

@@ -12,8 +12,6 @@ TEMPLATE = app
 SOURCES += main.cpp
 DESTDIR = ../../bin
 
-
-
 include(../../QMetaOrm.pri)
 
 HEADERS += \

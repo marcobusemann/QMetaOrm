@@ -94,4 +94,4 @@ public:
 
 QTEST_APPLESS_MAIN(MetaEntityTest)
 
-#include "tst_metaentitytest.moc"
+#include "MetaEntityTest.moc"
