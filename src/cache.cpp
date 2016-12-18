@@ -1,4 +1,4 @@
-#include <QMetaOrm\Cache.h>
+#include <QMetaOrm/Cache.h>
 
 #include <QVariant>
 #include <QHash>

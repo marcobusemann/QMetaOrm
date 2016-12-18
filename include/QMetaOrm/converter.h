@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QMetaOrm\Private.h>
+#include <QMetaOrm/Private.h>
 #include <qsharedpointer.h>
 #include <qvariant.h>
 

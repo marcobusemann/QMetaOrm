@@ -23,8 +23,8 @@ namespace QMetaOrm {
    public:
       virtual ~Criterion() {}
 
-      static Criterion::Ptr and(Criterion::Ptr left,  Criterion::Ptr right =  Criterion::Ptr());
-      static Criterion::Ptr or(Criterion::Ptr left,  Criterion::Ptr right =  Criterion::Ptr());
+      static Criterion::Ptr andCondition(Criterion::Ptr left,  Criterion::Ptr right =  Criterion::Ptr());
+      static Criterion::Ptr orCondition(Criterion::Ptr left,  Criterion::Ptr right =  Criterion::Ptr());
 
       virtual QString dump() const;
 

@@ -106,19 +106,19 @@ private Q_SLOTS :
    {
       auto session = m_sessionFactory->createSession();
 
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 * from person");
+      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1");
 
       QVERIFY(item == nullptr);
    }
 
    void selectOneBySql_onePersonIsSelected_thatPerson()
    {
-      QString name = "Müller", surname = "Hans";
+      QString name = "Mueller", surname = "Hans";
       int id = 1;
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << name << surname);
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 * from person");
+      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1");
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), id);
@@ -138,11 +138,11 @@ private Q_SLOTS :
 
    void selectOneBySql_onePersonWithNameOnlyIsSelected_onePersonWithNameOnlyIsFilled()
    {
-      QString name = "Müller";
+      QString name = "Mueller";
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << name << "Hans");
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 name from person");
+      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1");
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), 0);
@@ -155,8 +155,9 @@ private Q_SLOTS :
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 id from person");
-      auto item2 = session->selectOneBySql<PersonSimple>("select first 1 id from person");
+      auto item = session->selectOneBySql<PersonSimple>("select id from person limit 1");
+      auto item2 = session->selectOneBySql<PersonSimple>("select id from person limit 1");
+
 
       QCOMPARE(item, item2);
    }
@@ -166,8 +167,8 @@ private Q_SLOTS :
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 name from person");
-      auto item2 = session->selectOneBySql<PersonSimple>("select first 1 name from person");
+      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1");
+      auto item2 = session->selectOneBySql<PersonSimple>("select name from person limit 1");
 
       QVERIFY(item != item2);
    }
@@ -178,7 +179,7 @@ private Q_SLOTS :
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select first 1 * from person where id = ?", QVariantList() << id);
+      auto item = session->selectOneBySql<PersonSimple>("select * from person where id = ? limit 1", QVariantList() << id);
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), id);
@@ -195,7 +196,7 @@ private Q_SLOTS :
 
    void selectOne_onePersonIsSelected_thatPerson()
    {
-      QString name = "Müller", surname = "Hans";
+      QString name = "Mueller", surname = "Hans";
       int id = 1;
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << name << surname);
 
@@ -222,7 +223,7 @@ private Q_SLOTS :
 
    void selectOne_personWithOneToManyRelation_relationWillBeFilled()
    {
-      QString country = "Germany", postCode = "55555", street = "Müller Street 1";
+      QString country = "Germany", postCode = "55555", street = "Mueller Street 1";
       int idPerson = 1, idAddress = 1;
       m_sqlHelper->insert("insert into address (id, country, postCode, street) values (?,?,?,?)", QVariantList() << idAddress << country << postCode << street);
       m_sqlHelper->insert("insert into person (id, name, surname, address) values (?,?,?,?)", QVariantList() << idPerson << AnyBuilder::anyString() << AnyBuilder::anyString() << idAddress);
@@ -261,8 +262,8 @@ private Q_SLOTS :
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items  = session->selectManyBySql<PersonSimple>("select first 1 id from person");
-      auto items2 = session->selectManyBySql<PersonSimple>("select first 1 id from person");
+      auto items  = session->selectManyBySql<PersonSimple>("select id from person limit 1");
+      auto items2 = session->selectManyBySql<PersonSimple>("select id from person limit 1");
 
       QCOMPARE(items[0], items2[0]);
    }
@@ -273,7 +274,7 @@ private Q_SLOTS :
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectManyBySql<PersonSimple>("select first 1 * from person where id = ?", QVariantList() << id);
+      auto items = session->selectManyBySql<PersonSimple>("select * from person where id = ? limit 1", QVariantList() << id);
 
       QVERIFY(items.size() == 1);
       QCOMPARE(items[0]->getId(), id);
@@ -326,7 +327,7 @@ private Q_SLOTS :
    void save_newPerson_personIsPersistetAndIdIsSet() 
    {
       auto person = PersonSimple::Ptr(new PersonSimple());
-      person->setName("Müller");
+      person->setName("Mueller");
       person->setSurname("Hans");
 
       auto session = m_sessionFactory->createSession();
@@ -350,11 +351,12 @@ private Q_SLOTS :
          .build<PersonSimple>();
 
       auto person = PersonSimple::Ptr(new PersonSimple());
-      person->setName("Müller");
+      person->setName("Mueller");
       person->setSurname("Hans");
 
       auto session = m_sessionFactory->createSession();
-      session->save(person.objectCast<QObject>(), metaEntity);
+      auto generellEntity  = person.objectCast<QObject>();
+      session->save(generellEntity, metaEntity);
       session->commit();
 
       auto records = m_sqlHelper->select("select id, name, surname from person");
@@ -418,7 +420,7 @@ private Q_SLOTS :
    void remove_existingPerson_personIsDeleted()
    {
       int idPerson = 1;
-      QString name = "Müller", surname = "Hans";
+      QString name = "Mueller", surname = "Hans";
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << idPerson << name << surname);
 
       auto person = PersonSimple::Ptr(new PersonSimple());

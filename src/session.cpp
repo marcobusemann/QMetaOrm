@@ -1,11 +1,11 @@
 #include <QMetaOrm/Session.h>
 #include <QMetaOrm/Exceptions.h>
-#include <qthread.h>
+#include <quuid.h>
 
 using namespace QMetaOrm;
 
 QString GetThreadIdentifier() {
-   return QString::number((int)QThread::currentThreadId());
+   return QUuid::createUuid().toString();
 }
 
 Session::Session(
@@ -14,8 +14,8 @@ Session::Session(
    EntityMapper::Ptr entityMapper,
    ConverterStore::Ptr converterStore)
    : m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
-   , m_entitySqlBuilder(entitySqlBuilder)
    , m_entityMapper(entityMapper)
+   , m_entitySqlBuilder(entitySqlBuilder)
    , m_converterStore(converterStore)
 {
 }

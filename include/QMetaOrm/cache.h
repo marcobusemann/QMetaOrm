@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QMetaOrm\MetaEntity.h>
-#include <QMetaOrm\Private.h>
+#include <QMetaOrm/MetaEntity.h>
+#include <QMetaOrm/Private.h>
 
 #include <QSharedPointer>
 #include <QVariant>

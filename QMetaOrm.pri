@@ -1,3 +1,4 @@
 INCLUDEPATH += "$$PWD"/include
-LIBS += "$$PWD"/lib/QMetaOrm.lib
 
+unix:LIBS += -L"$$PWD"/lib/ -lQMetaOrm
+win32:LIBS += "$$PWD"/lib/QMetaOrm.lib

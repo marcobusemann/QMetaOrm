@@ -7,15 +7,16 @@ TEMPLATE = lib
 DEFINES += QMETAORM_LIBRARY
 
 INCLUDEPATH   += "$$PWD"/include
+
 DESTDIR       += "$$PWD"/lib
 DLLDESTDIR    += "$$PWD"/bin
 
 MOC_DIR       += "$$PWD"/build
 OBJECTS_DIR   += "$$PWD"/build
 
+# Copy lib files for tests
 unix {
-    target.path = /usr/lib
-    INSTALLS += target
+    QMAKE_POST_LINK += cp "$$PWD"/lib/* "$$PWD"/bin/
 }
 
 HEADERS += \
@@ -49,6 +50,6 @@ SOURCES += \
     src/Converter.cpp \
     src/ConverterStore.cpp \
     src/EntityMapper.cpp \
-	src/Logger.cpp \
-	src/Cache.cpp \
-	src/CacheFactory.cpp \
+    src/Logger.cpp \
+    src/Cache.cpp \
+    src/CacheFactory.cpp \

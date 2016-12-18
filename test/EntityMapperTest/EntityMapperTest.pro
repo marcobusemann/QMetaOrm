@@ -1,5 +1,4 @@
 QT       += testlib sql
-
 QT       -= gui
 
 TARGET = EntityMapperTest
@@ -10,6 +9,5 @@ TEMPLATE = app
 DESTDIR = ../../bin
 
 SOURCES += EntityMapperTest.cpp
-DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 include(../../QMetaOrm.pri)

@@ -1,11 +1,4 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-08-22T14:31:06
-#
-#-------------------------------------------------
-
 QT       += testlib sql
-
 QT       -= gui
 
 TARGET = SessionIT
@@ -19,6 +12,5 @@ DESTDIR = ../../bin
 
 HEADERS += Person.h DatabaseFactory.h
 SOURCES += SessionIT.cpp Person.cpp
-DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 include(../../QMetaOrm.pri)

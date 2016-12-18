@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMetaOrm/Private.h>
-#include <QMetaOrm\ConverterStore.h>
+#include <QMetaOrm/ConverterStore.h>
 
 #include <qsharedpointer.h>
 #include <qstringlist.h>
@@ -11,6 +11,8 @@
 #include <qlist.h>
 
 #include <functional>
+
+#include <qdebug.h>
 
 // General utility: if_<Condition, Then, Else>::type
 // Selects 'Then' or 'Else' type based on the value of 
@@ -61,26 +63,26 @@ namespace QMetaOrm {
    class DefaultEntityFactory<T, typename if_<false, typename T::Ptr>::type> : public EntityFactory {
    public:
       DefaultEntityFactory() {
-         qRegisterMetaType<T::Ptr>();
+         qRegisterMetaType<typename T::Ptr>();
       }
 
       virtual QSharedPointer<QObject> construct() const override {
-         return T::Ptr(new T());
+         return typename T::Ptr(new T());
       }
 
       virtual QVariant pack(const QSharedPointer<QObject> &entity) const override {
-         return QVariant::fromValue(static_cast<T::Ptr>(entity.objectCast<T>()));
+         return QVariant::fromValue(static_cast<typename T::Ptr>(entity.objectCast<T>()));
       }
 
       virtual QSharedPointer<QObject> unpack(const QVariant &packetValue) const override {
-         return *reinterpret_cast<const T::Ptr *>(packetValue.constData());
+         return *reinterpret_cast<const typename T::Ptr *>(packetValue.constData());
       }
    };
 
    /**
    * @brief The MetaProperty struct
    */
-   struct MetaProperty
+   struct QMETAORM_LIBRARY_API MetaProperty
    {
       QString propertyName;
       QString databaseName;

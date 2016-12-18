@@ -2,7 +2,7 @@
 
 using namespace QMetaOrm;
 
-Criterion::Ptr Criterion::and(Criterion::Ptr left,  Criterion::Ptr right) {
+Criterion::Ptr Criterion::andCondition(Criterion::Ptr left,  Criterion::Ptr right) {
    if (!left && right)
       return right;
    else if (!right && left)
@@ -10,7 +10,7 @@ Criterion::Ptr Criterion::and(Criterion::Ptr left,  Criterion::Ptr right) {
    return Criterion::Ptr(new Criterion(CombinationType::And, left, right));
 }
 
-Criterion::Ptr Criterion::or(Criterion::Ptr left,  Criterion::Ptr right) {
+Criterion::Ptr Criterion::orCondition(Criterion::Ptr left,  Criterion::Ptr right) {
    if (!left && right)
       return right;
    else if (!right && left)

@@ -14,14 +14,14 @@ QString ValueCriterion::dump() const {
 }
 
 QString ValueCriterion::stringify(
-   std::function<QString(const Criterion *, const QString &leftChild, const QString &rightChild)> containerDelegate,
+   std::function<QString(const Criterion *, const QString & /*leftChild*/, const QString &rightChild)> /*containerDelegate*/,
    std::function<QString(const class ValueCriterion *)> valueDelegate,
-   std::function<QString(const class ListCriterion *)> listDelegate) const {
+   std::function<QString(const class ListCriterion *)> /*listDelegate*/) const {
    return valueDelegate(this);
 }
 
 ValueCriterion::ValueCriterion(ExpressionType atype, const QString &aprop, const QVariant &avalue)
-   : value(avalue)
+   : expressiontype(atype)
    , prop(aprop)
-   , expressiontype(atype)
+   , value(avalue)
 {}

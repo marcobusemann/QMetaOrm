@@ -1,4 +1,4 @@
-#include <QMetaOrm\MetaEntity.h>
+#include <QMetaOrm/MetaEntity.h>
 
 #include <qstring.h>
 #include <qsharedpointer.h>
@@ -14,13 +14,6 @@ class PersonSimple : public QObject
 
 public:
    typedef QSharedPointer<PersonSimple> Ptr;
-
-   static PersonSimple::Ptr factoryOttoMueller() {
-      PersonSimple::Ptr person(new PersonSimple());
-      person->setName("Müller");
-      person->setSurname("Otto");
-      return person;
-   }
 
 public:
    struct p {

@@ -1,8 +1,12 @@
-#include <QMetaOrm\DatabaseFactory.h>
+#include <QMetaOrm/DatabaseFactory.h>
 
 #include <qstringlist.h>
 #include <quuid.h>
 #include <qfile.h>
+
+#include <QSqlQuery>
+#include <QDebug>
+#include <QSqlError>
 
 using namespace QMetaOrm;
 
@@ -14,14 +18,10 @@ public:
    }
 
 public:
-   TestDatabaseFactory() {
-      m_file = QUuid::createUuid().toString().remove("{").remove("}").remove("-") + ".fdb";
-      QFile::copy(":/database.fdb", m_file);
-
-      QFile file(m_file);
-      file.open(QFile::WriteOnly);
-      file.setPermissions(QFileDevice::ExeOther | QFileDevice::ReadOther | QFileDevice::WriteOther);
-      file.close();
+   TestDatabaseFactory()
+      : m_isDatabaseInitialized(false)
+   {
+      m_file = QUuid::createUuid().toString().remove("{").remove("}").remove("-") + ".sqlite";
    }
 
    ~TestDatabaseFactory() {
@@ -31,10 +31,13 @@ public:
    virtual QSqlDatabase createDatabase(const QString & name = QString()) const override
    {
       if (!QSqlDatabase::contains(name)) {
-         QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE", name);
+         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", name);
          db.setDatabaseName(m_file);
-         db.setUserName("SYSDBA");
-         db.setPassword("MASTERKEY");
+
+         if (!m_isDatabaseInitialized) {
+             initializeDatabase(db);
+             m_isDatabaseInitialized = true;
+         }
       }
       return QSqlDatabase::database(name, true);
    }
@@ -47,4 +50,21 @@ public:
 
 private:
    QString m_file;
+   mutable bool m_isDatabaseInitialized;
+
+   void initializeDatabase(QSqlDatabase &db) const {
+       bool okOpen = db.open();
+       Q_ASSERT(okOpen);
+
+       QFile schemaFile(":/schema.sql");
+       bool okOpenFile = schemaFile.open(QFile::ReadOnly);
+       Q_ASSERT(okOpenFile);
+       auto ddl = QString::fromLocal8Bit(schemaFile.readAll()).trimmed();
+       auto ddlStatements = ddl.split(';', QString::SplitBehavior::SkipEmptyParts);
+
+       QSqlQuery initialization(db);
+       for(auto statement : ddlStatements)
+           initialization.exec(statement.trimmed());
+       db.close();
+   }
 };

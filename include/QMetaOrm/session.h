@@ -142,7 +142,8 @@ namespace QMetaOrm {
 
    template <class T>
    void Session::save(QSharedPointer<T> &entity) {
-      save(entity.objectCast<QObject>(), QMetaOrm::Mappings::mapping<T>());
+      auto generellEntity = entity.template objectCast<QObject>();
+      save(generellEntity, QMetaOrm::Mappings::mapping<T>());
    }
    
    template <class T>
@@ -152,12 +153,12 @@ namespace QMetaOrm {
 
    template <class T, typename Key>
    QSharedPointer<T> Session::selectOne(Key key) {
-      return selectOne(key, QMetaOrm::Mappings::mapping<T>()).objectCast<T>();
+      return selectOne(key, QMetaOrm::Mappings::mapping<T>()).template objectCast<T>();
    }
 
    template <class T>
    QSharedPointer<T> Session::selectOneBySql(const QString &sql, const QVariantList &parameters) {
-      return selectOneBySql(sql, QMetaOrm::Mappings::mapping<T>(), parameters).objectCast<T>();
+      return selectOneBySql(sql, QMetaOrm::Mappings::mapping<T>(), parameters).template objectCast<T>();
    }
 
    template <class T>

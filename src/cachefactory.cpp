@@ -1,4 +1,4 @@
-#include <QMetaOrm\CacheFactory.h>
+#include <QMetaOrm/CacheFactory.h>
 
 using namespace QMetaOrm;
 
