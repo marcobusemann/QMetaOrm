@@ -18,3 +18,4 @@ build
 /**/*.VC.VC.opendb
 .vs
 .qmake.stash
+/**/*.o

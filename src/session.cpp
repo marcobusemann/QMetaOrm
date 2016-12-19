@@ -70,14 +70,36 @@ void Session::create(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping) {
    QSqlQuery query(m_database);
 
    QStringList properties;
-   if (!query.prepare(m_entitySqlBuilder->buildInsert(mapping, properties)))
-      throw CouldNotPrepareQueryException(query.lastError());
+   auto keyStrategy = mapping->getKeyGenerationStrategy();
+
+   if (keyStrategy == KeyGenerationStrategy::Sequence) {
+      QSqlQuery keyQuery(m_database);
+      if (!keyQuery.exec(m_entitySqlBuilder->buildSequenceSelect(mapping)))
+         throw CouldNotQueryNextSequenceValueException(query.lastError());
+
+      if (!keyQuery.first())
+         throw CouldNotQueryNextSequenceValueException(query.lastError());
+
+      mapping->setProperty(entity, mapping->getKeyProperty(), keyQuery.value(0));
+
+      if (!query.prepare(m_entitySqlBuilder->buildInsertForSequence(mapping, properties)))
+         throw CouldNotPrepareQueryException(query.lastError());
+   }
+   else if (keyStrategy == KeyGenerationStrategy::Identity) {
+      if (!query.prepare(m_entitySqlBuilder->buildInsertForIdentity(mapping, properties)))
+         throw CouldNotPrepareQueryException(query.lastError());
+   }
+   else
+      Q_ASSERT(false);
 
    for (int i = 0; i < properties.size(); i++)
       query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
 
    if (!query.exec())
       throw CouldNotExecuteQueryException(query.lastError());
+
+   if (keyStrategy == KeyGenerationStrategy::Identity)
+      mapping->setProperty(entity, mapping->getKeyProperty(), query.lastInsertId());
 
    if (query.first())
       mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));

@@ -25,6 +25,11 @@ MetaEntity::Ptr MetaEntity::copy()
    return Ptr(new MetaEntity(*this));
 }
 
+MetaEntity::MetaEntity()
+   : m_keyGenerationstrategy(KeyGenerationStrategy::Identity)
+{
+}
+
 MetaEntity::MetaEntity(const MetaEntity &rhs)
 {
    m_source = rhs.m_source;
@@ -32,6 +37,7 @@ MetaEntity::MetaEntity(const MetaEntity &rhs)
    m_key = rhs.m_key;
    m_propertyMapping = rhs.m_propertyMapping;
    m_entityFactory = rhs.m_entityFactory;
+   m_keyGenerationstrategy = rhs.m_keyGenerationstrategy;
 }
 
 void MetaEntity::setSource(const QString & aSource)
@@ -52,6 +58,7 @@ bool MetaEntity::hasSource() const
 void MetaEntity::setSequence(const QString &aSequence)
 {
    m_sequence = aSequence;
+   m_keyGenerationstrategy = KeyGenerationStrategy::Sequence;
 }
 
 const QString &MetaEntity::getSequence() const
@@ -62,6 +69,11 @@ const QString &MetaEntity::getSequence() const
 bool MetaEntity::hasSequence() const
 {
    return !m_sequence.isEmpty();
+}
+
+KeyGenerationStrategy MetaEntity::getKeyGenerationStrategy() const
+{
+   return m_keyGenerationstrategy;
 }
 
 void MetaEntity::setKey(const QString &aProperty, const QString &aDatabaseField)

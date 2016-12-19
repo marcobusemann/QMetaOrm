@@ -21,7 +21,6 @@ namespace QMetaOrm {
       template <> QMetaOrm::MetaEntity::Ptr mapping<PersonSimple>() {
          static const MetaEntity::Ptr map = MetaEntityBuilder::anEntity()
             .forSource("person")
-            .withSequence("person_gen")
             .withId(PersonSimple::p::id, "ID")
             .withData(PersonSimple::p::name, "NAME")
             .withData(PersonSimple::p::surname, "SURNAME")
@@ -32,7 +31,6 @@ namespace QMetaOrm {
       template <> QMetaOrm::MetaEntity::Ptr mapping<Address>() {
          static const MetaEntity::Ptr map = MetaEntityBuilder::anEntity()
             .forSource("address")
-            .withSequence("address_gen")
             .withId(Address::p::id, "ID")
             .withData(Address::p::country, "COUNTRY")
             .withData(Address::p::postCode, "POSTCODE")
@@ -44,7 +42,6 @@ namespace QMetaOrm {
       template <> QMetaOrm::MetaEntity::Ptr mapping<PersonComplex>() {
          static const MetaEntity::Ptr map = MetaEntityBuilder::anEntity()
             .forSource("person")
-            .withSequence("person_gen")
             .withId(PersonComplex::p::id, "ID")
             .withData(PersonComplex::p::name, "NAME")
             .withData(PersonComplex::p::surname, "SURNAME")

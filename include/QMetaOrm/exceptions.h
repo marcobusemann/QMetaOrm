@@ -92,4 +92,12 @@ namespace QMetaOrm {
          : std::runtime_error("A statement returned more than one result where only was was expected.")
       {}
    };
+
+   /**
+    */
+   class QMETAORM_LIBRARY_API CouldNotQueryNextSequenceValueException: public QueryException
+   {
+   public:
+      CouldNotQueryNextSequenceValueException(const QSqlError &error): QueryException(error) {}
+   };
 }

@@ -345,7 +345,6 @@ private Q_SLOTS :
    {
       auto metaEntity = MetaEntityBuilder::anEntity()
          .forSource("PERSON")
-         .withSequence("PERSON_GEN")
          .withId(PersonSimple::p::id, "ID")
          .withData(PersonSimple::p::name, "NAME")
          .build<PersonSimple>();
@@ -363,7 +362,7 @@ private Q_SLOTS :
       QCOMPARE(records.size(), 1);
       QCOMPARE(records[0][0].toInt(), person->getId());
       QCOMPARE(records[0][1].toString(), person->getName());
-      QCOMPARE(records[0][2], QVariant());
+      QCOMPARE(records[0][2].toString(), QString());
    }
 
    void save_newPersonWithAddressRelation_personAndReferencedAddressIdIsPersistetButAddressDatasetStaysUntuched()
@@ -376,6 +375,7 @@ private Q_SLOTS :
       address->setId(idAddress);
 
       auto person = PersonComplex::Ptr(new PersonComplex());
+      person->setName(AnyBuilder::anyString());
       person->setAddress(address);
 
       auto session = m_sessionFactory->createSession();

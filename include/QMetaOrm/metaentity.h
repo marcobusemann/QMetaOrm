@@ -98,6 +98,11 @@ namespace QMetaOrm {
       }
    };
 
+   enum class KeyGenerationStrategy {
+      Sequence,
+      Identity
+   };
+
    /**
     * @brief The MetaEntity struct
     */
@@ -124,6 +129,7 @@ namespace QMetaOrm {
       void setSequence(const QString &aSequence);
       const QString &getSequence() const;
       bool hasSequence() const;
+      KeyGenerationStrategy getKeyGenerationStrategy() const;
 
       void setKey(const QString &aProperty, const QString &aDatabaseField);
       const QString &getKeyProperty() const;
@@ -192,13 +198,14 @@ namespace QMetaOrm {
 
    private:
       friend class MetaEntityBuilder;
-      MetaEntity() {
-      }
+      MetaEntity();
 
       QString m_source;
-      QString m_sequence;
       QPair<QString, QString> m_key;
       QHash<QString, MetaProperty> m_propertyMapping;
+
+      KeyGenerationStrategy m_keyGenerationstrategy;
+      QString m_sequence;
 
       EntityFactory::Ptr m_entityFactory;
    };

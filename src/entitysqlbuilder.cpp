@@ -228,9 +228,7 @@ QString EntitySqlBuilder::buildRemove(MetaEntity::Ptr mapping) {
       .arg(mapping->getKeyProperty());
 }
 
-QString EntitySqlBuilder::buildInsert(MetaEntity::Ptr mapping, QStringList &properties) {
-   Q_ASSERT_X(mapping->hasSequence(), "buildInsert", "actually inserting entities requires a sequence");
-
+QString EntitySqlBuilder::buildInsertForSequence(MetaEntity::Ptr mapping, QStringList &properties) {
    properties = mapping->getProperties();
 
    QStringList fields;
@@ -239,16 +237,33 @@ QString EntitySqlBuilder::buildInsert(MetaEntity::Ptr mapping, QStringList &prop
       fields.append(mapping->getProperty(prop).databaseName);
 
    QStringList params;
-   for(int i = 0; i < fields.size() - 1; i++)
+   for(int i = 0; i < fields.size(); i++)
       params << "?";
 
-   return QString("INSERT INTO %1 (%2) VALUES (gen_id(%3, 1), %4) RETURNING %5")
+   //return QString("INSERT INTO %1 (%2) VALUES (gen_id(%3, 1), %4) RETURNING %5")
+   return QString("INSERT INTO %1 (%2) VALUES (%3)")
       .arg(
          mapping->getSource(),
          fields.join(","),
-         mapping->getSequence(),
-         params.join(","),
-         mapping->getKeyDatabaseField());
+         params.join(","));
+}
+
+QString EntitySqlBuilder::buildInsertForIdentity(MetaEntity::Ptr mapping, QStringList &properties) {
+   properties = mapping->getProperties();
+
+   QStringList fields;
+   foreach(auto prop, properties)
+      fields.append(mapping->getProperty(prop).databaseName);
+
+   QStringList params;
+   for(int i = 0; i < fields.size(); i++)
+      params << "?";
+
+   return QString("INSERT INTO %1 (%2) VALUES (%3)")
+      .arg(
+         mapping->getSource(),
+         fields.join(","),
+         params.join(","));
 }
 
 QString EntitySqlBuilder::buildUpdate(MetaEntity::Ptr mapping, QStringList &properties) {
@@ -262,5 +277,11 @@ QString EntitySqlBuilder::buildUpdate(MetaEntity::Ptr mapping, QStringList &prop
       .arg(
          mapping->getSource(),
          fields.join(","),
-         mapping->getKeyDatabaseField());
+            mapping->getKeyDatabaseField());
+}
+
+QString EntitySqlBuilder::buildSequenceSelect(MetaEntity::Ptr mapping) {
+   Q_ASSERT_X(mapping->hasSequence(), __FUNCTION__, "actually inserting entities requires a sequence");
+   return QString("SELECT nextval FROM %1")
+      .arg(mapping->getSequence());
 }
