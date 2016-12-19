@@ -1,6 +1,8 @@
-# Getting started
+# Work in progress
 
-# Todos
+# Just some notes
+
+## Todos
 - Support multiple database systems by checking if features are available.
   - Eg. the "returning" keyword in create statements.
 - How to support different styles of shared pointers? (std::shared_ptr, QSharedPointer, ...)
