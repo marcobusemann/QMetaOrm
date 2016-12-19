@@ -1,30 +1,29 @@
 #include <QMetaOrm/DatabaseFactory.h>
 
-#include <qstringlist.h>
-#include <quuid.h>
-#include <qfile.h>
-
+#include <QStringList.h>
 #include <QSqlQuery>
-#include <QDebug>
 #include <QSqlError>
+#include <QUUid.h>
+#include <QFile.h>
+#include <QDebug>
 
 using namespace QMetaOrm;
 
-class TestDatabaseFactory : public DatabaseFactory
+class SQLiteEmbeddedDatabaseFactory : public DatabaseFactory
 {
 public:
    static Ptr factory() {
-      return Ptr(new TestDatabaseFactory());
+      return Ptr(new SQLiteEmbeddedDatabaseFactory());
    }
 
 public:
-   TestDatabaseFactory()
+   SQLiteEmbeddedDatabaseFactory()
       : m_isDatabaseInitialized(false)
    {
       m_file = QUuid::createUuid().toString().remove("{").remove("}").remove("-") + ".sqlite";
    }
 
-   ~TestDatabaseFactory() {
+   ~SQLiteEmbeddedDatabaseFactory() {
       cleanup();
    }
 

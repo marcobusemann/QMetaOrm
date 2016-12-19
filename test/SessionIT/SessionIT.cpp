@@ -88,7 +88,7 @@ private Q_SLOTS :
 
    void init()
    {
-      m_databaseFactory = TestDatabaseFactory::factory();
+      m_databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
       m_sessionFactory = DefaultSessionFactory::factory(
          m_databaseFactory,
          StandardQtLogger::factory(),
