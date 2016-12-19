@@ -17,7 +17,6 @@ namespace QMetaOrm {
     * @brief The Session class
     * @todo - Add logging (TRACE/DEBUG)
     *       - Added identity persistence
-    *       - Add custom sql support 
     *       - Add object-pointer support (std::shared_ptr, QSharedPointer)
     *       - Add selectOneByMapping (The template based variant actually does not support passing a custom mapping)
     */
@@ -35,8 +34,17 @@ namespace QMetaOrm {
 
       virtual ~Session();
 
+      /**
+        * See the template less variant for more information.
+        * This one uses the default mapping for T (QMetaOrm::Mappings::mapping<T>()).
+       */
       template <class T>
       void save(QSharedPointer<T> &entity);
+
+      /**
+       * Creates or update (an id is present) the given entity using the given mapping.
+       * If the entity is created, the new id will be applied.
+       */
       void save(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
 
 	     template <class T>
