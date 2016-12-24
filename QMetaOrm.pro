@@ -14,6 +14,8 @@ DLLDESTDIR    += "$$PWD"/bin
 MOC_DIR       += "$$PWD"/build
 OBJECTS_DIR   += "$$PWD"/build
 
+CONFIG += c++11
+
 # Copy lib files for tests
 unix {
     QMAKE_POST_LINK += cp "$$PWD"/lib/* "$$PWD"/bin/
