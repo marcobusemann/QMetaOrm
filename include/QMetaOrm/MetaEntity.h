@@ -211,7 +211,7 @@ namespace QMetaOrm {
    };
 
    namespace Mappings {
-      template <class T> MetaEntity::Ptr mapping() {}
+      template <class T> MetaEntity::Ptr mapping() { return MetaEntity::Ptr(); }
    }
 }
 

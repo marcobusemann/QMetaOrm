@@ -11,7 +11,7 @@ namespace QMetaOrm {
    class QMETAORM_LIBRARY_API DatabaseException: public std::runtime_error
    {
    public:
-      DatabaseException(const QSqlError &error): runtime_error(error.text().toLocal8Bit()){}
+      DatabaseException(const QSqlError &error): runtime_error(error.text().toLocal8Bit().data()){}
    };
 
    /**
@@ -62,7 +62,7 @@ namespace QMetaOrm {
 
    /**
    */
-   class CreatingObjectByMetaObjectException : public std::runtime_error
+   class QMETAORM_LIBRARY_API CreatingObjectByMetaObjectException : public std::runtime_error
    {
    public:
       CreatingObjectByMetaObjectException(const char *type) 
@@ -72,20 +72,20 @@ namespace QMetaOrm {
 
    /**
    */
-   class ConverterNotFoundException : public std::runtime_error
+   class QMETAORM_LIBRARY_API ConverterNotFoundException : public std::runtime_error
    {
    public:
       ConverterNotFoundException(const char *type)
-         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit())
+         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit().data())
       {}
       ConverterNotFoundException(const QString &type)
-         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit())
+         : std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit().data())
       {}
    };
 
    /**
    */
-   class MoreThanOneResultException : public std::runtime_error
+   class QMETAORM_LIBRARY_API MoreThanOneResultException : public std::runtime_error
    {
    public:
       MoreThanOneResultException()
