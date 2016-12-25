@@ -1,3 +1,8 @@
+Platform    | Status | 
+----------- | :------------ |
+Windows | [![Windows Status (NOT YET SET UP]()]()
+Linux & OSX | [![Linux & Osx Status](https://travis-ci.org/marcobusemann/QMetaOrm.svg?branch=master)](https://travis-ci.org/marcobusemann/QMetaOrm)
+
 # Work in progress
 
 # Just some notes
