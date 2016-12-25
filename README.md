@@ -1,6 +1,6 @@
 Platform    | Status | 
 ----------- | :------------ |
-Windows | [![Windows Status (NOT YET SET UP]()]()
+Windows | [![Windows Status](https://ci.appveyor.com/api/projects/status/2u12ikvskeoi5fjy?svg=true)](https://ci.appveyor.com/project/marcobusemann/qmetaorm)
 Linux & OSX | [![Linux & Osx Status](https://travis-ci.org/marcobusemann/QMetaOrm.svg?branch=master)](https://travis-ci.org/marcobusemann/QMetaOrm)
 
 # Work in progress
