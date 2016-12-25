@@ -1,0 +1,9 @@
+version: '0.0.{build}'
+skip_tags: false
+environment:
+  matrix:
+  - SCRIPT: scripts\appveyor\msvc2015-qt57.bat
+matrix:
+  fast_finish: true
+build_script:
+- cmd: '%SCRIPT%'
