@@ -1,4 +1,5 @@
 #include <QMetaOrm/ConverterStore.h>
+#include <QDebug>
 
 using namespace QMetaOrm;
 
@@ -7,13 +8,9 @@ DefaultConverterStore::Ptr DefaultConverterStore::factory()
 	return DefaultConverterStore::Ptr(new DefaultConverterStore());
 }
 
-void DefaultConverterStore::registerConverter(Converter::Ptr converter)
-{
-	registerConverterBy(converter->getName(), converter);
-}
-
-void DefaultConverterStore::registerConverterBy(const QString &name, Converter::Ptr converter) {
-   // TODO: Notify if already something registered?
+void DefaultConverterStore::registerConverter(const QString &name, const Converter::Ptr &converter) {
+   if (m_converters.contains(name))
+       qDebug() << "A converter for " << name << " has already been registered. It will be overwritten!";
    m_converters[name] = converter;
 }
 

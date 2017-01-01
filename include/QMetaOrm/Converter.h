@@ -12,8 +12,6 @@ namespace QMetaOrm {
 
    public:
       virtual ~Converter() {}
-
-	  virtual QString getName() const = 0;
 	  virtual QVariant convert(const QVariant &value) const = 0;
    };
 }

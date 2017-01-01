@@ -53,7 +53,6 @@ SOURCES += \
     src/Session.cpp \
     src/SessionFactory.cpp \
     src/MetaEntity.cpp \
-    src/Converter.cpp \
     src/ConverterStore.cpp \
     src/EntityMapper.cpp \
     src/Logger.cpp \
