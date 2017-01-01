@@ -104,7 +104,7 @@ namespace QMetaOrm {
             }
             else {
                value = getRecord(propertie.databaseName);
-               if (value.isValid() && !value.isNull() && propertie.hasConverter())
+               if (propertie.hasConverter())
                   value = applyConverter(propertie.converterName, value, converterStore);
             }
             applyHandler(key, value);
