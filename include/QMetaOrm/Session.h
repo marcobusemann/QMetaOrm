@@ -175,7 +175,9 @@ namespace QMetaOrm {
       Criterion::Ptr criterion,
       int skip,
       int pageSize) {
-      selectManyByCallback(QMetaOrm::Mappings::mapping<T>(), callback, criterion, skip, pageSize);
+      selectManyByCallback(QMetaOrm::Mappings::mapping<T>(), [callback](const QSharedPointer<QObject> &item) -> bool {
+        return callback(item.objectCast<T>());
+      }, criterion, skip, pageSize);
    }
 
    template <class T>
@@ -183,7 +185,9 @@ namespace QMetaOrm {
       const QString &sql,
       std::function<bool(const QSharedPointer<T> &)> callback,
       const QVariantList &parameters) {
-      selectManyByCallbackBySql(sql, QMetaOrm::Mappings::mapping<T>(), callback, parameters);
+      selectManyByCallbackBySql(sql, QMetaOrm::Mappings::mapping<T>(), [callback](const QSharedPointer<QObject> &item) -> bool {
+        return callback(item.objectCast<T>());
+      }, parameters);
    }
 
    template <class T>
