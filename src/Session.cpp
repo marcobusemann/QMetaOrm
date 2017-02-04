@@ -21,7 +21,7 @@ Session::Session(
 }
 
 Session::~Session() {
-   rollback();
+    rollback();
 }
 
 void Session::commit() {
@@ -48,6 +48,11 @@ void Session::save(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping)
       return create(entity, mapping);
 }
 
+void Session::saveBySql(const QString &sql, const QVariantList &parameters)
+{
+    removeBySql(sql, parameters);
+}
+
 void Session::remove(const QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping)
 {
    setupSession();
@@ -62,6 +67,22 @@ void Session::remove(const QSharedPointer<QObject> &entity, MetaEntity::Ptr mapp
 
    if (!query.exec())
       throw CouldNotExecuteQueryException(query.lastError());
+}
+
+void Session::removeBySql(const QString &sql, const QVariantList &parameters)
+{
+    setupSession();
+
+    QSqlQuery query(m_database);
+
+    if (!query.prepare(sql))
+        throw CouldNotPrepareQueryException(query.lastError());
+
+    for (int i = 0; i < parameters.size(); i++)
+        query.bindValue(i, parameters[i]);
+
+    if (!query.exec())
+        throw CouldNotExecuteQueryException(query.lastError());
 }
 
 void Session::create(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping) {

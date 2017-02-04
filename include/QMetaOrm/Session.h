@@ -40,6 +40,7 @@ namespace QMetaOrm {
        */
       template <class T>
       void save(QSharedPointer<T> &entity);
+      void saveBySql(const QString &sql, const QVariantList &parameters = QVariantList());
 
       /**
        * Creates or update (an id is present) the given entity using the given mapping.
@@ -47,9 +48,10 @@ namespace QMetaOrm {
        */
       void save(QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
 
-	     template <class T>
+      template <class T>
       void remove(const QSharedPointer<T> &entity);
       void remove(const QSharedPointer<QObject> &entity, MetaEntity::Ptr mapping);
+      void removeBySql(const QString &sql, const QVariantList &parameters = QVariantList());
 
       /**
         * See the template less variant for more information.
