@@ -36,10 +36,9 @@ install:
   - if [ "$QT_BASE" = "57" ]; then sudo apt-get install -qq qt57base; source /opt/qt57/bin/qt57-env.sh; fi
 
 script:
-  - CMAKE_MODULE_PATH="$CMAKE_MODULE_PATH:$QTDIR"
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_PREFIX_PATH=$QTDIR ..
   - make
   - ctest -V
 
