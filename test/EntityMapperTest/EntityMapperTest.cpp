@@ -58,6 +58,8 @@ private:
    QString m_name;
 };
 
+Q_DECLARE_METATYPE(QSharedPointer<DummyObject>)
+
 const QString DummyObject::p::id = "id";
 const QString DummyObject::p::name = "id";
 
@@ -89,6 +91,9 @@ public:
 private:
    int m_id;
 };
+
+Q_DECLARE_METATYPE(QSharedPointer<DummyObjectWithoutStdCtor>)
+
 
 QString NoopPrefixer(const QString &v) {
    return v;
