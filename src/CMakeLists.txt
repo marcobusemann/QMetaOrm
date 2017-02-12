@@ -47,8 +47,8 @@ find_package(Qt5Sql)
 if(Qt5Core_FOUND AND Qt5Sql_FOUND)
     set (EXTRA_LIBS ${EXTRA_LIBS} Qt5::Core Qt5::Sql)    
 else()
-    find_package(Qt4 REQUIRED)
-    set (EXTRA_LIBS ${EXTRA_LIBS} Qt4::Core Qt4::Sql)
+    find_package(Qt4 REQUIRED QtCore QtSql)
+    set (EXTRA_LIBS ${EXTRA_LIBS} Qt4::QtCore Qt4::QtSql)
 endif()
 
 set(needed_features
