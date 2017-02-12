@@ -3,6 +3,6 @@ set PATH=%PATH%;%QTDIR%\bin
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 mkdir build
 cd build
-cmake -G "Visual Studio 14 Win64" -DCMAKE_PREFIX_PATH=$QTDIR\lib\cmake\ ..
+cmake -G "Visual Studio 14" -DCMAKE_PREFIX_PATH=$QTDIR\lib\cmake\ ..
 msbuild QMetaOrm.sln
 ctest -V
