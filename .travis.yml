@@ -9,7 +9,6 @@ dist: trusty
 
 env:
   - QT_BASE=48
-  - QT_BASE=51
   - QT_BASE=52
   - QT_BASE=53
   - QT_BASE=54
