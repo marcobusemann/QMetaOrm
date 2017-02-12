@@ -1,6 +1,6 @@
 #include <QMetaOrm/DatabaseFactory.h>
 
-#include <QStringList.h>
+#include <QStringList>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QUUid.h>
