@@ -4,6 +4,5 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 mkdir build
 cd build
 cmake -G "Visual Studio 14 Win64" -DCMAKE_PREFIX_PATH=$QTDIR\lib\cmake\ ..
-ls -l
-msbuild
+msbuild QMetaOrm.sln
 ctest -V
