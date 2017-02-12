@@ -6,6 +6,8 @@ set(header_path ${CMAKE_CURRENT_SOURCE_DIR}/../include/QMetaOrm)
 
 include_directories(${header_path_include})
 
+add_definitions(-DQMETAORM_LIBRARY)
+
 set(header
     ${header_path}/Private.h
     ${header_path}/MetaEntity.h
@@ -59,7 +61,7 @@ set(needed_features
     cxx_override
     cxx_lambdas)
 
-add_library(QMetaOrm ${header} ${src})
+add_library(QMetaOrm SHARED ${header} ${src})
 target_compile_features(QMetaOrm PRIVATE ${needed_features})
 target_include_directories(QMetaOrm PUBLIC ${header_path_include}
 										   ${CMAKE_CURRENT_BINARY_DIR})
