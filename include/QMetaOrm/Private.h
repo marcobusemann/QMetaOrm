@@ -5,4 +5,3 @@
 #else
 #  define QMETAORM_LIBRARY_API Q_DECL_IMPORT
 #endif
-
