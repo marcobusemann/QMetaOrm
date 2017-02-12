@@ -3,7 +3,7 @@
 #include <QStringList>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QUUid>
+#include <QUuid>
 #include <QFile>
 #include <QDebug>
 
