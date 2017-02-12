@@ -5,4 +5,4 @@ target_include_directories(${TESTNAME} PRIVATE
                             ${CMAKE_CURRENT_BINARY_DIR}
                             ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
 
-add_test(${TESTNAME} ${TESTNAME})
+add_test(${TESTNAME} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTNAME})
