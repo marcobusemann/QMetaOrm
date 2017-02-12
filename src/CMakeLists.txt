@@ -51,7 +51,16 @@ else()
     set (EXTRA_LIBS ${EXTRA_LIBS} Qt4::Core Qt4::Sql)
 endif()
 
+set(needed_features
+    cxx_strong_enums
+    cxx_constexpr
+    cxx_auto_type
+    cxx_nullptr
+    cxx_override
+    cxx_lambdas)
+
 add_library(QMetaOrm ${header} ${src})
+target_compile_features(QMetaOrm PRIVATE ${needed_features})
 target_include_directories(QMetaOrm PUBLIC ${header_path_include}
 										   ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(QMetaOrm ${EXTRA_LIBS})
