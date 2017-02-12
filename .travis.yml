@@ -36,9 +36,11 @@ install:
   - if [ "$QT_BASE" = "57" ]; then sudo apt-get install -qq qt57base; source /opt/qt57/bin/qt57-env.sh; fi
 
 script:
-  - qmake -r
+  - mkdir build
+  - cd build
+  - cmake ..
   - make
-  - make check
+  - ctest -V
 
 notifications:
   email: false
