@@ -1,9 +1,11 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories(../include)
+set(header_path_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+set(header_path ${CMAKE_CURRENT_SOURCE_DIR}/../include/QMetaOrm)
 
-set(header_path ../include/QMetaOrm)
+include_directories(${header_path_include})
+
 set(header
     ${header_path}/Private.h
     ${header_path}/MetaEntity.h
@@ -50,6 +52,6 @@ else()
 endif()
 
 add_library(QMetaOrm ${header} ${src})
-target_include_directories(QMetaOrm PUBLIC ${QMETAORM_SOURCE_DIR}/include
+target_include_directories(QMetaOrm PUBLIC ${header_path_include}
 										   ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(QMetaOrm ${EXTRA_LIBS})

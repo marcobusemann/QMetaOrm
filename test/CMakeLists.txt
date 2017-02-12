@@ -1,0 +1,3 @@
+add_subdirectory(EntityMapperTest)
+add_subdirectory(MetaEntityTest)
+add_subdirectory(SessionIT)

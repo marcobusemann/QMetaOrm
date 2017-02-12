@@ -6,4 +6,7 @@ project(QMetaOrm)
 set (QMETAORM_VERSION_MAJOR 0)
 set (QMETAORM_VERSION_MINOR 1)
 
+enable_testing()
+
 add_subdirectory(src)
+add_subdirectory(test)

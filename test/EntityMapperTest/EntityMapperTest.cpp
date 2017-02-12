@@ -95,11 +95,6 @@ QString NoopPrefixer(const QString &v) {
 }
 
 class UpperConverter : public QMetaOrm::Converter {
-   // Geerbt �ber Converter
-   virtual QString getName() const override
-   {
-      return "UpperConverter";
-   }
    virtual QVariant convert(const QVariant & value) const override
    {
       return value.type() == QVariant::Type::String ? value.toString().toUpper() : QVariant();
@@ -188,7 +183,7 @@ private Q_SLOTS:
 
    void applyConverter_converterSpecified_valueTransformedCorrectly() {
       auto store = QMetaOrm::DefaultConverterStore::factory();
-      store->registerConverter(QSharedPointer<UpperConverter>(new UpperConverter()));
+      store->registerConverter("UpperConverter", QSharedPointer<UpperConverter>(new UpperConverter()));
       QCOMPARE(aMapper()->applyConverter("UpperConverter", QVariant("abc"), store), QVariant("ABC"));
    }
 
