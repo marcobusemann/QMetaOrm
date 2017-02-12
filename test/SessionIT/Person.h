@@ -50,6 +50,8 @@ private:
    QString m_name;
 };
 
+Q_DECLARE_METATYPE(PersonSimple::Ptr)
+
 class Address : public QObject
 {
    Q_OBJECT
@@ -147,6 +149,8 @@ private:
    QString m_name;
    Address::Ptr m_address;
 };
+
+Q_DECLARE_METATYPE(PersonComplex::Ptr)
 
 namespace QMetaOrm {
    namespace Mappings {
