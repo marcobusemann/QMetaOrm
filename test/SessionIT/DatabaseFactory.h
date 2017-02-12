@@ -3,8 +3,8 @@
 #include <QStringList>
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QUUid.h>
-#include <QFile.h>
+#include <QUUid>
+#include <QFile>
 #include <QDebug>
 
 using namespace QMetaOrm;
