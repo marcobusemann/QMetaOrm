@@ -126,10 +126,9 @@ namespace QMetaOrm {
       QVariant createCachedReference(const MetaEntity::Ptr &mapping, const ConverterStore::Ptr &converterStore, PropertyPrefixer::Handler getRecord) {
          auto entityFactory = mapping->getEntityFactory();
          auto key = getKeyFor(mapping, getRecord);
-
+         if (!isValidObject(mapping, getRecord)) return QVariant();
          if (!m_entityCache->contains(key, mapping))
             m_entityCache->put(key, createReference(mapping, converterStore, getRecord), mapping);
-
          return m_entityCache->get(key, mapping);
       }
 
