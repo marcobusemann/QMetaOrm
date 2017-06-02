@@ -1,7 +1,7 @@
-add_subdirectory(EntityMapperTest)
-add_subdirectory(MetaEntityTest)
-add_subdirectory(SessionIT)
+add_subdirectory(QormEntityMapperTest)
+add_subdirectory(QormMetaEntityTest)
+add_subdirectory(QormSessionIT)
 
-set_property(TARGET EntityMapperTest PROPERTY FOLDER "tests")
-set_property(TARGET MetaEntityTest PROPERTY FOLDER "tests")
-set_property(TARGET SessionIT PROPERTY FOLDER "tests")
+set_property(TARGET QormEntityMapperTest PROPERTY FOLDER "tests")
+set_property(TARGET QormMetaEntityTest PROPERTY FOLDER "tests")
+set_property(TARGET QormSessionIT PROPERTY FOLDER "tests")

@@ -9,38 +9,38 @@ include_directories(${header_path_include})
 add_definitions(-DQMETAORM_LIBRARY)
 
 set(header
-    ${header_path}/Private.h
-    ${header_path}/MetaEntity.h
-    ${header_path}/MetaEntityBuilder.h
-    ${header_path}/Criterion.h
-    ${header_path}/ValueCriterion.h
-    ${header_path}/ListCriterion.h
-    ${header_path}/EntitySqlBuilder.h
-    ${header_path}/EntityMapper.h
-    ${header_path}/Exceptions.h
-    ${header_path}/Session.h
-    ${header_path}/DatabaseFactory.h
-    ${header_path}/SessionFactory.h
-    ${header_path}/Converter.h
-    ${header_path}/ConverterStore.h
-    ${header_path}/Logger.h
-    ${header_path}/Cache.h
-    ${header_path}/CacheFactory.h)
+    ${header_path}/QormPrivate.h
+    ${header_path}/QormMetaEntity.h
+    ${header_path}/QormMetaEntityBuilder.h
+    ${header_path}/QormCriterion.h
+    ${header_path}/QormValueCriterion.h
+    ${header_path}/QormListCriterion.h
+    ${header_path}/QormEntitySqlBuilder.h
+    ${header_path}/QormEntityMapper.h
+    ${header_path}/QormExceptions.h
+    ${header_path}/QormSession.h
+    ${header_path}/QormDatabaseFactory.h
+    ${header_path}/QormSessionFactory.h
+    ${header_path}/QormConverter.h
+    ${header_path}/QormConverterStore.h
+    ${header_path}/QormLogger.h
+    ${header_path}/QormCache.h
+    ${header_path}/QormCacheFactory.h)
 
 set(src
-    MetaEntityBuilder.cpp
-    Criterion.cpp
-    ValueCriterion.cpp
-    ListCriterion.cpp
-    EntitySqlBuilder.cpp
-    Session.cpp
-    SessionFactory.cpp
-    MetaEntity.cpp
-    ConverterStore.cpp
-    EntityMapper.cpp
-    Logger.cpp
-    Cache.cpp
-    CacheFactory.cpp)
+    QormMetaEntityBuilder.cpp
+    QormCriterion.cpp
+    QormValueCriterion.cpp
+    QormListCriterion.cpp
+    QormEntitySqlBuilder.cpp
+    QormSession.cpp
+    QormSessionFactory.cpp
+    QormMetaEntity.cpp
+    QormConverterStore.cpp
+    QormEntityMapper.cpp
+    QormLogger.cpp
+    QormCache.cpp
+    QormCacheFactory.cpp)
 
 # Bind to qt
 find_package(Qt5Core)
