@@ -20,7 +20,6 @@ public:
    QormMetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
    QormMetaEntityBuilder withOneToMany(const QString &prop, const QString &field, QormMetaEntity::Ptr referenceEntity);
    QormMetaEntityBuilder withEntityFactory(const QormEntityFactory::Ptr &entityFactory);
-   QormMetaEntityBuilder withEmbeddedPtrNamingScheme();
 
    template <class T>
    QormMetaEntity::Ptr build() const {
@@ -46,5 +45,4 @@ private:
    }
 
    QormMetaEntity::Ptr m_entity;
-   bool m_useEmbeddedPtrEntityFactoryNamingScheme;
 };

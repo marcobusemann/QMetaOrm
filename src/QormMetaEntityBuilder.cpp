@@ -11,13 +11,11 @@ QormMetaEntityBuilder QormMetaEntityBuilder::derivedEntity(const QormMetaEntity:
 
 QormMetaEntityBuilder::QormMetaEntityBuilder(const QormMetaEntity::Ptr& aParentEntity)
    : m_entity(aParentEntity->copy())
-   , m_useEmbeddedPtrEntityFactoryNamingScheme(false)
 {
 }
 
 QormMetaEntityBuilder::QormMetaEntityBuilder()
    : m_entity(QormMetaEntity::factory())
-   , m_useEmbeddedPtrEntityFactoryNamingScheme(false)
 {
 }
 
@@ -58,11 +56,5 @@ QormMetaEntityBuilder QormMetaEntityBuilder::withOneToMany(const QString & prop,
 QormMetaEntityBuilder QormMetaEntityBuilder::withEntityFactory(const QormEntityFactory::Ptr &entityFactory)
 {
    m_entity->setEntityFactory(entityFactory);
-   return *this;
-}
-
-QormMetaEntityBuilder QormMetaEntityBuilder::withEmbeddedPtrNamingScheme()
-{
-   m_useEmbeddedPtrEntityFactoryNamingScheme = true;
    return *this;
 }
