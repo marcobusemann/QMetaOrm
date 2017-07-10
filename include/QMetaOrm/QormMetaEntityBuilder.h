@@ -37,11 +37,17 @@ public:
 private:
    template <class T>
    static QVariant::Type gatherKeyType(QormMetaEntity::Ptr mapping) {
-      // TODO: error handling
       QMetaObject metaObject = T::staticMetaObject;
-      int keyPropertyIndex = metaObject.indexOfProperty(mapping->getKeyProperty().toStdString().c_str());
-      QMetaProperty keyProperty = metaObject.property(keyPropertyIndex);
-      return keyProperty.type();
+      int keyPropertyIndex = findKeyPropertyIndex(&metaObject, mapping->getKeyProperty().toStdString().c_str());
+      return keyPropertyIndex < 0 ? QVariant::Type::Invalid : metaObject.property(keyPropertyIndex).type();
+   }
+
+   static int findKeyPropertyIndex(const QMetaObject *metaObject, const QString &prop)
+   {
+      if (metaObject == nullptr)
+         return -1;
+      auto keyPropertyIndex = metaObject->indexOfProperty(prop.toStdString().c_str());
+      return keyPropertyIndex < 0 ? findKeyPropertyIndex(metaObject->superClass(), prop) : keyPropertyIndex;
    }
 
    QormMetaEntity::Ptr m_entity;
