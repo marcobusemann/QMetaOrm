@@ -11,6 +11,8 @@ class QMETAORM_LIBRARY_API QormMetaEntityBuilder
 {
 public:
    static QormMetaEntityBuilder anEntity();
+   static QormMetaEntityBuilder derivedEntity(const QormMetaEntity::Ptr &aParentEntity);
+   QormMetaEntityBuilder(const QormMetaEntity::Ptr &aParentEntity);
    QormMetaEntityBuilder();
    QormMetaEntityBuilder forSource(const QString &source);
    QormMetaEntityBuilder withSequence(const QString &sequence);

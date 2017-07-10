@@ -4,6 +4,17 @@ QormMetaEntityBuilder QormMetaEntityBuilder::anEntity() {
    return QormMetaEntityBuilder();
 }
 
+QormMetaEntityBuilder QormMetaEntityBuilder::derivedEntity(const QormMetaEntity::Ptr& aParentEntity)
+{
+   return QormMetaEntityBuilder(aParentEntity);
+}
+
+QormMetaEntityBuilder::QormMetaEntityBuilder(const QormMetaEntity::Ptr& aParentEntity)
+   : m_entity(aParentEntity->copy())
+   , m_useEmbeddedPtrEntityFactoryNamingScheme(false)
+{
+}
+
 QormMetaEntityBuilder::QormMetaEntityBuilder()
    : m_entity(QormMetaEntity::factory())
    , m_useEmbeddedPtrEntityFactoryNamingScheme(false)
