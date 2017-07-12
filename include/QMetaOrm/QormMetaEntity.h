@@ -204,8 +204,4 @@ private:
    QormEntityFactory::Ptr m_entityFactory;
 };
 
-namespace QormMappings {
-   template <class T> QormMetaEntity::Ptr mapping() { return QormMetaEntity::Ptr(); }
-}
-
 Q_DECLARE_METATYPE(QSharedPointer<QObject>)
