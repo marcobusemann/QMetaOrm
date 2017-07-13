@@ -11,6 +11,20 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+class QMETAORM_LIBRARY_API QOrmOnDemandRecordMapper
+{
+public:
+   virtual ~QOrmOnDemandRecordMapper() {}
+
+   template <class T>
+   QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr &mapping, const QString &prefix = QString()) const
+   {
+      return mapToEntity(mapping, prefix).objectCast<T>();
+   }
+
+   virtual QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr &mapping, const QString &prefix = QString()) const = 0;
+};
+
 /**
 * @todo - Add logging (TRACE/DEBUG)
 *       - Added identity persistence
@@ -129,6 +143,11 @@ public:
      * If the result object contains a key as specified in the mapping, the object will be cached per session.
      */
    QList<QSharedPointer<QObject>> selectManyBySql(const QString &sql, QormMetaEntity::Ptr mapping, const QVariantList &parameters = QVariantList());
+
+   void selectManyBySqlWithCustomMapping(
+      const QString &sql,
+      std::function<bool(const QOrmOnDemandRecordMapper *)> callback,
+      const QVariantList &parameters = QVariantList());
 
    void commit();
    void rollback();

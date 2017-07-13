@@ -2,6 +2,23 @@
 #include <QMetaOrm/QormExceptions.h>
 #include <QUuid>
 
+class QOrmOnDemandRecordMapperImpl : public QOrmOnDemandRecordMapper
+{
+public:
+   QOrmOnDemandRecordMapperImpl(std::function<QSharedPointer<QObject>(const QormMetaEntity::Ptr&, const QString&)> callback)
+      : m_callback(callback)
+   {
+   }
+
+   virtual QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr& mapping, const QString& prefix) const override
+   {
+      return m_callback(mapping, prefix);
+   }
+
+private:
+   std::function<QSharedPointer<QObject>(const QormMetaEntity::Ptr&, const QString&)> m_callback;
+};
+
 QString GetThreadIdentifier() {
    return QUuid::createUuid().toString();
 }
@@ -226,4 +243,32 @@ QList<QSharedPointer<QObject>> QormSession::selectManyBySql(const QString &sql, 
    };
    selectManyByCallbackBySql(sql, mapping, func, parameters);
    return result;
+}
+
+void QormSession::selectManyBySqlWithCustomMapping(
+   const QString &sql,
+   std::function<bool(const QOrmOnDemandRecordMapper *)> callback,
+   const QVariantList &parameters) {
+   
+   setupSession();
+
+   QSqlQuery query(m_database);
+
+   if (!query.prepare(sql))
+      throw QormCouldNotPrepareQueryException(query.lastError());
+
+   for (int i = 0; i < parameters.size(); i++)
+      query.bindValue(i, parameters[i]);
+
+   if (!query.exec())
+      throw QormCouldNotExecuteQueryException(query.lastError());
+
+   QOrmOnDemandRecordMapperImpl recordMapper([&](const QormMetaEntity::Ptr& mapping, const QString& prefix)
+   {
+      return m_entityMapper->mapToEntity(mapping, query.record(), m_converterStore);
+   });
+
+   bool continueWork = true;
+   while (query.next() && continueWork)
+      continueWork = callback(&recordMapper);
 }

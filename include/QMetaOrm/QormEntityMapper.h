@@ -33,8 +33,8 @@ public:
       const QormLogger::Ptr &logger,
       const QormEntityCache::Ptr &entityCache);
 
-   QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr &mapping, const QSqlRecord &record, const QormConverterStore::Ptr &converterStore) {
-      auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record);
+   QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr &mapping, const QSqlRecord &record, const QormConverterStore::Ptr &converterStore, const QString &prefix = QString()) {
+      auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record, prefix);
       QVariant result;
       if (isValidObject(mapping, getRecordFunc))
          result = createCachedReference(mapping, converterStore, getRecordFunc);
@@ -44,8 +44,8 @@ public:
    }
 
    template <class T>
-   QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr &mapping, const QSqlRecord &record, const QormConverterStore::Ptr &converterStore) {
-      return mapToEntity(mapping, record, converterStore).objectCast<T>();
+   QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr &mapping, const QSqlRecord &record, const QormConverterStore::Ptr &converterStore, const QString &prefix = QString()) {
+      return mapToEntity(mapping, record, converterStore, prefix).objectCast<T>();
    }
 
    ApplyHandler applyTo(QSharedPointer<QObject> &obj) {
