@@ -163,6 +163,36 @@ QSharedPointer<QObject> QormSession::selectOne(const QVariant &key, QormMetaEnti
    return selectOneBySql(m_entitySqlBuilder->buildSelect(mapping), mapping, QVariantList() << key);
 }
 
+QVariantList QormSession::selectOneBySql(const QString &sql, const QVariantList &parameters)
+{
+   setupSession();
+
+   QSqlQuery query(m_database);
+
+   if (!query.prepare(sql))
+      throw QormCouldNotPrepareQueryException(query.lastError());
+
+   for (int i = 0; i < parameters.size(); i++)
+      query.bindValue(i, parameters[i]);
+
+   if (!query.exec())
+      throw QormCouldNotExecuteQueryException(query.lastError());
+
+   auto result = QVariantList();
+
+   if (query.next())
+   {
+      auto record = query.record();
+      for (auto i = 0; i < record.count(); i++)
+         result.append(record.value(i));
+   }
+
+   if (query.next())
+      throw QormMoreThanOneResultException();
+
+   return result;
+}
+
 QSharedPointer<QObject> QormSession::selectOneBySql(const QString &sql, QormMetaEntity::Ptr mapping, const QVariantList &parameters) {
    setupSession();
 

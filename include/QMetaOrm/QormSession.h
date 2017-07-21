@@ -76,6 +76,7 @@ public:
      * \throws MoreThanOneResultException
      */
    QSharedPointer<QObject> selectOne(const QVariant &key, QormMetaEntity::Ptr mapping);
+   QVariantList selectOneBySql(const QString &sql, const QVariantList &parameters = QVariantList());
 
    /**
      * See the template less variant for more information.
