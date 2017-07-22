@@ -33,7 +33,9 @@ set(src
     QormStandardEntityCache.cpp
     QormStandardEntityCache.h
     QormStandardEntityCacheFactory.cpp
-    QormStandardEntityCacheFactory.h QormStandardQtLogger.cpp QormStandardQtLogger.h)
+    QormStandardEntityCacheFactory.h
+    QormStandardQtLogger.cpp
+    QormStandardQtLogger.h)
 
 # Bind to qt
 find_package(Qt5Core)
