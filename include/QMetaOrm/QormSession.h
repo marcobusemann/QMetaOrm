@@ -96,13 +96,11 @@ public:
    void selectManyByCallback(
       QormMetaEntity::Ptr mapping,
       std::function<bool(const QSharedPointer<T> &)> callback,
-      QormCriterion::Ptr criterion = QormCriterion::Ptr(),
       int skip = -1,
       int pageSize = -1);
    void selectManyByCallback(
       QormMetaEntity::Ptr mapping,
       std::function<bool(const QSharedPointer<QObject> &)> callback,
-      QormCriterion::Ptr criterion = QormCriterion::Ptr(),
       int skip = -1,
       int pageSize = -1);
 
@@ -122,14 +120,14 @@ public:
      * See the template less variant for more information.
      */
    template <class T>
-   QList<QSharedPointer<T>> selectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion = QormCriterion::Ptr(), int skip = -1, int pageSize = -1);
+   QList<QSharedPointer<T>> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1);
 
    /**
      * Returns multiple objects from the database matching the given criterion.
      * Data will be mapped according to the given mapping.
      * If the result object contains a key as specified in the mapping, the object will be cached per session.
      */
-   QList<QSharedPointer<QObject>> selectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion = QormCriterion::Ptr(), int skip = -1, int pageSize = -1);
+   QList<QSharedPointer<QObject>> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1);
 
 
    /**
@@ -190,12 +188,11 @@ template <class T>
 void QormSession::selectManyByCallback(
    QormMetaEntity::Ptr mapping,
    std::function<bool(const QSharedPointer<T> &)> callback,
-   QormCriterion::Ptr criterion,
    int skip,
    int pageSize) {
    selectManyByCallback(mapping, [callback](const QSharedPointer<QObject> &item) -> bool {
       return callback(item.objectCast<T>());
-   }, criterion, skip, pageSize);
+   }, skip, pageSize);
 }
 
 template <class T>
@@ -210,13 +207,13 @@ void QormSession::selectManyByCallbackBySql(
 }
 
 template <class T>
-QList<QSharedPointer<T>> QormSession::selectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion, int skip, int pageSize) {
+QList<QSharedPointer<T>> QormSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize) {
    QList<QSharedPointer<T>> result;
    auto func = [&result](const QSharedPointer<QObject> &item) -> bool {
       result.append(item.objectCast<T>());
       return true;
    };
-   selectManyByCallback(mapping, func, criterion, skip, pageSize);
+   selectManyByCallback(mapping, func, skip, pageSize);
    return result;
 }
 

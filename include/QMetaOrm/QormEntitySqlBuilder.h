@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QMetaOrm/QormMetaEntity.h>
-#include <QMetaOrm/QormCriterion.h>
 #include <QMetaOrm/QormPrivate.h>
 
 #include <QSharedPointer>
@@ -18,7 +17,7 @@ public:
    virtual ~QormEntitySqlBuilder() {}
 
    virtual QString buildSelect(QormMetaEntity::Ptr mapping);
-   virtual QString buildSelectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions);
+   virtual QString buildSelectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize, QVariantList &conditions);
    virtual QString buildRemove(QormMetaEntity::Ptr mapping);
    virtual QString buildInsertForSequence(QormMetaEntity::Ptr mapping, QStringList &properties);
    virtual QString buildInsertForIdentity(QormMetaEntity::Ptr mapping, QStringList &properties);

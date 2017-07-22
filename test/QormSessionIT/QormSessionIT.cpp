@@ -4,7 +4,6 @@
 #include <QtTest>
 
 #include <QMetaOrm/QormMetaEntityBuilder.h>
-#include <QMetaOrm/QormValueCriterion.h>
 #include <QMetaOrm/QormSessionFactory.h>
 #include <QMetaOrm/QormSession.h>
 
@@ -331,20 +330,6 @@ private Q_SLOTS :
       auto items2 = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(items[0], items2[0]);
-   }
-
-   void selectMany_onePersonIsSelectedById_thePersonWithThatId()
-   {
-      int id = 1;
-      m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 3 << AnyBuilder::anyString() << AnyBuilder::anyString());
-      m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
-      m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
-
-      auto session = m_sessionFactory->createSession();
-      auto items = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping(), QormValueCriterion::equals(PersonSimple::p::id, id));
-
-      QVERIFY(items.size() == 1);
-      QCOMPARE(items[0]->getId(), id);
    }
 
    void save_newPerson_personIsPersistetAndIdIsSet()

@@ -1,6 +1,4 @@
 #include <QMetaOrm/QormEntitySqlBuilder.h>
-#include <QMetaOrm/QormValueCriterion.h>
-#include <QMetaOrm/QormListCriterion.h>
 #include <QtSql>
 
 QString EmbeddAlias(const QString &alias, const QString &field) {
@@ -76,34 +74,8 @@ public:
       return *this;
    }
 
-   SelectBuilder withCriterion(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion, QVariantList &conditions) {
-      QString condition;
-      if (!criterion)
-         condition = "1=1";
-      else
-         condition = criterion->stringify([](const QormCriterion *c, const QString &leftChild, const QString &rightChild) -> QString {
-         return QString("((%1) %2 (%3))")
-            .arg(leftChild)
-            .arg(c->combinationtype == QormCriterion::CombinationType::Leaf ? "" :
-               c->combinationtype == QormCriterion::CombinationType::And ? " AND " :
-               c->combinationtype == QormCriterion::CombinationType::Or ? " OR " : "")
-            .arg(rightChild);
-      }, [&conditions, &mapping, this](const QormValueCriterion *c) -> QString {
-         conditions.append(c->value);
-         return QString("%1 %2 ?")
-            .arg(resolveRecursiveProperty(c->prop.indexOf(".") == -1 ? "" : c->prop, c->prop, mapping))
-            .arg(c->expressiontype == QormValueCriterion::ExpressionType::Equals ? " = " : "");
-      }, [&conditions](const QormListCriterion *c) -> QString {
-         conditions.append(c->values);
-         QStringList params;
-         for (int i = 0; i < c->values.size(); i++)
-            params << "?";
-
-         return QString(" %1 %2 %3 ")
-            .arg(c->prop)
-            .arg(c->expressiontype == QormListCriterion::ExpressionType::In ? QString(" in (%1)").arg(params.join(",")) : "");
-      });
-      m_condition = condition;
+   SelectBuilder withCriterion(QormMetaEntity::Ptr mapping, QVariantList &conditions) {
+      m_condition = "1=1";
       return *this;
    }
 
@@ -212,11 +184,11 @@ QString QormEntitySqlBuilder::buildSelect(QormMetaEntity::Ptr mapping) {
 }
 
 // TODO: - Cache build condition
-QString QormEntitySqlBuilder::buildSelectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion, int skip, int pageSize, QVariantList &conditions) {
+QString QormEntitySqlBuilder::buildSelectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize, QVariantList &conditions) {
    return ConstructSelect(mapping)
       .startWith(pageSize)
       .skip(skip)
-      .withCriterion(mapping, criterion, conditions)
+      .withCriterion(mapping, conditions)
       .build();
 }
 

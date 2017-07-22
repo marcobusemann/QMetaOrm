@@ -220,11 +220,10 @@ QSharedPointer<QObject> QormSession::selectOneBySql(const QString &sql, QormMeta
 void QormSession::selectManyByCallback(
    QormMetaEntity::Ptr mapping,
    std::function<bool(const QSharedPointer<QObject> &)> callback,
-   QormCriterion::Ptr criterion,
    int skip,
    int pageSize) {
    QVariantList conditions;
-   auto sql = m_entitySqlBuilder->buildSelectMany(mapping, criterion, skip, pageSize, conditions);
+   auto sql = m_entitySqlBuilder->buildSelectMany(mapping, skip, pageSize, conditions);
    selectManyByCallbackBySql(
       sql,
       mapping,
@@ -255,13 +254,13 @@ void QormSession::selectManyByCallbackBySql(
       continueWork = callback(m_entityMapper->mapToEntity(mapping, query.record(), m_converterStore));
 }
 
-QList<QSharedPointer<QObject>> QormSession::selectMany(QormMetaEntity::Ptr mapping, QormCriterion::Ptr criterion, int skip, int pageSize) {
+QList<QSharedPointer<QObject>> QormSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize) {
    QList<QSharedPointer<QObject>> result;
    auto func = [&result](const QSharedPointer<QObject> &item) -> bool {
       result.append(item);
       return true;
    };
-   selectManyByCallback(mapping, func, criterion, skip, pageSize);
+   selectManyByCallback(mapping, func, skip, pageSize);
    return result;
 }
 
