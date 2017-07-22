@@ -12,6 +12,9 @@ make
 ctest -V
 ```
 
+# Style-Guide
+http://www.stroustrup.com/Programming/PPP-style-rev3.pdf
+
 # Work in progress
 
 # Just some notes

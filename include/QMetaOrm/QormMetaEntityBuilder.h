@@ -7,48 +7,59 @@
 #include <QMetaProperty>
 #include <QDebug>
 
-class QMETAORM_LIBRARY_API QormMetaEntityBuilder
-{
+class QMETAORM_LIBRARY_API QormMetaEntityBuilder {
 public:
-   static QormMetaEntityBuilder anEntity();
-   static QormMetaEntityBuilder derivedEntity(const QormMetaEntity::Ptr &aParentEntity);
-   QormMetaEntityBuilder(const QormMetaEntity::Ptr &aParentEntity);
-   QormMetaEntityBuilder();
-   QormMetaEntityBuilder forSource(const QString &source);
-   QormMetaEntityBuilder withSequence(const QString &sequence);
-   QormMetaEntityBuilder withId(const QString &prop, const QString &field);
-   QormMetaEntityBuilder withData(const QString &prop, const QString &field, const QString &converter = QString());
-   QormMetaEntityBuilder withOneToMany(const QString &prop, const QString &field, QormMetaEntity::Ptr referenceEntity);
-   QormMetaEntityBuilder withEntityFactory(const QormEntityFactory::Ptr &entityFactory);
+    static QormMetaEntityBuilder anEntity();
 
-   template <class T>
-   QormMetaEntity::Ptr build() const {
-      Q_ASSERT_X(m_entity->hasSource(), "build", "source not specified");
-      Q_ASSERT_X(m_entity->hasKey(), "build", "key not specified");
+    static QormMetaEntityBuilder derivedEntity(const QormMetaEntity::Ptr& aParentEntity);
 
-      auto keyType = gatherKeyType<T>(m_entity);
-      Q_ASSERT_X(QormMetaEntity::SupportedKeyTypes.contains(keyType), "build", "actually only int, long or string key types are allowed!");
+    QormMetaEntityBuilder(const QormMetaEntity::Ptr& aParentEntity);
 
-      m_entity->setEntityFactory(QormEntityFactory::Ptr(new QormDefaultEntityFactory<T>()));
+    QormMetaEntityBuilder();
 
-      return m_entity->copy();
-   }
+    QormMetaEntityBuilder forSource(const QString& source);
+
+    QormMetaEntityBuilder withSequence(const QString& sequence);
+
+    QormMetaEntityBuilder withId(const QString& prop, const QString& field);
+
+    QormMetaEntityBuilder withData(const QString& prop, const QString& field, const QString& converter = QString());
+
+    QormMetaEntityBuilder withOneToMany(const QString& prop, const QString& field, QormMetaEntity::Ptr referenceEntity);
+
+    QormMetaEntityBuilder withEntityFactory(const QormEntityFactory::Ptr& entityFactory);
+
+    template<class T>
+    QormMetaEntity::Ptr build() const
+    {
+        Q_ASSERT_X(m_entity->hasSource(), "build", "source not specified");
+        Q_ASSERT_X(m_entity->hasKey(), "build", "key not specified");
+
+        auto keyType = gatherKeyType<T>(m_entity);
+        Q_ASSERT_X(QormMetaEntity::SupportedKeyTypes.contains(keyType), "build",
+            "actually only int, long or string key types are allowed!");
+
+        m_entity->setEntityFactory(QormEntityFactory::Ptr(new QormDefaultEntityFactory<T>()));
+
+        return m_entity->copy();
+    }
 
 private:
-   template <class T>
-   static QVariant::Type gatherKeyType(QormMetaEntity::Ptr mapping) {
-      QMetaObject metaObject = T::staticMetaObject;
-      int keyPropertyIndex = findKeyPropertyIndex(&metaObject, mapping->getKeyProperty().toStdString().c_str());
-      return keyPropertyIndex < 0 ? QVariant::Type::Invalid : metaObject.property(keyPropertyIndex).type();
-   }
+    template<class T>
+    static QVariant::Type gatherKeyType(QormMetaEntity::Ptr mapping)
+    {
+        QMetaObject metaObject = T::staticMetaObject;
+        int keyPropertyIndex = findKeyPropertyIndex(&metaObject, mapping->getKeyProperty().toStdString().c_str());
+        return keyPropertyIndex<0 ? QVariant::Type::Invalid : metaObject.property(keyPropertyIndex).type();
+    }
 
-   static int findKeyPropertyIndex(const QMetaObject *metaObject, const QString &prop)
-   {
-      if (metaObject == nullptr)
-         return -1;
-      auto keyPropertyIndex = metaObject->indexOfProperty(prop.toStdString().c_str());
-      return keyPropertyIndex < 0 ? findKeyPropertyIndex(metaObject->superClass(), prop) : keyPropertyIndex;
-   }
+    static int findKeyPropertyIndex(const QMetaObject* metaObject, const QString& prop)
+    {
+        if (metaObject==nullptr)
+            return -1;
+        auto keyPropertyIndex = metaObject->indexOfProperty(prop.toStdString().c_str());
+        return keyPropertyIndex<0 ? findKeyPropertyIndex(metaObject->superClass(), prop) : keyPropertyIndex;
+    }
 
-   QormMetaEntity::Ptr m_entity;
+    QormMetaEntity::Ptr m_entity;
 };

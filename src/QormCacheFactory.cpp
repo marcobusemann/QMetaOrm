@@ -2,10 +2,10 @@
 
 QormEntityCacheFactory::Ptr QormStandardEntityCacheFactory::factory()
 {
-   return QormEntityCacheFactory::Ptr(new QormStandardEntityCacheFactory());
+    return QormEntityCacheFactory::Ptr(new QormStandardEntityCacheFactory());
 }
 
 QormEntityCache::Ptr QormStandardEntityCacheFactory::createCache() const
 {
-   return QormStandardEntityCache::factory();
+    return QormStandardEntityCache::factory();
 }
