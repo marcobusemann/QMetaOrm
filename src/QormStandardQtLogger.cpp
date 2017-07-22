@@ -1,5 +1,4 @@
-#include <QMetaOrm/QormLogger.h>
-#include <QtGlobal>
+#include "QormStandardQtLogger.h"
 #include <QDebug>
 
 QormLogger::Ptr QormStandardQtLogger::factory()

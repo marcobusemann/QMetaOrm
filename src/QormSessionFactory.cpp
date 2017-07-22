@@ -3,6 +3,7 @@
 #include <QMetaOrm/QormEntityMapper.h>
 
 #include "QormStandardEntityCacheFactory.h"
+#include "QormStandardQtLogger.h"
 
 QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory)
     :databaseFactory(databaseFactory)

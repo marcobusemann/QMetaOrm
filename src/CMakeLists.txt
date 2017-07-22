@@ -30,11 +30,10 @@ set(src
     QormSessionFactory.cpp
     QormMetaEntity.cpp
     QormEntityMapper.cpp
-    QormLogger.cpp
     QormStandardEntityCache.cpp
     QormStandardEntityCache.h
     QormStandardEntityCacheFactory.cpp
-    QormStandardEntityCacheFactory.h)
+    QormStandardEntityCacheFactory.h QormStandardQtLogger.cpp QormStandardQtLogger.h)
 
 # Bind to qt
 find_package(Qt5Core)
