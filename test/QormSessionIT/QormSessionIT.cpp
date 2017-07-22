@@ -95,6 +95,14 @@ public:
     }
 };
 
+class ToUpperConverter : public QormConverter {
+public:
+    QVariant convert(const QVariant& value) const override
+    {
+        return value.toString().toUpper();
+    }
+};
+
 /*
    TODO:
    - Caching when save() and select() is called in sequence.
@@ -104,7 +112,7 @@ Q_OBJECT
 
 private:
     QormDatabaseFactory::Ptr m_databaseFactory;
-    QormSessionFactory::Ptr m_sessionFactory;
+    QSharedPointer<QormDefaultSessionFactory> m_sessionFactory;
     SqlHelper::Ptr m_sqlHelper;
 
 public:
@@ -477,6 +485,30 @@ private Q_SLOTS :
 
         auto records = m_sqlHelper->select("select id, name, surname from person");
         QCOMPARE(records.size(), 0);
+    }
+
+    void selectOne_mappingWithConverter_valueGetsConverted()
+    {
+        auto converterStore = QormDefaultConverterStore::factory();
+        converterStore->registerConverter("upper", QSharedPointer<ToUpperConverter>(new ToUpperConverter()));
+        m_sessionFactory->setConverterStore(converterStore);
+
+        auto mapping = QormMetaEntityBuilder::anEntity()
+            .forSource("person")
+            .withId("id", "ID")
+            .withData("upperName", "NAME", "upper")
+            .build<PersonSimple>();
+
+        int idPerson = 1;
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << idPerson << name << surname);
+
+        auto session = m_sessionFactory->createSession();
+        auto item = session->selectOne<PersonSimple>(1, mapping);
+
+        QVERIFY(item != nullptr);
+        QCOMPARE(QString("MUELLER"), item->property("upperName").toString());
     }
 
 };
