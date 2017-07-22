@@ -57,8 +57,10 @@ public:
     ApplyHandler applyTo(QSharedPointer<QObject>& obj)
     {
         return [&](const QString& prop, const QVariant& value) {
-            if (!obj->setProperty(prop.toStdString().c_str(), value)) {
-                if (value.isValid()) {
+            auto propertyName = prop.toStdString().c_str();
+            bool hadProperty = obj->metaObject()->indexOfProperty(propertyName) != -1;
+            if (!obj->setProperty(propertyName, value)) {
+                if (value.isValid() && hadProperty) {
                     qWarning() << "Could not apply " << value << " to " << prop;
                     qWarning() << "\tNote that the variants type and the type used in Q_PROPERTY must match exactly!";
                     qWarning() << "\tIf you use a typedef, be sure that Q_DECLARE_METATYPE is used for that type.";
