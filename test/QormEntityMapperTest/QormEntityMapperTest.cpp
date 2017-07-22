@@ -1,12 +1,11 @@
 #include <QSqlField>
-#include <QString>
 #include <QtTest>
 
 #include <QMetaOrm/QormMetaEntity.h>
-#include <QMetaOrm/QormEntityMapper.h>
 #include <QMetaOrm/QormMetaEntityBuilder.h>
 
 #include "../../src/QormStandardQtLogger.h"
+#include "../../src/QormEntityMapper.h"
 
 #define QVERIFY_THROW(expression, ExpectedExceptionType) \
 do \

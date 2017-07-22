@@ -2,7 +2,6 @@
 
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormExceptions.h>
-#include <QMetaOrm/QormPrivate.h>
 #include <QMetaOrm/QormLogger.h>
 #include <QMetaOrm/QormEntityCache.h>
 
@@ -12,7 +11,7 @@
 
 #include <functional>
 
-class QMETAORM_LIBRARY_API QormPropertyPrefixer {
+class QormPropertyPrefixer {
 public:
     typedef std::function<QVariant(const QString&)> Handler;
 
@@ -24,7 +23,7 @@ public:
     QString prepend(const QString& value, const QString& prefixString = QString());
 };
 
-class QMETAORM_LIBRARY_API QormEntityMapper {
+class QormEntityMapper {
 public:
     typedef QSharedPointer<QormEntityMapper> Ptr;
     typedef std::function<void(const QString& key, const QVariant& value)> ApplyHandler;

@@ -1,15 +1,11 @@
 #pragma once
 
 #include <QMetaOrm/QormDatabaseFactory.h>
-#include <QMetaOrm/QormEntitySqlBuilder.h>
-#include <QMetaOrm/QormEntityMapper.h>
-#include <QMetaOrm/QormExceptions.h>
+#include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormPrivate.h>
-#include <QMetaOrm/QormEntityCache.h>
+#include <QMetaOrm/QormLogger.h>
 
 #include <QSharedPointer>
-#include <QSqlDatabase>
-#include <QSqlQuery>
 
 class QMETAORM_LIBRARY_API QOrmOnDemandRecordMapper {
 public:
@@ -36,10 +32,7 @@ public:
     typedef QSharedPointer<QormSession> Ptr;
 
 public:
-    QormSession(
-        QormDatabaseFactory::Ptr databaseFactory,
-        QormEntitySqlBuilder::Ptr entitySqlBuilder,
-        QormEntityMapper::Ptr entityMapper);
+    QormSession(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr& logger);
 
     virtual ~QormSession();
 
@@ -167,8 +160,8 @@ private:
     void setupSession();
 
     QSqlDatabase m_database;
-    QormEntityMapper::Ptr m_entityMapper;
-    QormEntitySqlBuilder::Ptr m_entitySqlBuilder;
+    QSharedPointer<class QormEntityMapper> m_entityMapper;
+    QSharedPointer<class QormEntitySqlBuilder> m_entitySqlBuilder;
 };
 
 template<class T>

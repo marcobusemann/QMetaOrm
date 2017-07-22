@@ -3,7 +3,6 @@
 #include <QMetaOrm/QormPrivate.h>
 
 #include <QSqlError>
-#include <QDebug>
 
 class QMETAORM_LIBRARY_API QormDatabaseException : public std::runtime_error {
 public:
@@ -16,7 +15,6 @@ public:
     QormConnectToDatabaseException(const QSqlError& error)
         :QormDatabaseException(error)
     {
-        qDebug() << error;
     }
 };
 
@@ -30,9 +28,7 @@ class QMETAORM_LIBRARY_API QormQueryException : public QormDatabaseException {
 public:
     QormQueryException(const QSqlError& error)
         :QormDatabaseException(error)
-    {
-        qDebug() << error;
-    }
+    {}
 };
 
 class QMETAORM_LIBRARY_API QormCouldNotPrepareQueryException : public QormQueryException {

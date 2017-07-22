@@ -12,8 +12,6 @@ set(header
     ${header_path}/QormPrivate.h
     ${header_path}/QormMetaEntity.h
     ${header_path}/QormMetaEntityBuilder.h
-    ${header_path}/QormEntitySqlBuilder.h
-    ${header_path}/QormEntityMapper.h
     ${header_path}/QormExceptions.h
     ${header_path}/QormSession.h
     ${header_path}/QormDatabaseFactory.h
@@ -26,9 +24,11 @@ set(header
 set(src
     QormMetaEntityBuilder.cpp
     QormEntitySqlBuilder.cpp
+    QormEntitySqlBuilder.h
     QormSession.cpp
     QormSessionFactory.cpp
     QormMetaEntity.cpp
+    QormEntityMapper.h
     QormEntityMapper.cpp
     QormStandardEntityCache.cpp
     QormStandardEntityCache.h

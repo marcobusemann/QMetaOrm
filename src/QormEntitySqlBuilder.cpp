@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormEntitySqlBuilder.h>
+#include "QormEntitySqlBuilder.h"
 #include <QtSql>
 
 QString EmbeddAlias(const QString& alias, const QString& field)

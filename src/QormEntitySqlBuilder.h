@@ -1,14 +1,13 @@
 #pragma once
 
 #include <QMetaOrm/QormMetaEntity.h>
-#include <QMetaOrm/QormPrivate.h>
 
 #include <QSharedPointer>
 #include <QStringList>
 
 #include <algorithm>
 
-class QMETAORM_LIBRARY_API QormEntitySqlBuilder {
+class QormEntitySqlBuilder {
 public:
     typedef QSharedPointer<QormEntitySqlBuilder> Ptr;
 

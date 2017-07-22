@@ -1,5 +1,11 @@
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormExceptions.h>
+
+#include "QormEntitySqlBuilder.h"
+#include "QormStandardEntityCache.h"
+#include "QormEntityMapper.h"
+
+#include <QSqlQuery>
 #include <QUuid>
 
 class QOrmOnDemandRecordMapperImpl : public QOrmOnDemandRecordMapper {
@@ -25,12 +31,10 @@ QString GetThreadIdentifier()
     return QUuid::createUuid().toString();
 }
 
-QormSession::QormSession(
-    QormDatabaseFactory::Ptr databaseFactory,
-    QormEntitySqlBuilder::Ptr entitySqlBuilder,
-    QormEntityMapper::Ptr entityMapper)
-    :m_database(databaseFactory->createDatabase(GetThreadIdentifier())), m_entityMapper(entityMapper)
-     , m_entitySqlBuilder(entitySqlBuilder)
+QormSession::QormSession(const QormDatabaseFactory::Ptr &databaseFactory, const QormLogger::Ptr& logger)
+    :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
+     , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger, QormStandardEntityCache::factory())))
+     , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
 {
 }
 

@@ -12,4 +12,3 @@ public:
 
     virtual QormEntityCache::Ptr createCache() const = 0;
 };
-

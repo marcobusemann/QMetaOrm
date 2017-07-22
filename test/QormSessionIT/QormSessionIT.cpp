@@ -2,10 +2,11 @@
 #include "Person.h"
 
 #include <QtTest>
+#include <QtSql>
 
 #include <QMetaOrm/QormMetaEntityBuilder.h>
 #include <QMetaOrm/QormSessionFactory.h>
-#include <QMetaOrm/QormSession.h>
+#include <QMetaOrm/QormExceptions.h>
 
 /*
     Took from qt source for usage in old qt versions

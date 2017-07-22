@@ -6,7 +6,6 @@
 
 #include <QSharedPointer>
 #include <QMetaProperty>
-#include <QDebug>
 
 #include <functional>
 

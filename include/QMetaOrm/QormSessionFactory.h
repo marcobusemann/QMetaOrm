@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QMetaOrm/QormDatabaseFactory.h>
-#include <QMetaOrm/QormEntityCacheFactory.h>
 #include <QMetaOrm/QormPrivate.h>
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormLogger.h>
@@ -27,8 +26,6 @@ public:
 public:
     void setLogger(const QormLogger::Ptr& logger);
 
-    void setEntityCacheFactory(const QormEntityCacheFactory::Ptr& cacheFactory);
-
     virtual QormSession::Ptr createSession() const override;
 
 private:
@@ -36,5 +33,4 @@ private:
 
     QormDatabaseFactory::Ptr databaseFactory;
     QormLogger::Ptr logger;
-    QormEntityCacheFactory::Ptr cacheFactory;
 };
