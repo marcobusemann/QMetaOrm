@@ -1,4 +1,5 @@
-#include <QMetaOrm/QormCacheFactory.h>
+#include "QormStandardEntityCacheFactory.h"
+#include "QormStandardEntityCache.h"
 
 QormEntityCacheFactory::Ptr QormStandardEntityCacheFactory::factory()
 {

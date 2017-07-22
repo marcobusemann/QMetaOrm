@@ -21,8 +21,8 @@ set(header
     ${header_path}/QormConverter.h
     ${header_path}/QormConverterStore.h
     ${header_path}/QormLogger.h
-    ${header_path}/QormCache.h
-    ${header_path}/QormCacheFactory.h)
+    ${header_path}/QormEntityCache.h
+    ${header_path}/QormEntityCacheFactory.h)
 
 set(src
     QormMetaEntityBuilder.cpp
@@ -33,8 +33,10 @@ set(src
     QormConverterStore.cpp
     QormEntityMapper.cpp
     QormLogger.cpp
-    QormCache.cpp
-    QormCacheFactory.cpp)
+    QormStandardEntityCache.cpp
+    QormStandardEntityCache.h
+    QormStandardEntityCacheFactory.cpp
+    QormStandardEntityCacheFactory.h)
 
 # Bind to qt
 find_package(Qt5Core)

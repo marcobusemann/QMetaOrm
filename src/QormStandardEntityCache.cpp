@@ -1,7 +1,4 @@
-#include <QMetaOrm/QormCache.h>
-
-#include <QVariant>
-#include <QHash>
+#include "QormStandardEntityCache.h"
 
 QormEntityCache::Ptr QormStandardEntityCache::factory()
 {

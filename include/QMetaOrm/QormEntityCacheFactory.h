@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMetaOrm/QormPrivate.h>
-#include <QMetaOrm/QormCache.h>
+#include <QMetaOrm/QormEntityCache.h>
 
 class QMETAORM_LIBRARY_API QormEntityCacheFactory {
 public:
@@ -13,10 +13,3 @@ public:
     virtual QormEntityCache::Ptr createCache() const = 0;
 };
 
-class QMETAORM_LIBRARY_API QormStandardEntityCacheFactory : public QormEntityCacheFactory {
-public:
-    static QormEntityCacheFactory::Ptr factory();
-
-public:
-    virtual QormEntityCache::Ptr createCache() const override;
-};

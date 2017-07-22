@@ -2,6 +2,8 @@
 #include <QMetaOrm/QormSessionFactory.h>
 #include <QMetaOrm/QormEntityMapper.h>
 
+#include "QormStandardEntityCacheFactory.h"
+
 QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory)
     :databaseFactory(databaseFactory)
      , converterStore(QormDefaultConverterStore::factory())

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMetaOrm/QormDatabaseFactory.h>
-#include <QMetaOrm/QormCacheFactory.h>
+#include <QMetaOrm/QormEntityCacheFactory.h>
 #include <QMetaOrm/QormPrivate.h>
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormLogger.h>

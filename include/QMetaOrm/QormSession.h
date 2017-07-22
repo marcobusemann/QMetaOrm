@@ -5,7 +5,7 @@
 #include <QMetaOrm/QormEntityMapper.h>
 #include <QMetaOrm/QormExceptions.h>
 #include <QMetaOrm/QormPrivate.h>
-#include <QMetaOrm/QormCache.h>
+#include <QMetaOrm/QormEntityCache.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
