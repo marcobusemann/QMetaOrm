@@ -172,7 +172,8 @@ void QormSession::save(QSharedPointer<T> &entity, QormMetaEntity::Ptr mapping) {
 
 template <class T>
 void QormSession::remove(const QSharedPointer<T> &entity, QormMetaEntity::Ptr mapping) {
-   remove(entity, mapping);
+   auto generellEntity = entity.template objectCast<QObject>();
+   remove(generellEntity, mapping);
 }
 
 template <class T, typename Key>

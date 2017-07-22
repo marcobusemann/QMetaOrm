@@ -107,9 +107,9 @@ private:
 public:
    QormSessionIT() {}
 
-   private Q_SLOTS :
+private Q_SLOTS :
 
-      void init()
+   void init()
    {
       m_databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
       m_sessionFactory = QormDefaultSessionFactory::factory(
@@ -129,7 +129,7 @@ public:
    {
       auto session = m_sessionFactory->createSession();
 
-      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1");
+      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1", QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item == nullptr);
    }
@@ -141,7 +141,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << name << surname);
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1");
+      auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1", QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), id);
@@ -156,7 +156,7 @@ public:
       m_sqlHelper->insert(sql, QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      VERIFY_EXCEPTION_THROWN(session->selectOneBySql<PersonSimple>("select * from person"), QormMoreThanOneResultException);
+      VERIFY_EXCEPTION_THROWN(session->selectOneBySql<PersonSimple>("select * from person", QormMappings::TsPersonSimpleMapping()), QormMoreThanOneResultException);
    }
 
    void selectOneBySql_onePersonWithNameOnlyIsSelected_onePersonWithNameOnlyIsFilled()
@@ -165,7 +165,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << name << "Hans");
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1");
+      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1", QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), 0);
@@ -178,8 +178,8 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select id from person limit 1");
-      auto item2 = session->selectOneBySql<PersonSimple>("select id from person limit 1");
+      auto item = session->selectOneBySql<PersonSimple>("select id from person limit 1", QormMappings::TsPersonSimpleMapping());
+      auto item2 = session->selectOneBySql<PersonSimple>("select id from person limit 1", QormMappings::TsPersonSimpleMapping());
 
 
       QCOMPARE(item, item2);
@@ -190,8 +190,8 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1");
-      auto item2 = session->selectOneBySql<PersonSimple>("select name from person limit 1");
+      auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1", QormMappings::TsPersonSimpleMapping());
+      auto item2 = session->selectOneBySql<PersonSimple>("select name from person limit 1", QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item != item2);
    }
@@ -202,7 +202,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOneBySql<PersonSimple>("select * from person where id = ? limit 1", QVariantList() << id);
+      auto item = session->selectOneBySql<PersonSimple>("select * from person where id = ? limit 1", QormMappings::TsPersonSimpleMapping(), QVariantList() << id);
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), id);
@@ -212,7 +212,7 @@ public:
    {
       auto session = m_sessionFactory->createSession();
 
-      auto item = session->selectOne<PersonSimple>(1);
+      auto item = session->selectOne<PersonSimple>(1, QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item == nullptr);
    }
@@ -224,7 +224,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << name << surname);
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOne<PersonSimple>(id);
+      auto item = session->selectOne<PersonSimple>(id, QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(item != nullptr);
       QCOMPARE(item->getId(), id);
@@ -238,8 +238,8 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOne<PersonSimple>(id);
-      auto item2 = session->selectOne<PersonSimple>(id);
+      auto item = session->selectOne<PersonSimple>(id, QormMappings::TsPersonSimpleMapping());
+      auto item2 = session->selectOne<PersonSimple>(id, QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(item, item2);
    }
@@ -252,7 +252,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname, address) values (?,?,?,?)", QVariantList() << idPerson << AnyBuilder::anyString() << AnyBuilder::anyString() << idAddress);
 
       auto session = m_sessionFactory->createSession();
-      auto item = session->selectOne<PersonComplex>(idPerson);
+      auto item = session->selectOne<PersonComplex>(idPerson, QormMappings::TsPersonComplexMapping());
 
       QVERIFY(item != nullptr && item->getAddress() != nullptr);
       QCOMPARE(item->getAddress()->getId(), idAddress);
@@ -264,7 +264,7 @@ public:
    void selectManyBySql_noPersons_emptyList()
    {
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectManyBySql<PersonSimple>("select * from person");
+      auto items = session->selectManyBySql<PersonSimple>("select * from person", QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(items.isEmpty());
    }
@@ -275,7 +275,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectManyBySql<PersonSimple>("select * from person");
+      auto items = session->selectManyBySql<PersonSimple>("select * from person", QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(items.size(), 2);
    }
@@ -285,8 +285,8 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectManyBySql<PersonSimple>("select id from person limit 1");
-      auto items2 = session->selectManyBySql<PersonSimple>("select id from person limit 1");
+      auto items = session->selectManyBySql<PersonSimple>("select id from person limit 1", QormMappings::TsPersonSimpleMapping());
+      auto items2 = session->selectManyBySql<PersonSimple>("select id from person limit 1", QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(items[0], items2[0]);
    }
@@ -297,7 +297,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectManyBySql<PersonSimple>("select * from person where id = ? limit 1", QVariantList() << id);
+      auto items = session->selectManyBySql<PersonSimple>("select * from person where id = ? limit 1", QormMappings::TsPersonSimpleMapping(), QVariantList() << id);
 
       QVERIFY(items.size() == 1);
       QCOMPARE(items[0]->getId(), id);
@@ -306,7 +306,7 @@ public:
    void selectMany_noPersons_emptyList()
    {
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectMany<PersonSimple>();
+      auto items = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
 
       QVERIFY(items.isEmpty());
    }
@@ -317,7 +317,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectMany<PersonSimple>();
+      auto items = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(items.size(), 2);
    }
@@ -327,8 +327,8 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectMany<PersonSimple>();
-      auto items2 = session->selectMany<PersonSimple>();
+      auto items = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
+      auto items2 = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
 
       QCOMPARE(items[0], items2[0]);
    }
@@ -341,7 +341,7 @@ public:
       m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)", QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
       auto session = m_sessionFactory->createSession();
-      auto items = session->selectMany<PersonSimple>(QormValueCriterion::equals(PersonSimple::p::id, id));
+      auto items = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping(), QormValueCriterion::equals(PersonSimple::p::id, id));
 
       QVERIFY(items.size() == 1);
       QCOMPARE(items[0]->getId(), id);
@@ -354,7 +354,7 @@ public:
       person->setSurname("Hans");
 
       auto session = m_sessionFactory->createSession();
-      session->save(person);
+      session->save(person, QormMappings::TsPersonSimpleMapping());
       session->commit();
 
       auto records = m_sqlHelper->select("select id, name, surname from person");
@@ -402,7 +402,7 @@ public:
       person->setAddress(address);
 
       auto session = m_sessionFactory->createSession();
-      session->save(person);
+      session->save(person, QormMappings::TsPersonComplexMapping());
       session->commit();
 
       auto personRecords = m_sqlHelper->select("select id, address from person");
@@ -430,7 +430,7 @@ public:
       person->setSurname(surname);
 
       auto session = m_sessionFactory->createSession();
-      session->save(person);
+      session->save(person, QormMappings::TsPersonSimpleMapping());
       session->commit();
 
       auto records = m_sqlHelper->select("select id, name, surname from person");
@@ -452,12 +452,13 @@ public:
       person->setSurname(surname);
 
       auto session = m_sessionFactory->createSession();
-      session->remove(person);
+      session->remove(person, QormMappings::TsPersonSimpleMapping());
       session->commit();
 
       auto records = m_sqlHelper->select("select id, name, surname from person");
       QCOMPARE(records.size(), 0);
    }
+
 };
 
 QTEST_APPLESS_MAIN(QormSessionIT)

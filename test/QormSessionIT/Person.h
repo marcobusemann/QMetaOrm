@@ -153,6 +153,6 @@ private:
 Q_DECLARE_METATYPE(PersonComplex::Ptr)
 
 namespace QormMappings {
-   template <> QormMetaEntity::Ptr mapping<PersonSimple>();
-   template <> QormMetaEntity::Ptr mapping<PersonComplex>();
+   QormMetaEntity::Ptr TsPersonSimpleMapping();
+   QormMetaEntity::Ptr TsPersonComplexMapping();
 }

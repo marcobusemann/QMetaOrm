@@ -17,7 +17,7 @@ const QString Address::p::postCode = "postCode";
 const QString Address::p::street = "street";
 
 namespace QormMappings {
-   template <> QormMetaEntity::Ptr mapping<PersonSimple>() {
+   QormMetaEntity::Ptr TsPersonSimpleMapping() {
       static const QormMetaEntity::Ptr map = QormMetaEntityBuilder::anEntity()
          .forSource("person")
          .withId(PersonSimple::p::id, "ID")
@@ -27,7 +27,7 @@ namespace QormMappings {
       return map;
    }
 
-   template <> QormMetaEntity::Ptr mapping<Address>() {
+   QormMetaEntity::Ptr TsAddressMapping() {
       static const QormMetaEntity::Ptr map = QormMetaEntityBuilder::anEntity()
          .forSource("address")
          .withId(Address::p::id, "ID")
@@ -38,13 +38,13 @@ namespace QormMappings {
       return map;
    }
 
-   template <> QormMetaEntity::Ptr mapping<PersonComplex>() {
+   QormMetaEntity::Ptr TsPersonComplexMapping() {
       static const QormMetaEntity::Ptr map = QormMetaEntityBuilder::anEntity()
          .forSource("person")
          .withId(PersonComplex::p::id, "ID")
          .withData(PersonComplex::p::name, "NAME")
          .withData(PersonComplex::p::surname, "SURNAME")
-         .withOneToMany(PersonComplex::p::address, "ADDRESS", mapping<Address>())
+         .withOneToMany(PersonComplex::p::address, "ADDRESS", TsAddressMapping())
          .build<PersonComplex>();
       return map;
    }

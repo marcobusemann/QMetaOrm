@@ -61,7 +61,7 @@ const QString DummyObject::p::id = "id";
 const QString DummyObject::p::name = "id";
 
 namespace QormMappings {
-   template <> QormMetaEntity::Ptr mapping<DummyObject>()
+   QormMetaEntity::Ptr TsDummyObjectMapping()
    {
       static const QormMetaEntity::Ptr map = QormMetaEntityBuilder::anEntity()
          .forSource(DUMMY_SOURCE)
@@ -118,7 +118,7 @@ private Q_SLOTS :
    }
 
    QormMetaEntity::Ptr aDummyMapping() {
-      return QormMappings::mapping<DummyObject>();
+      return QormMappings::TsDummyObjectMapping();
    }
 
    /**
