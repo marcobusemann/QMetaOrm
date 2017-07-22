@@ -6,7 +6,6 @@
 
 QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory)
     :databaseFactory(databaseFactory)
-     , converterStore(QormDefaultConverterStore::factory())
      , logger(QormStandardQtLogger::factory())
      , cacheFactory(QormStandardEntityCacheFactory::factory()) { }
 
@@ -15,8 +14,7 @@ QormSession::Ptr QormDefaultSessionFactory::createSession() const
     return QSharedPointer<QormSession>(new QormSession(
         databaseFactory,
         QSharedPointer<QormEntitySqlBuilder>(new QormEntitySqlBuilder()),
-        QSharedPointer<QormEntityMapper>(new QormEntityMapper(logger, cacheFactory->createCache())),
-        converterStore));
+        QSharedPointer<QormEntityMapper>(new QormEntityMapper(logger, cacheFactory->createCache()))));
 }
 
 void QormDefaultSessionFactory::setLogger(const QormLogger::Ptr& logger)
@@ -27,11 +25,6 @@ void QormDefaultSessionFactory::setLogger(const QormLogger::Ptr& logger)
 void QormDefaultSessionFactory::setEntityCacheFactory(const QormEntityCacheFactory::Ptr& cacheFactory)
 {
     this->cacheFactory = cacheFactory;
-}
-
-void QormDefaultSessionFactory::setConverterStore(const QormConverterStore::Ptr& converterStore)
-{
-    this->converterStore = converterStore;
 }
 
 QormDefaultSessionFactory::Ptr QormDefaultSessionFactory::factory(const QormDatabaseFactory::Ptr& databaseFactory)

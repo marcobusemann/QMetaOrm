@@ -1,11 +1,14 @@
 #pragma once
 
 #include <QMetaOrm/QormMetaEntity.h>
+#include <QMetaOrm/QormConverter.h>
 #include <QMetaOrm/QormPrivate.h>
 
 #include <QSharedPointer>
 #include <QMetaProperty>
 #include <QDebug>
+
+#include <functional>
 
 class QMETAORM_LIBRARY_API QormMetaEntityBuilder {
 public:
@@ -23,7 +26,21 @@ public:
 
     QormMetaEntityBuilder withId(const QString& prop, const QString& field);
 
-    QormMetaEntityBuilder withData(const QString& prop, const QString& field, const QString& converter = QString());
+    QormMetaEntityBuilder withData(const QString& prop, const QString& field);
+
+    QormMetaEntityBuilder
+    withConvertedData(const QString& prop, const QString& field, std::function<QormConverter::Ptr()> converterSelector);
+
+    QormMetaEntityBuilder
+    withConvertedData(const QString& prop, const QString& field, const QormConverter::Ptr& converter);
+
+    template<class ConverterType>
+    QormMetaEntityBuilder withConvertedData(const QString& prop, const QString& field)
+    {
+        return withConvertedData(prop, field, []() {
+            return QSharedPointer<ConverterType>(new ConverterType());
+        });
+    }
 
     QormMetaEntityBuilder withOneToMany(const QString& prop, const QString& field, QormMetaEntity::Ptr referenceEntity);
 

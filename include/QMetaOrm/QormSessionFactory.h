@@ -21,6 +21,7 @@ public:
 class QMETAORM_LIBRARY_API QormDefaultSessionFactory : public QormSessionFactory {
 public:
     typedef QSharedPointer<QormDefaultSessionFactory> Ptr;
+
     static Ptr factory(const QormDatabaseFactory::Ptr& databaseFactory);
 
 public:
@@ -28,15 +29,12 @@ public:
 
     void setEntityCacheFactory(const QormEntityCacheFactory::Ptr& cacheFactory);
 
-    void setConverterStore(const QormConverterStore::Ptr& converterStore);
-
     virtual QormSession::Ptr createSession() const override;
 
 private:
     QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory);
 
     QormDatabaseFactory::Ptr databaseFactory;
-    QormConverterStore::Ptr converterStore;
     QormLogger::Ptr logger;
     QormEntityCacheFactory::Ptr cacheFactory;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QMetaOrm/QormConverterStore.h>
+#include <QMetaOrm/QormConverter.h>
 #include <QMetaOrm/QormPrivate.h>
 
 #include <QSharedPointer>
@@ -91,12 +91,12 @@ public:
 struct QMETAORM_LIBRARY_API QormMetaProperty {
     QString propertyName;
     QString databaseName;
-    QString converterName;
+    std::function<QormConverter::Ptr()> converterSelector;
     QSharedPointer<class QormMetaEntity> reference;
 
     bool hasConverter() const
     {
-        return !converterName.isEmpty();
+        return converterSelector!=nullptr;
     }
 
     bool isReference()
@@ -183,8 +183,7 @@ public:
     }
 
     template<class T>
-    QVariant getFlatPropertyValue(const QSharedPointer<T>& item, const QString& prop,
-        QormConverterStore::Ptr converterStore) const
+    QVariant getFlatPropertyValue(const QSharedPointer<T>& item, const QString& prop) const
     {
         auto propMeta = m_propertyMapping[prop];
         QVariant result;
@@ -196,12 +195,8 @@ public:
         else
             result = getProperty(item, prop);
 
-        if (propMeta.hasConverter()) {
-            if (!converterStore->hasConverter(propMeta.converterName))
-                qDebug() << "Converter " << propMeta.converterName << " not found!";
-            else
-                result = converterStore->getConverterFor(propMeta.converterName)->convert(result);
-        }
+        if (propMeta.hasConverter())
+            result = propMeta.converterSelector()->convert(result);
 
         return result;
     }

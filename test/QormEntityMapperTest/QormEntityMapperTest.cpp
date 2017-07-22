@@ -132,7 +132,7 @@ private Q_SLOTS :
     QormEntityMapper::Ptr aMapper()
     {
         return QormEntityMapper::Ptr(
-            new QormEntityMapper(QormStandardQtLogger::factory(), QormStandardEntityCache::factory()));
+            new QormEntityMapper(QormStandardQtLogger::factory(), QormEntityCache::Ptr()));
     }
 
     QormMetaEntity::Ptr aDummyMapping()
@@ -193,24 +193,6 @@ private Q_SLOTS :
             QFAIL("Mapping should not have been correct!");
         });
     }
-
-    /**
-      * Method applyConverter
-      */
-    void applyConverter_noConverterSpecified_exception()
-    {
-        auto store = QormDefaultConverterStore::factory();
-        QVERIFY_THROW(aMapper()->applyConverter("A", QVariant(), store), QormConverterNotFoundException);
-    }
-
-    void applyConverter_converterSpecified_valueTransformedCorrectly()
-    {
-        auto store = QormDefaultConverterStore::factory();
-        store->registerConverter("UpperConverter", QSharedPointer<UpperConverter>(new UpperConverter()));
-        QCOMPARE(aMapper()->applyConverter("UpperConverter", QVariant("abc"), store), QVariant("ABC"));
-    }
-
-
 };
 
 QTEST_APPLESS_MAIN(QormEntityMapperTest)

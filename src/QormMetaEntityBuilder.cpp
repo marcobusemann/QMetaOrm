@@ -38,15 +38,33 @@ QormMetaEntityBuilder QormMetaEntityBuilder::withId(const QString& prop, const Q
     return *this;
 }
 
-QormMetaEntityBuilder
-QormMetaEntityBuilder::withData(const QString& prop, const QString& field, const QString& converter)
+QormMetaEntityBuilder QormMetaEntityBuilder::withData(const QString& prop, const QString& field)
 {
     QormMetaProperty value;
     value.propertyName = prop;
     value.databaseName = field;
-    value.converterName = converter;
     m_entity->addProperty(value);
     return *this;
+}
+
+QormMetaEntityBuilder
+QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field,
+    std::function<QormConverter::Ptr()> converterSelector)
+{
+    QormMetaProperty value;
+    value.propertyName = prop;
+    value.databaseName = field;
+    value.converterSelector = converterSelector;
+    m_entity->addProperty(value);
+    return *this;
+}
+
+QormMetaEntityBuilder
+QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field, const QormConverter::Ptr& converter)
+{
+    return withConvertedData(prop, field, [converter]() {
+        return converter;
+    });
 }
 
 QormMetaEntityBuilder

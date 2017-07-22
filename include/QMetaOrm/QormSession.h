@@ -39,8 +39,7 @@ public:
     QormSession(
         QormDatabaseFactory::Ptr databaseFactory,
         QormEntitySqlBuilder::Ptr entitySqlBuilder,
-        QormEntityMapper::Ptr entityMapper,
-        QormConverterStore::Ptr converterStore);
+        QormEntityMapper::Ptr entityMapper);
 
     virtual ~QormSession();
 
@@ -170,7 +169,6 @@ private:
     QSqlDatabase m_database;
     QormEntityMapper::Ptr m_entityMapper;
     QormEntitySqlBuilder::Ptr m_entitySqlBuilder;
-    QormConverterStore::Ptr m_converterStore;
 };
 
 template<class T>

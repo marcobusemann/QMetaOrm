@@ -54,15 +54,6 @@ public:
         QString("Creating an instance of %1 was not possible. We need a std ctor.").arg(type).toLocal8Bit().data()) { }
 };
 
-class QMETAORM_LIBRARY_API QormConverterNotFoundException : public std::runtime_error {
-public:
-    QormConverterNotFoundException(const char* type)
-        :std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit().data()) { }
-
-    QormConverterNotFoundException(const QString& type)
-        :std::runtime_error(QString("Converter with name %1 was not found.").arg(type).toLocal8Bit().data()) { }
-};
-
 class QMETAORM_LIBRARY_API QormMoreThanOneResultException : public std::runtime_error {
 public:
     QormMoreThanOneResultException()

@@ -489,14 +489,10 @@ private Q_SLOTS :
 
     void selectOne_mappingWithConverter_valueGetsConverted()
     {
-        auto converterStore = QormDefaultConverterStore::factory();
-        converterStore->registerConverter("upper", QSharedPointer<ToUpperConverter>(new ToUpperConverter()));
-        m_sessionFactory->setConverterStore(converterStore);
-
         auto mapping = QormMetaEntityBuilder::anEntity()
             .forSource("person")
             .withId("id", "ID")
-            .withData("upperName", "NAME", "upper")
+            .withConvertedData<ToUpperConverter>("upperName", "NAME")
             .build<PersonSimple>();
 
         int idPerson = 1;

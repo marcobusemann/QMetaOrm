@@ -19,7 +19,6 @@ set(header
     ${header_path}/QormDatabaseFactory.h
     ${header_path}/QormSessionFactory.h
     ${header_path}/QormConverter.h
-    ${header_path}/QormConverterStore.h
     ${header_path}/QormLogger.h
     ${header_path}/QormEntityCache.h
     ${header_path}/QormEntityCacheFactory.h)
@@ -30,7 +29,6 @@ set(src
     QormSession.cpp
     QormSessionFactory.cpp
     QormMetaEntity.cpp
-    QormConverterStore.cpp
     QormEntityMapper.cpp
     QormLogger.cpp
     QormStandardEntityCache.cpp

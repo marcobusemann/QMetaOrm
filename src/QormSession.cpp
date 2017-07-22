@@ -28,10 +28,9 @@ QString GetThreadIdentifier()
 QormSession::QormSession(
     QormDatabaseFactory::Ptr databaseFactory,
     QormEntitySqlBuilder::Ptr entitySqlBuilder,
-    QormEntityMapper::Ptr entityMapper,
-    QormConverterStore::Ptr converterStore)
-    :m_database(databaseFactory->createDatabase(GetThreadIdentifier())), m_entityMapper(entityMapper),
-     m_entitySqlBuilder(entitySqlBuilder), m_converterStore(converterStore)
+    QormEntityMapper::Ptr entityMapper)
+    :m_database(databaseFactory->createDatabase(GetThreadIdentifier())), m_entityMapper(entityMapper)
+     , m_entitySqlBuilder(entitySqlBuilder)
 {
 }
 
@@ -134,7 +133,7 @@ void QormSession::create(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr ma
         Q_ASSERT(false);
 
     for (int i = 0; i<properties.size(); i++)
-        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
+        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i]));
 
     if (!query.exec())
         throw QormCouldNotExecuteQueryException(query.lastError());
@@ -158,7 +157,7 @@ void QormSession::update(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr ma
         throw QormCouldNotPrepareQueryException(query.lastError());
 
     for (int i = 0; i<properties.size(); i++)
-        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i], m_converterStore));
+        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i]));
     query.bindValue(properties.size(), mapping->getProperty(entity, mapping->getKeyProperty()));
 
     if (!query.exec())
@@ -216,7 +215,7 @@ QormSession::selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, con
         throw QormCouldNotExecuteQueryException(query.lastError());
 
     auto result = query.next() ?
-                  m_entityMapper->mapToEntity(mapping, query.record(), m_converterStore) :
+                  m_entityMapper->mapToEntity(mapping, query.record()) :
                   QSharedPointer<QObject>();
 
     if (query.next())
@@ -261,7 +260,7 @@ void QormSession::selectManyByCallbackBySql(
 
     bool continueWork = true;
     while (query.next() && continueWork)
-        continueWork = callback(m_entityMapper->mapToEntity(mapping, query.record(), m_converterStore));
+        continueWork = callback(m_entityMapper->mapToEntity(mapping, query.record()));
 }
 
 QList<QSharedPointer<QObject>> QormSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize)
@@ -307,7 +306,7 @@ void QormSession::selectManyBySqlWithCustomMapping(
         throw QormCouldNotExecuteQueryException(query.lastError());
 
     QOrmOnDemandRecordMapperImpl recordMapper([&](const QormMetaEntity::Ptr& mapping, const QString& prefix) {
-        return m_entityMapper->mapToEntity(mapping, query.record(), m_converterStore);
+        return m_entityMapper->mapToEntity(mapping, query.record());
     });
 
     bool continueWork = true;

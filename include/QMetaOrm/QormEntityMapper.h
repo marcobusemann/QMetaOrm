@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QMetaOrm/QormConverterStore.h>
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormExceptions.h>
 #include <QMetaOrm/QormPrivate.h>
@@ -36,22 +35,22 @@ public:
         const QormEntityCache::Ptr& entityCache);
 
     QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr& mapping, const QSqlRecord& record,
-        const QormConverterStore::Ptr& converterStore, const QString& prefix = QString())
+        const QString& prefix = QString())
     {
         auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record, prefix);
         QVariant result;
         if (isValidObject(mapping, getRecordFunc))
-            result = createCachedReference(mapping, converterStore, getRecordFunc);
+            result = createCachedReference(mapping, getRecordFunc);
         else
-            result = createReference(mapping, converterStore, getRecordFunc);
+            result = createReference(mapping, getRecordFunc);
         return mapping->getEntityFactory()->unpack(result);
     }
 
     template<class T>
     QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr& mapping, const QSqlRecord& record,
-        const QormConverterStore::Ptr& converterStore, const QString& prefix = QString())
+        const QString& prefix = QString())
     {
-        return mapToEntity(mapping, record, converterStore, prefix).objectCast<T>();
+        return mapToEntity(mapping, record, prefix).objectCast<T>();
     }
 
     ApplyHandler applyTo(QSharedPointer<QObject>& obj)
@@ -71,13 +70,12 @@ public:
 
     void mapToEntity(
         const QormMetaEntity::Ptr& mapping,
-        const QormConverterStore::Ptr& converterStore,
         QormPropertyPrefixer::Handler getRecord,
         ApplyHandler applyHandler)
     {
 
         mapKeyToEntity(mapping, getRecord, applyHandler);
-        mapPropertiesToEntity(mapping, converterStore, getRecord, applyHandler);
+        mapPropertiesToEntity(mapping, getRecord, applyHandler);
     }
 
     void mapKeyToEntity(
@@ -98,7 +96,6 @@ public:
 
     void mapPropertiesToEntity(
         const QormMetaEntity::Ptr& mapping,
-        const QormConverterStore::Ptr& converterStore,
         QormPropertyPrefixer::Handler getRecord,
         ApplyHandler applyHandler)
     {
@@ -108,13 +105,13 @@ public:
                 auto propertie = mapping->getProperty(key);
                 QVariant value;
                 if (propertie.isReference() && isValidObject(mapping, getRecord)) {
-                    value = createCachedReference(propertie.reference, converterStore,
+                    value = createCachedReference(propertie.reference,
                         m_prefixer.getEmbeddedRecordValuePrefixer(getRecord, propertie.databaseName));
                 }
                 else {
                     value = getRecord(propertie.databaseName);
                     if (propertie.hasConverter())
-                        value = applyConverter(propertie.converterName, value, converterStore);
+                        value = propertie.converterSelector()->convert(value);
                 }
                 applyHandler(key, value);
             }
@@ -126,32 +123,24 @@ public:
         return key.isValid() && !key.isNull();
     }
 
-    QVariant createReference(const QormMetaEntity::Ptr& mapping, const QormConverterStore::Ptr& converterStore,
+    QVariant createReference(const QormMetaEntity::Ptr& mapping,
         QormPropertyPrefixer::Handler getRecord)
     {
         auto entityFactory = mapping->getEntityFactory();
         auto entity = entityFactory->construct();
-        mapToEntity(mapping, converterStore, getRecord, applyTo(entity));
+        mapToEntity(mapping, getRecord, applyTo(entity));
         return entityFactory->pack(entity);
     }
 
-    QVariant createCachedReference(const QormMetaEntity::Ptr& mapping, const QormConverterStore::Ptr& converterStore,
+    QVariant createCachedReference(const QormMetaEntity::Ptr& mapping,
         QormPropertyPrefixer::Handler getRecord)
     {
         auto entityFactory = mapping->getEntityFactory();
         auto key = getKeyFor(mapping, getRecord);
         if (!isValidObject(mapping, getRecord)) return QVariant();
         if (!m_entityCache->contains(key, mapping))
-            m_entityCache->put(key, createReference(mapping, converterStore, getRecord), mapping);
+            m_entityCache->put(key, createReference(mapping, getRecord), mapping);
         return m_entityCache->get(key, mapping);
-    }
-
-    QVariant applyConverter(const QString& converterName, const QVariant& value, const QormConverterStore::Ptr& store)
-    {
-        auto converter = store->getConverterFor(converterName);
-        if (converter==nullptr)
-            throw QormConverterNotFoundException(converterName);
-        return converter->convert(value);
     }
 
 private:
