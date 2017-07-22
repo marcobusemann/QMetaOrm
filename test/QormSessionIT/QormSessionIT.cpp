@@ -115,10 +115,7 @@ private Q_SLOTS :
     void init()
     {
         m_databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
-        m_sessionFactory = QormDefaultSessionFactory::factory(
-            m_databaseFactory,
-            QormStandardQtLogger::factory(),
-            QormStandardEntityCacheFactory::factory());
+        m_sessionFactory = QormDefaultSessionFactory::factory(m_databaseFactory);
         m_sqlHelper = SqlHelper::factory(m_databaseFactory);
     }
 
