@@ -20,7 +20,8 @@ public:
 
 class QMETAORM_LIBRARY_API QormDefaultSessionFactory : public QormSessionFactory {
 public:
-    static QormSessionFactory::Ptr factory(const QormDatabaseFactory::Ptr& databaseFactory);
+    typedef QSharedPointer<QormDefaultSessionFactory> Ptr;
+    static Ptr factory(const QormDatabaseFactory::Ptr& databaseFactory);
 
 public:
     void setLogger(const QormLogger::Ptr& logger);

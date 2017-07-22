@@ -34,7 +34,7 @@ void QormDefaultSessionFactory::setConverterStore(const QormConverterStore::Ptr&
     this->converterStore = converterStore;
 }
 
-QormSessionFactory::Ptr QormDefaultSessionFactory::factory(const QormDatabaseFactory::Ptr& databaseFactory)
+QormDefaultSessionFactory::Ptr QormDefaultSessionFactory::factory(const QormDatabaseFactory::Ptr& databaseFactory)
 {
-    return QormSessionFactory::Ptr(new QormDefaultSessionFactory(databaseFactory));
+    return Ptr(new QormDefaultSessionFactory(databaseFactory));
 }
