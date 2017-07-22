@@ -32,6 +32,7 @@ public:
       const QormDatabaseFactory::Ptr &databaseFactory,
       const QormLogger::Ptr &logger,
       const QormEntityCacheFactory::Ptr &cacheFactory);
+
    virtual QormSession::Ptr createSession() const override;
    virtual QormConverterStore::Ptr getConverterStore() const override;
 
