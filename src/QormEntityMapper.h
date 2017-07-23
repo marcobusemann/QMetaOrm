@@ -3,7 +3,7 @@
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormExceptions.h>
 #include <QMetaOrm/QormLogger.h>
-#include <QMetaOrm/QormEntityCache.h>
+#include "QormEntityCache.h"
 
 #include <QSharedPointer>
 #include <QSqlRecord>

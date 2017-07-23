@@ -1,12 +1,11 @@
 #pragma once
 
 #include <QMetaOrm/QormMetaEntity.h>
-#include <QMetaOrm/QormPrivate.h>
 
 #include <QSharedPointer>
 #include <QVariant>
 
-class QMETAORM_LIBRARY_API QormEntityCache {
+class QormEntityCache {
 public:
     typedef QSharedPointer<QormEntityCache> Ptr;
 

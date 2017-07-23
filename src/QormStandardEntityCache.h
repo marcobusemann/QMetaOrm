@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QMetaOrm/QormEntityCache.h>
+#include "QormEntityCache.h"
 
 class QormStandardEntityCache : public QormEntityCache {
 public:
