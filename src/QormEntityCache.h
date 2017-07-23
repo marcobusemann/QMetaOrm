@@ -1,19 +1,17 @@
 #pragma once
 
-#include "QormEntityCache.h"
+#include <QMetaOrm/QormMetaEntity.h>
 
-class QormStandardEntityCache : public QormEntityCache {
+#include <QSharedPointer>
+#include <QVariant>
+
+class QormEntityCache {
 public:
+    bool contains(const QVariant& key, const QormMetaEntity::Ptr& mapping);
 
-    static QormEntityCache::Ptr factory();
+    QVariant get(const QVariant& key, const QormMetaEntity::Ptr& mapping);
 
-public:
-
-    virtual bool contains(const QVariant& key, const QormMetaEntity::Ptr& mapping) override;
-
-    virtual QVariant get(const QVariant& key, const QormMetaEntity::Ptr& mapping) override;
-
-    virtual void put(const QVariant& key, const QVariant& item, const QormMetaEntity::Ptr& mapping) override;
+    void put(const QVariant& key, const QVariant& item, const QormMetaEntity::Ptr& mapping);
 
 private:
 
