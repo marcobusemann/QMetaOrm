@@ -28,10 +28,10 @@ void QormStandardQtLogger::warn(const QString& message)
 
 void QormStandardQtLogger::error(const QString& message)
 {
-    qFatal(message.toLocal8Bit().data());
+    qFatal("%s", message.toLocal8Bit().data());
 }
 
 void QormStandardQtLogger::fatal(const QString& message)
 {
-    qFatal(message.toLocal8Bit().data());
+    qFatal("%s", message.toLocal8Bit().data());
 }
