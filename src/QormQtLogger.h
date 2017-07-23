@@ -11,7 +11,7 @@
   * - qFatal for error
   * - qFatal for fatal
   */
-class QormStandardQtLogger : public QormLogger {
+class QormQtLogger : public QormLogger {
 public:
     static QormLogger::Ptr factory();
 

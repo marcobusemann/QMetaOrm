@@ -1,11 +1,11 @@
 #include <QormEntitySqlBuilder.h>
 #include <QMetaOrm/QormSessionFactory.h>
 
-#include "QormStandardQtLogger.h"
+#include "QormQtLogger.h"
 
 QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory)
     :databaseFactory(databaseFactory)
-     , logger(QormStandardQtLogger::factory()) { }
+     , logger(QormQtLogger::factory()) { }
 
 QormSession::Ptr QormDefaultSessionFactory::createSession() const
 {
