@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QMetaOrm/QormDatabaseSettings.h>
 #include <QMetaOrm/QormSessionFactory.h>
 #include <QMetaOrm/QormPrivate.h>
 
@@ -21,4 +22,5 @@ public:
     static QormSessionFactoryBuilder AFactory();
 
     QormSessionFactoryDatabaseConnectionBuilder withDatabase(const QormDatabaseFactory::Ptr& databaseFactory);
+    QormSessionFactoryDatabaseConnectionBuilder withDatabase(const QString &driverName, const QormDatabaseSettings& databaseSettings);
 };

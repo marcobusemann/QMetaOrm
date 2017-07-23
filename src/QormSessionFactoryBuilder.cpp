@@ -1,5 +1,6 @@
 #include <QMetaOrm/QormSessionFactoryBuilder.h>
 
+#include "QormSettingBasedDatabaseFactory.h"
 #include "QormDefaultSessionFactory.h"
 #include "QormQtLogger.h"
 
@@ -12,6 +13,12 @@ QormSessionFactoryDatabaseConnectionBuilder
 QormSessionFactoryBuilder::withDatabase(const QormDatabaseFactory::Ptr& databaseFactory)
 {
     return QormSessionFactoryDatabaseConnectionBuilder(databaseFactory);
+}
+
+QormSessionFactoryDatabaseConnectionBuilder
+QormSessionFactoryBuilder::withDatabase(const QString &driverName, const QormDatabaseSettings& databaseSettings)
+{
+    return withDatabase(QormSettingBasedDatabaseFactory::factory(driverName, databaseSettings));
 }
 
 QormSessionFactoryDatabaseConnectionBuilder::QormSessionFactoryDatabaseConnectionBuilder(

@@ -4,6 +4,20 @@ Windows | [![Windows Status](https://ci.appveyor.com/api/projects/status/2u12ikv
 Linux & OSX | [![Linux & Osx Status](https://travis-ci.org/marcobusemann/QMetaOrm.svg?branch=master)](https://travis-ci.org/marcobusemann/QMetaOrm)
 
 # Getting started
+A simple usage for sqlite looks like this:
+```cpp
+auto settings = QormDatabaseSettings();
+settings.setDatabaseName("file.sqlite");
+
+auto sessionFactory = QormSessionFactoryBuilder::AFactory()
+    .withDatabase("QSQLITE", settings)
+    .build();
+    
+auto session = sessionFactory->createSession();
+auto address = session->selectOne<Address>("select * from address where id = ?", QVariantList() << 1);
+```
+
+# Building the library
 ## Unix
 ```
 mkdir build && cd build
