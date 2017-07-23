@@ -5,7 +5,7 @@
 #include <QtSql>
 
 #include <QMetaOrm/QormMetaEntityBuilder.h>
-#include <QMetaOrm/QormSessionFactory.h>
+#include <QMetaOrm/QormSessionFactoryBuilder.h>
 #include <QMetaOrm/QormExceptions.h>
 
 /*
@@ -112,8 +112,7 @@ class QormSessionIT : public QObject {
 Q_OBJECT
 
 private:
-    QormDatabaseFactory::Ptr m_databaseFactory;
-    QSharedPointer<QormDefaultSessionFactory> m_sessionFactory;
+    QormSessionFactory::Ptr m_sessionFactory;
     SqlHelper::Ptr m_sqlHelper;
 
 public:
@@ -123,16 +122,17 @@ private Q_SLOTS :
 
     void init()
     {
-        m_databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
-        m_sessionFactory = QormDefaultSessionFactory::factory(m_databaseFactory);
-        m_sqlHelper = SqlHelper::factory(m_databaseFactory);
+        auto databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
+        m_sessionFactory = QormSessionFactoryBuilder::AFactory()
+            .withDatabase(databaseFactory)
+            .build();
+        m_sqlHelper = SqlHelper::factory(databaseFactory);
     }
 
     void cleanup()
     {
         m_sqlHelper.clear();
         m_sessionFactory.clear();
-        m_databaseFactory.clear();
     }
 
     void selectOneBySql_noPersonExists_nullptr()
