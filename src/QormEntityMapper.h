@@ -29,9 +29,7 @@ public:
     typedef std::function<void(const QString& key, const QVariant& value)> ApplyHandler;
 
 public:
-    QormEntityMapper(
-        const QormLogger::Ptr& logger,
-        const QormEntityCache::Ptr& entityCache);
+    QormEntityMapper(const QormLogger::Ptr& logger);
 
     QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr& mapping, const QSqlRecord& record,
         const QString& prefix = QString())
@@ -137,13 +135,13 @@ public:
         auto entityFactory = mapping->getEntityFactory();
         auto key = getKeyFor(mapping, getRecord);
         if (!isValidObject(mapping, getRecord)) return QVariant();
-        if (!m_entityCache->contains(key, mapping))
-            m_entityCache->put(key, createReference(mapping, getRecord), mapping);
-        return m_entityCache->get(key, mapping);
+        if (!m_entityCache.contains(key, mapping))
+            m_entityCache.put(key, createReference(mapping, getRecord), mapping);
+        return m_entityCache.get(key, mapping);
     }
 
 private:
     QormPropertyPrefixer m_prefixer;
     QormLogger::Ptr m_logger;
-    QormEntityCache::Ptr m_entityCache;
+    QormEntityCache m_entityCache;
 };

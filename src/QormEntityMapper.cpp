@@ -21,7 +21,7 @@ QString QormPropertyPrefixer::prepend(const QString& value, const QString& prefi
     return prefixString.isEmpty() ? value : QString("%1_%2").arg(prefixString, value);
 }
 
-QormEntityMapper::QormEntityMapper(const QormLogger::Ptr& logger, const QormEntityCache::Ptr& entityCache)
-    :m_logger(logger), m_entityCache(entityCache)
+QormEntityMapper::QormEntityMapper(const QormLogger::Ptr& logger)
+    :m_logger(logger)
 {
 }

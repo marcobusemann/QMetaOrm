@@ -2,7 +2,7 @@
 #include <QMetaOrm/QormExceptions.h>
 
 #include "QormEntitySqlBuilder.h"
-#include "QormStandardEntityCache.h"
+#include "QormEntityCache.h"
 #include "QormEntityMapper.h"
 
 #include <QSqlQuery>
@@ -33,7 +33,7 @@ QString GetThreadIdentifier()
 
 QormSession::QormSession(const QormDatabaseFactory::Ptr &databaseFactory, const QormLogger::Ptr& logger)
     :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
-     , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger, QormStandardEntityCache::factory())))
+     , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger)))
      , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
 {
 }

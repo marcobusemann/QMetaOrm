@@ -28,11 +28,10 @@ set(src
     QormMetaEntity.cpp
     QormEntityMapper.h
     QormEntityMapper.cpp
-    QormStandardEntityCache.cpp
-    QormStandardEntityCache.h
+    QormEntityCache.cpp
+    QormEntityCache.h
     QormStandardQtLogger.cpp
-    QormStandardQtLogger.h
-    QormEntityCache.h)
+    QormStandardQtLogger.h)
 
 # Bind to qt
 find_package(Qt5Core)

@@ -1,26 +1,21 @@
-#include "QormStandardEntityCache.h"
+#include "QormEntityCache.h"
 
-QormEntityCache::Ptr QormStandardEntityCache::factory()
-{
-    return QormEntityCache::Ptr(new QormStandardEntityCache());
-}
-
-QVariant QormStandardEntityCache::get(const QVariant& key, const QormMetaEntity::Ptr& mapping)
+QVariant QormEntityCache::get(const QVariant& key, const QormMetaEntity::Ptr& mapping)
 {
     return forMapping(mapping)[key];
 }
 
-bool QormStandardEntityCache::contains(const QVariant& key, const QormMetaEntity::Ptr& mapping)
+bool QormEntityCache::contains(const QVariant& key, const QormMetaEntity::Ptr& mapping)
 {
     return forMapping(mapping).contains(key);
 }
 
-void QormStandardEntityCache::put(const QVariant& key, const QVariant& item, const QormMetaEntity::Ptr& mapping)
+void QormEntityCache::put(const QVariant& key, const QVariant& item, const QormMetaEntity::Ptr& mapping)
 {
     forMapping(mapping)[key] = item;
 }
 
-QHash<QVariant, QVariant>& QormStandardEntityCache::forMapping(const QormMetaEntity::Ptr& mapping)
+QHash<QVariant, QVariant>& QormEntityCache::forMapping(const QormMetaEntity::Ptr& mapping)
 {
     if (!m_data.contains(mapping))
         m_data[mapping] = QHash<QVariant, QVariant>();

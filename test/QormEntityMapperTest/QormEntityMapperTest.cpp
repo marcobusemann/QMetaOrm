@@ -147,7 +147,7 @@ private Q_SLOTS :
     QormEntityMapper::Ptr aMapper()
     {
         auto logger = QSharedPointer<QormLogger>(new DummyLogger());
-        return QormEntityMapper::Ptr(new QormEntityMapper(logger, QormEntityCache::Ptr()));
+        return QormEntityMapper::Ptr(new QormEntityMapper(logger));
     }
 
     QormMetaEntity::Ptr aDummyMapping()
