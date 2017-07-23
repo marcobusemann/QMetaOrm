@@ -1,8 +1,6 @@
 include(../cmake/qtest.cmake)
 set(TESTNAME QormEntityMapperTest)
 set(SRC ${TESTNAME}.cpp
-        ../../src/QormStandardQtLogger.h
-        ../../src/QormStandardQtLogger.cpp
         ../../src/QormEntityMapper.h
         ../../src/QormEntityMapper.cpp)
 set(NEEDED_FEATURES

@@ -4,7 +4,6 @@
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormMetaEntityBuilder.h>
 
-#include "../../src/QormStandardQtLogger.h"
 #include "../../src/QormEntityMapper.h"
 
 #define QVERIFY_THROW(expression, ExpectedExceptionType) \
@@ -31,12 +30,12 @@ class DummyObject : public QObject {
 Q_OBJECT
     Q_PROPERTY(int id
         READ
-        getId
+            getId
         WRITE
         setId)
     Q_PROPERTY(QString name
         READ
-        getName
+            getName
         WRITE
         setName)
 
@@ -91,7 +90,7 @@ class DummyObjectWithoutStdCtor : public QObject {
 Q_OBJECT
     Q_PROPERTY(int id
         READ
-        getId
+            getId
         WRITE
         setId)
 public:
@@ -119,6 +118,21 @@ class UpperConverter : public QormConverter {
     }
 };
 
+class DummyLogger : public QormLogger {
+public:
+    void trace(const QString& message) override { }
+
+    void debug(const QString& message) override { }
+
+    void info(const QString& message) override { }
+
+    void warn(const QString& message) override { }
+
+    void error(const QString& message) override { }
+
+    void fatal(const QString& message) override { }
+};
+
 class QormEntityMapperTest : public QObject {
 Q_OBJECT
 
@@ -132,8 +146,8 @@ private Q_SLOTS :
       */
     QormEntityMapper::Ptr aMapper()
     {
-        return QormEntityMapper::Ptr(
-            new QormEntityMapper(QormStandardQtLogger::factory(), QormEntityCache::Ptr()));
+        auto logger = QSharedPointer<QormLogger>(new DummyLogger());
+        return QormEntityMapper::Ptr(new QormEntityMapper(logger, QormEntityCache::Ptr()));
     }
 
     QormMetaEntity::Ptr aDummyMapping()
