@@ -1,92 +1,14 @@
-#include "DatabaseFactory.h"
-#include "Person.h"
-
-#include <QtTest>
-#include <QtSql>
-
 #include <QMetaOrm/QormMetaEntityBuilder.h>
 #include <QMetaOrm/QormSessionFactoryBuilder.h>
 #include <QMetaOrm/QormExceptions.h>
 
-/*
-    Took from qt source for usage in old qt versions
-*/
-#  define VERIFY_EXCEPTION_THROWN(expression, exceptiontype) \
-    do {\
-        QT_TRY {\
-            QT_TRY {\
-                expression;\
-                QTest::qFail("Expected exception of type " #exceptiontype " to be thrown" \
-                             " but no exception caught", __FILE__, __LINE__);\
-                return;\
-            } QT_CATCH (const exceptiontype &) {\
-            }\
-        } QT_CATCH (const std::exception &e) {\
-            QByteArray msg = QByteArray() + "Expected exception of type " #exceptiontype \
-                             " to be thrown but std::exception caught with message: " + e.what(); \
-            QTest::qFail(msg.constData(), __FILE__, __LINE__);\
-            return;\
-        } QT_CATCH (...) {\
-            QTest::qFail("Expected exception of type " #exceptiontype " to be thrown" \
-                         " but unknown exception caught", __FILE__, __LINE__);\
-            return;\
-        }\
-    } while (0)
+#include <QtTest>
+#include <QtSql>
 
-class SqlHelper {
-public:
-    typedef QSharedPointer<SqlHelper> Ptr;
-
-    static Ptr factory(QormDatabaseFactory::Ptr databaseFactory)
-    {
-        return Ptr(new SqlHelper(databaseFactory));
-    }
-
-public:
-    SqlHelper(QormDatabaseFactory::Ptr databaseFactory)
-        :
-        m_databaseFactory(databaseFactory)
-    {
-    }
-
-    void insert(const QString& aSql, const QVariantList& params = QVariantList())
-    {
-        auto database = m_databaseFactory->createDatabase();
-        QSqlQuery query(database);
-        bool okPrepare = query.prepare(aSql);
-        Q_ASSERT(okPrepare);
-
-        for (int i = 0; i<params.size(); i++)
-            query.bindValue(i, params[i]);
-        bool okExec = query.exec();
-        Q_ASSERT(okExec);
-    }
-
-    QList<QVariantList> select(const QString& aSql, const QVariantList& params = QVariantList())
-    {
-        auto database = m_databaseFactory->createDatabase();
-        QSqlQuery query(database);
-        bool okPrepare = query.prepare(aSql);
-        Q_ASSERT(okPrepare);
-
-        for (int i = 0; i<params.size(); i++)
-            query.bindValue(i, params[i]);
-        bool okExec = query.exec();
-        Q_ASSERT(okExec);
-
-        QList<QVariantList> result;
-        while (query.next()) {
-            QVariantList record;
-            for (int i = 0; i<query.record().count(); i++)
-                record << query.value(i);
-            result << record;
-        }
-        return result;
-    }
-
-private:
-    QormDatabaseFactory::Ptr m_databaseFactory;
-};
+#include "DatabaseFactory.h"
+#include "TestMacros.h"
+#include "SqlHelper.h"
+#include "Person.h"
 
 class AnyBuilder {
 public:
@@ -139,7 +61,7 @@ private Q_SLOTS :
     {
         auto session = m_sessionFactory->createSession();
 
-        auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1",
+        auto item = session->selectOne<PersonSimple>("select * from person limit 1",
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item==nullptr);
@@ -153,7 +75,7 @@ private Q_SLOTS :
             QVariantList() << id << name << surname);
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOneBySql<PersonSimple>("select * from person limit 1",
+        auto item = session->selectOne<PersonSimple>(QormSql("select * from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item!=nullptr);
@@ -170,7 +92,7 @@ private Q_SLOTS :
 
         auto session = m_sessionFactory->createSession();
         VERIFY_EXCEPTION_THROWN(
-            session->selectOneBySql<PersonSimple>("select * from person", QormMappings::TsPersonSimpleMapping()),
+            session->selectOne<PersonSimple>(QormSql("select * from person"), QormMappings::TsPersonSimpleMapping()),
             QormMoreThanOneResultException);
     }
 
@@ -181,7 +103,7 @@ private Q_SLOTS :
             QVariantList() << 1 << name << "Hans");
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1",
+        auto item = session->selectOne<PersonSimple>(QormSql("select name from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item!=nullptr);
@@ -196,9 +118,9 @@ private Q_SLOTS :
             QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOneBySql<PersonSimple>("select id from person limit 1",
+        auto item = session->selectOne<PersonSimple>("select id from person limit 1",
             QormMappings::TsPersonSimpleMapping());
-        auto item2 = session->selectOneBySql<PersonSimple>("select id from person limit 1",
+        auto item2 = session->selectOne<PersonSimple>("select id from person limit 1",
             QormMappings::TsPersonSimpleMapping());
 
         QCOMPARE(item, item2);
@@ -210,9 +132,9 @@ private Q_SLOTS :
             QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOneBySql<PersonSimple>("select name from person limit 1",
+        auto item = session->selectOne<PersonSimple>(QormSql("select name from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
-        auto item2 = session->selectOneBySql<PersonSimple>("select name from person limit 1",
+        auto item2 = session->selectOne<PersonSimple>(QormSql("select name from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item!=item2);
@@ -225,8 +147,9 @@ private Q_SLOTS :
             QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOneBySql<PersonSimple>("select * from person where id = ? limit 1",
-            QormMappings::TsPersonSimpleMapping(), QVariantList() << id);
+        auto item = session->selectOne<PersonSimple>(
+            QormSql("select * from person where id = ? limit 1", QVariantList() << id),
+            QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item!=nullptr);
         QCOMPARE(item->getId(), id);
@@ -292,7 +215,7 @@ private Q_SLOTS :
     void selectManyBySql_noPersons_emptyList()
     {
         auto session = m_sessionFactory->createSession();
-        auto items = session->selectManyBySql<PersonSimple>("select * from person",
+        auto items = session->selectMany<PersonSimple>(QormSql("select * from person"),
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(items.isEmpty());
@@ -306,7 +229,7 @@ private Q_SLOTS :
             QVariantList() << 2 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto items = session->selectManyBySql<PersonSimple>("select * from person",
+        auto items = session->selectMany<PersonSimple>(QormSql("select * from person"),
             QormMappings::TsPersonSimpleMapping());
 
         QCOMPARE(items.size(), 2);
@@ -318,9 +241,9 @@ private Q_SLOTS :
             QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto items = session->selectManyBySql<PersonSimple>("select id from person limit 1",
+        auto items = session->selectMany<PersonSimple>(QormSql("select id from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
-        auto items2 = session->selectManyBySql<PersonSimple>("select id from person limit 1",
+        auto items2 = session->selectMany<PersonSimple>(QormSql("select id from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QCOMPARE(items[0], items2[0]);
@@ -333,8 +256,9 @@ private Q_SLOTS :
             QVariantList() << id << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto items = session->selectManyBySql<PersonSimple>("select * from person where id = ? limit 1",
-            QormMappings::TsPersonSimpleMapping(), QVariantList() << id);
+        auto items = session->selectMany<PersonSimple>(
+            QormSql("select * from person where id = ? limit 1", QVariantList() << id),
+            QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(items.size()==1);
         QCOMPARE(items[0]->getId(), id);
@@ -504,7 +428,7 @@ private Q_SLOTS :
         auto session = m_sessionFactory->createSession();
         auto item = session->selectOne<PersonSimple>(1, mapping);
 
-        QVERIFY(item != nullptr);
+        QVERIFY(item!=nullptr);
         QCOMPARE(QString("MUELLER"), item->property("upperName").toString());
     }
 

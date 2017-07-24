@@ -4,6 +4,8 @@ set(SRC
     DatabaseFactory.h
     Person.cpp
     Person.h
+    SqlHelper.h
+    TestMacros.h
     QormSessionIT.cpp
     resource.qrc)
 set(NEEDED_FEATURES

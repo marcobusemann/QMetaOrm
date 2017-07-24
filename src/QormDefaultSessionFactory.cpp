@@ -1,4 +1,5 @@
 #include "QormDefaultSessionFactory.h"
+#include "QormDefaultSession.h"
 
 QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr &logger)
     :databaseFactory(databaseFactory)
@@ -6,7 +7,7 @@ QormDefaultSessionFactory::QormDefaultSessionFactory(const QormDatabaseFactory::
 
 QormSession::Ptr QormDefaultSessionFactory::createSession() const
 {
-    return QSharedPointer<QormSession>(new QormSession(databaseFactory, logger));
+    return QSharedPointer<QormSession>(new QormDefaultSession(databaseFactory, logger));
 }
 
 QormDefaultSessionFactory::Ptr QormDefaultSessionFactory::factory(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr &logger)

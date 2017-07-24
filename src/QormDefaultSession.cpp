@@ -1,16 +1,15 @@
-#include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormExceptions.h>
 
 #include "QormEntitySqlBuilder.h"
-#include "QormEntityCache.h"
+#include "QormDefaultSession.h"
 #include "QormEntityMapper.h"
 
 #include <QSqlQuery>
 #include <QUuid>
 
-class QOrmOnDemandRecordMapperImpl : public QOrmOnDemandRecordMapper {
+class QormOnDemandRecordMapperImpl : public QormOnDemandRecordMapper {
 public:
-    QOrmOnDemandRecordMapperImpl(
+    QormOnDemandRecordMapperImpl(
         std::function<QSharedPointer<QObject>(const QormMetaEntity::Ptr&, const QString&)> callback)
         :m_callback(callback)
     {
@@ -31,29 +30,29 @@ QString GetThreadIdentifier()
     return QUuid::createUuid().toString();
 }
 
-QormSession::QormSession(const QormDatabaseFactory::Ptr &databaseFactory, const QormLogger::Ptr& logger)
+QormDefaultSession::QormDefaultSession(const QormDatabaseFactory::Ptr &databaseFactory, const QormLogger::Ptr& logger)
     :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
      , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger)))
      , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
 {
 }
 
-QormSession::~QormSession()
+QormDefaultSession::~QormDefaultSession()
 {
     rollback();
 }
 
-void QormSession::commit()
+void QormDefaultSession::commit()
 {
     m_database.commit();
 }
 
-void QormSession::rollback()
+void QormDefaultSession::rollback()
 {
     m_database.rollback();
 }
 
-void QormSession::setupSession()
+void QormDefaultSession::setupSession()
 {
     if (!m_database.isOpen() && !m_database.open())
         throw QormConnectToDatabaseException(m_database.lastError());
@@ -61,21 +60,20 @@ void QormSession::setupSession()
     m_database.transaction();
 }
 
-void QormSession::save(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
+QSharedPointer<QObject> QormDefaultSession::save(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
 {
     setupSession();
-    if (mapping->hasValidKey(entity))
-        return update(entity, mapping);
-    else
-        return create(entity, mapping);
+    return mapping->hasValidKey(entity) ?
+           update(entity, mapping) :
+           create(entity, mapping);
 }
 
-void QormSession::saveBySql(const QString& sql, const QVariantList& parameters)
+void QormDefaultSession::save(const QormSql& sqlQuery)
 {
-    removeBySql(sql, parameters);
+    remove(sqlQuery);
 }
 
-void QormSession::remove(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
+void QormDefaultSession::remove(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
 {
     setupSession();
     Q_ASSERT_X(mapping->hasValidKey(entity), "remove", "entity has no valid key, removing not possible.");
@@ -91,15 +89,16 @@ void QormSession::remove(const QSharedPointer<QObject>& entity, QormMetaEntity::
         throw QormCouldNotExecuteQueryException(query.lastError());
 }
 
-void QormSession::removeBySql(const QString& sql, const QVariantList& parameters)
+void QormDefaultSession::remove(const QormSql& sqlQuery)
 {
     setupSession();
 
     QSqlQuery query(m_database);
 
-    if (!query.prepare(sql))
+    if (!query.prepare(sqlQuery.sql))
         throw QormCouldNotPrepareQueryException(query.lastError());
 
+    auto parameters = sqlQuery.parameters;
     for (int i = 0; i<parameters.size(); i++)
         query.bindValue(i, parameters[i]);
 
@@ -107,11 +106,12 @@ void QormSession::removeBySql(const QString& sql, const QVariantList& parameters
         throw QormCouldNotExecuteQueryException(query.lastError());
 }
 
-void QormSession::create(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
+QSharedPointer<QObject> QormDefaultSession::create(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
 {
     setupSession();
 
     QSqlQuery query(m_database);
+    auto result = entity;
 
     QStringList properties;
     auto keyStrategy = mapping->getKeyGenerationStrategy();
@@ -124,7 +124,7 @@ void QormSession::create(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr ma
         if (!keyQuery.first())
             throw QormCouldNotQueryNextSequenceValueException(query.lastError());
 
-        mapping->setProperty(entity, mapping->getKeyProperty(), keyQuery.value(0));
+        mapping->setProperty(result, mapping->getKeyProperty(), keyQuery.value(0));
 
         if (!query.prepare(m_entitySqlBuilder->buildInsertForSequence(mapping, properties)))
             throw QormCouldNotPrepareQueryException(query.lastError());
@@ -143,13 +143,14 @@ void QormSession::create(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr ma
         throw QormCouldNotExecuteQueryException(query.lastError());
 
     if (keyStrategy==KeyGenerationStrategy::Identity)
-        mapping->setProperty(entity, mapping->getKeyProperty(), query.lastInsertId());
+        mapping->setProperty(result, mapping->getKeyProperty(), query.lastInsertId());
 
     if (query.first())
-        mapping->setProperty(entity, mapping->getKeyProperty(), query.value(0));
+        mapping->setProperty(result, mapping->getKeyProperty(), query.value(0));
+    return result;
 }
 
-void QormSession::update(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
+QSharedPointer<QObject> QormDefaultSession::update(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
 {
     setupSession();
 
@@ -166,52 +167,25 @@ void QormSession::update(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr ma
 
     if (!query.exec())
         throw QormCouldNotExecuteQueryException(query.lastError());
+
+    return entity;
 }
 
-QSharedPointer<QObject> QormSession::selectOne(const QVariant& key, QormMetaEntity::Ptr mapping)
+QSharedPointer<QObject> QormDefaultSession::selectOne(const QVariant& key, QormMetaEntity::Ptr mapping)
 {
-    return selectOneBySql(m_entitySqlBuilder->buildSelect(mapping), mapping, QVariantList() << key);
+    return selectOne(QormSql(m_entitySqlBuilder->buildSelect(mapping), QVariantList() << key), mapping);
 }
 
-QVariantList QormSession::selectOneBySql(const QString& sql, const QVariantList& parameters)
-{
-    setupSession();
-
-    QSqlQuery query(m_database);
-
-    if (!query.prepare(sql))
-        throw QormCouldNotPrepareQueryException(query.lastError());
-
-    for (int i = 0; i<parameters.size(); i++)
-        query.bindValue(i, parameters[i]);
-
-    if (!query.exec())
-        throw QormCouldNotExecuteQueryException(query.lastError());
-
-    auto result = QVariantList();
-
-    if (query.next()) {
-        auto record = query.record();
-        for (auto i = 0; i<record.count(); i++)
-            result.append(record.value(i));
-    }
-
-    if (query.next())
-        throw QormMoreThanOneResultException();
-
-    return result;
-}
-
-QSharedPointer<QObject>
-QormSession::selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters)
+QSharedPointer<QObject> QormDefaultSession::selectOne(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
 {
     setupSession();
 
     QSqlQuery query(m_database);
 
-    if (!query.prepare(sql))
+    if (!query.prepare(sqlQuery.sql))
         throw QormCouldNotPrepareQueryException(query.lastError());
 
+    auto parameters = sqlQuery.parameters;
     for (int i = 0; i<parameters.size(); i++)
         query.bindValue(i, parameters[i]);
 
@@ -228,7 +202,7 @@ QormSession::selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, con
     return result;
 }
 
-void QormSession::selectManyByCallback(
+void QormDefaultSession::selectMany(
     QormMetaEntity::Ptr mapping,
     std::function<bool(const QSharedPointer<QObject>&)> callback,
     int skip,
@@ -236,26 +210,25 @@ void QormSession::selectManyByCallback(
 {
     QVariantList conditions;
     auto sql = m_entitySqlBuilder->buildSelectMany(mapping, skip, pageSize, conditions);
-    selectManyByCallbackBySql(
-        sql,
+    selectMany(
+        QormSql(sql, conditions),
         mapping,
-        callback,
-        conditions);
+        callback);
 }
 
-void QormSession::selectManyByCallbackBySql(
-    const QString& sql,
+void QormDefaultSession::selectMany(
+    const QormSql& sqlQuery,
     QormMetaEntity::Ptr mapping,
-    std::function<bool(const QSharedPointer<QObject>&)> callback,
-    const QVariantList& parameters)
+    std::function<bool(const QSharedPointer<QObject>&)> callback)
 {
     setupSession();
 
     QSqlQuery query(m_database);
 
-    if (!query.prepare(sql))
+    if (!query.prepare(sqlQuery.sql))
         throw QormCouldNotPrepareQueryException(query.lastError());
 
+    auto parameters = sqlQuery.parameters;
     for (int i = 0; i<parameters.size(); i++)
         query.bindValue(i, parameters[i]);
 
@@ -267,49 +240,48 @@ void QormSession::selectManyByCallbackBySql(
         continueWork = callback(m_entityMapper->mapToEntity(mapping, query.record()));
 }
 
-QList<QSharedPointer<QObject>> QormSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize)
+QList<QSharedPointer<QObject>> QormDefaultSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize)
 {
     QList<QSharedPointer<QObject>> result;
     auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
         result.append(item);
         return true;
     };
-    selectManyByCallback(mapping, func, skip, pageSize);
+    selectMany(mapping, func, skip, pageSize);
     return result;
 }
 
 QList<QSharedPointer<QObject>>
-QormSession::selectManyBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters)
+QormDefaultSession::selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
 {
     QList<QSharedPointer<QObject>> result;
     auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
         result.append(item);
         return true;
     };
-    selectManyByCallbackBySql(sql, mapping, func, parameters);
+    selectMany(sqlQuery, mapping, func);
     return result;
 }
 
-void QormSession::selectManyBySqlWithCustomMapping(
-    const QString& sql,
-    std::function<bool(const QOrmOnDemandRecordMapper*)> callback,
-    const QVariantList& parameters)
+void QormDefaultSession::selectManyWithCustomMapping(
+    const QormSql& sqlQuery,
+    std::function<bool(const QormOnDemandRecordMapper*)> callback)
 {
-
     setupSession();
 
     QSqlQuery query(m_database);
 
-    if (!query.prepare(sql))
+    if (!query.prepare(sqlQuery.sql))
         throw QormCouldNotPrepareQueryException(query.lastError());
 
+    auto parameters = sqlQuery.parameters;
     for (int i = 0; i<parameters.size(); i++)
         query.bindValue(i, parameters[i]);
 
     if (!query.exec())
         throw QormCouldNotExecuteQueryException(query.lastError());
 
-    QOrmOnDemandRecordMapperImpl recordMapper([&](const QormMetaEntity::Ptr& mapping, const QString& prefix) {
+    QormOnDemandRecordMapperImpl recordMapper([&](const QormMetaEntity::Ptr& mapping, const QString& prefix) {
         return m_entityMapper->mapToEntity(mapping, query.record());
     });
 

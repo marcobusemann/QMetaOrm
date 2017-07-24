@@ -19,13 +19,14 @@ set(header
     ${header_path}/QormConverter.h
     ${header_path}/QormLogger.h
     ${header_path}/QormSessionFactoryBuilder.h
-    ${header_path}/QormDatabaseSettings.h)
+    ${header_path}/QormDatabaseSettings.h
+    ${header_path}/QormOnDemandRecordMapper.h
+    ${header_path}/QormSql.h)
 
 set(src
     QormMetaEntityBuilder.cpp
     QormEntitySqlBuilder.cpp
     QormEntitySqlBuilder.h
-    QormSession.cpp
     QormMetaEntity.cpp
     QormEntityMapper.h
     QormEntityMapper.cpp
@@ -38,7 +39,9 @@ set(src
     QormDefaultSessionFactory.h
     QormDatabaseSettings.cpp
     QormSettingBasedDatabaseFactory.cpp
-    QormSettingBasedDatabaseFactory.h)
+    QormSettingBasedDatabaseFactory.h
+    QormDefaultSession.cpp
+    QormDefaultSession.h)
 
 # Bind to qt
 find_package(Qt5Core)

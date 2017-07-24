@@ -1,241 +1,119 @@
 #pragma once
 
+#include <QMetaOrm/QormOnDemandRecordMapper.h>
 #include <QMetaOrm/QormDatabaseFactory.h>
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormPrivate.h>
-#include <QMetaOrm/QormLogger.h>
+#include <QMetaOrm/QormSql.h>
 
 #include <QSharedPointer>
 
-class QMETAORM_LIBRARY_API QOrmOnDemandRecordMapper {
-public:
-    virtual ~QOrmOnDemandRecordMapper() { }
-
-    template<class T>
-    QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr& mapping, const QString& prefix = QString()) const
-    {
-        return mapToEntity(mapping, prefix).objectCast<T>();
-    }
-
-    virtual QSharedPointer<QObject>
-    mapToEntity(const QormMetaEntity::Ptr& mapping, const QString& prefix = QString()) const = 0;
-};
-
-/**
-* @todo - Add logging (TRACE/DEBUG)
-*       - Added identity persistence
-*       - Add object-pointer support (std::shared_ptr, QSharedPointer)
-*       - Add selectOneByMapping (The template based variant actually does not support passing a custom mapping)
-*/
 class QMETAORM_LIBRARY_API QormSession {
 public:
     typedef QSharedPointer<QormSession> Ptr;
+    typedef std::function<bool(const QSharedPointer<QObject>&)> ObjectHandler;
+    typedef QSharedPointer<QObject> SharedObject;
 
 public:
-    QormSession(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr& logger);
+    virtual ~QormSession() { };
 
-    virtual ~QormSession();
+    virtual SharedObject save(const SharedObject& entity, QormMetaEntity::Ptr mapping) = 0;
 
-    /**
-      * See the template less variant for more information.
-      */
-    template<class T>
-    void save(QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping);
+    virtual void remove(const SharedObject& entity, QormMetaEntity::Ptr mapping) = 0;
 
-    void saveBySql(const QString& sql, const QVariantList& parameters = QVariantList());
+    virtual SharedObject selectOne(const QVariant& key, QormMetaEntity::Ptr mapping) = 0;
 
-    /**
-      * Creates or update (an id is present) the given entity using the given mapping.
-      * If the entity is created, the new id will be applied.
-      */
-    void save(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping);
+    virtual QList<SharedObject> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1) = 0;
 
-    template<class T>
-    void remove(const QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping);
+    virtual void selectMany(QormMetaEntity::Ptr mapping, ObjectHandler callback, int skip = -1, int pageSize = -1) = 0;
 
-    void remove(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping);
+    virtual void save(const QormSql& sqlQuery) = 0;
 
-    void removeBySql(const QString& sql, const QVariantList& parameters = QVariantList());
+    virtual void remove(const QormSql& sqlQuery) = 0;
 
-    /**
-      * See the template less variant for more information.
-      */
-    template<class T, typename Key>
-    QSharedPointer<T> selectOne(Key key, QormMetaEntity::Ptr mapping);
+    virtual SharedObject selectOne(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping) = 0;
 
-    /**
-      * Returns one object from the database which matches the given key.
-      * Data will be mapped according to the given mapping.
-      * If the result object contains a key as specified in the mapping, the object will be cached per session.
-      * \throws MoreThanOneResultException
-      */
-    QSharedPointer<QObject> selectOne(const QVariant& key, QormMetaEntity::Ptr mapping);
+    virtual QList<SharedObject> selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping) = 0;
 
-    QVariantList selectOneBySql(const QString& sql, const QVariantList& parameters = QVariantList());
+    virtual void selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping, ObjectHandler callback) = 0;
 
-    /**
-      * See the template less variant for more information.
-      */
-    template<class T>
-    QSharedPointer<T>
-    selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters = QVariantList());
+    virtual void selectManyWithCustomMapping(const QormSql& sqlQuery,
+        std::function<bool(const QormOnDemandRecordMapper*)> callback) = 0;
 
-    /**
-      * Returns one object from the database which matches the given sql statement.
-      * Data will be mapped according to the given mapping.
-      * If the result object contains a key as specified in the mapping, the object will be cached per session.
-      * \throws MoreThanOneResultException
-      */
-    QSharedPointer<QObject>
-    selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters = QVariantList());
+    virtual void commit() = 0;
+
+    virtual void rollback() = 0;
 
     template<class T>
-    void selectManyByCallback(
+    QSharedPointer<T> save(const QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping)
+    {
+        auto generalEntity = entity.template objectCast<QObject>();
+        return save(generalEntity, mapping).template objectCast<T>();
+    }
+
+    template<class T>
+    void remove(const QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping)
+    {
+        auto generalEntity = entity.template objectCast<QObject>();
+        remove(generalEntity, mapping);
+    }
+
+    template<class T>
+    QSharedPointer<T> selectOne(const QVariant& key, QormMetaEntity::Ptr mapping)
+    {
+        return selectOne(key, mapping).template objectCast<T>();
+    };
+
+    template<class T>
+    QSharedPointer<T> selectOne(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
+    {
+        return selectOne(sqlQuery, mapping).template objectCast<T>();
+    }
+
+    template<class T>
+    void selectMany(
         QormMetaEntity::Ptr mapping,
         std::function<bool(const QSharedPointer<T>&)> callback,
         int skip = -1,
-        int pageSize = -1);
-
-    void selectManyByCallback(
-        QormMetaEntity::Ptr mapping,
-        std::function<bool(const QSharedPointer<QObject>&)> callback,
-        int skip = -1,
-        int pageSize = -1);
+        int pageSize = -1)
+    {
+        selectMany(mapping, [callback](const QSharedPointer<QObject>& item) -> bool {
+            return callback(item.template objectCast<T>());
+        }, skip, pageSize);
+    }
 
     template<class T>
-    void selectManyByCallbackBySql(
+    void selectMany(
+        const QormSql& sqlQuery,
         QormMetaEntity::Ptr mapping,
-        const QString& sql,
-        std::function<bool(const QSharedPointer<T>&)> callback,
-        const QVariantList& parameters = QVariantList());
+        std::function<bool(const QSharedPointer<T>&)> callback)
+    {
+        selectMany(sqlQuery, mapping, [callback](const QSharedPointer<QObject>& item) -> bool {
+            return callback(item.template objectCast<T>());
+        });
+    }
 
-    void selectManyByCallbackBySql(
-        const QString& sql,
-        QormMetaEntity::Ptr mapping,
-        std::function<bool(const QSharedPointer<QObject>&)> callback,
-        const QVariantList& parameters = QVariantList());
-
-    /**
-      * See the template less variant for more information.
-      */
     template<class T>
-    QList<QSharedPointer<T>> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1);
+    QList<QSharedPointer<T>> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1)
+    {
+        QList<QSharedPointer<T>> result;
+        auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
+            result.append(item.objectCast<T>());
+            return true;
+        };
+        selectMany(mapping, func, skip, pageSize);
+        return result;
+    }
 
-    /**
-      * Returns multiple objects from the database matching the given criterion.
-      * Data will be mapped according to the given mapping.
-      * If the result object contains a key as specified in the mapping, the object will be cached per session.
-      */
-    QList<QSharedPointer<QObject>> selectMany(QormMetaEntity::Ptr mapping, int skip = -1, int pageSize = -1);
-
-    /**
-      * See the template less variant for more information.
-      */
     template<class T>
-    QList<QSharedPointer<T>>
-    selectManyBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters = QVariantList());
-
-    /**
-      * Returns multiple objects from the database which matche the given sql statement.
-      * Data will be mapped according to the given mapping.
-      * If the result object contains a key as specified in the mapping, the object will be cached per session.
-      */
-    QList<QSharedPointer<QObject>>
-    selectManyBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters = QVariantList());
-
-    void selectManyBySqlWithCustomMapping(
-        const QString& sql,
-        std::function<bool(const QOrmOnDemandRecordMapper*)> callback,
-        const QVariantList& parameters = QVariantList());
-
-    void commit();
-
-    void rollback();
-
-private:
-    void create(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping);
-
-    void update(QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping);
-
-    void setupSession();
-
-    QSqlDatabase m_database;
-    QSharedPointer<class QormEntityMapper> m_entityMapper;
-    QSharedPointer<class QormEntitySqlBuilder> m_entitySqlBuilder;
+    QList<QSharedPointer<T>> selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
+    {
+        QList<QSharedPointer<T>> result;
+        auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
+            result.append(item.objectCast<T>());
+            return true;
+        };
+        selectMany(sqlQuery, mapping, func);
+        return result;
+    }
 };
-
-template<class T>
-void QormSession::save(QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping)
-{
-    auto generellEntity = entity.template objectCast<QObject>();
-    save(generellEntity, mapping);
-}
-
-template<class T>
-void QormSession::remove(const QSharedPointer<T>& entity, QormMetaEntity::Ptr mapping)
-{
-    auto generellEntity = entity.template objectCast<QObject>();
-    remove(generellEntity, mapping);
-}
-
-template<class T, typename Key>
-QSharedPointer<T> QormSession::selectOne(Key key, QormMetaEntity::Ptr mapping)
-{
-    return selectOne(key, mapping).template objectCast<T>();
-}
-
-template<class T>
-QSharedPointer<T>
-QormSession::selectOneBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters)
-{
-    return selectOneBySql(sql, mapping, parameters).template objectCast<T>();
-}
-
-template<class T>
-void QormSession::selectManyByCallback(
-    QormMetaEntity::Ptr mapping,
-    std::function<bool(const QSharedPointer<T>&)> callback,
-    int skip,
-    int pageSize)
-{
-    selectManyByCallback(mapping, [callback](const QSharedPointer<QObject>& item) -> bool {
-        return callback(item.objectCast<T>());
-    }, skip, pageSize);
-}
-
-template<class T>
-void QormSession::selectManyByCallbackBySql(
-    QormMetaEntity::Ptr mapping,
-    const QString& sql,
-    std::function<bool(const QSharedPointer<T>&)> callback,
-    const QVariantList& parameters)
-{
-    selectManyByCallbackBySql(sql, mapping, [callback](const QSharedPointer<QObject>& item) -> bool {
-        return callback(item.objectCast<T>());
-    }, parameters);
-}
-
-template<class T>
-QList<QSharedPointer<T>> QormSession::selectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize)
-{
-    QList<QSharedPointer<T>> result;
-    auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
-        result.append(item.objectCast<T>());
-        return true;
-    };
-    selectManyByCallback(mapping, func, skip, pageSize);
-    return result;
-}
-
-template<class T>
-QList<QSharedPointer<T>>
-QormSession::selectManyBySql(const QString& sql, QormMetaEntity::Ptr mapping, const QVariantList& parameters)
-{
-    QList<QSharedPointer<T>> result;
-    auto func = [&result](const QSharedPointer<QObject>& item) -> bool {
-        result.append(item.objectCast<T>());
-        return true;
-    };
-    selectManyByCallbackBySql(sql, mapping, func, parameters);
-    return result;
-}

@@ -3,6 +3,7 @@
 #include <QMetaOrm/QormDatabaseSettings.h>
 #include <QMetaOrm/QormSessionFactory.h>
 #include <QMetaOrm/QormPrivate.h>
+#include <QMetaOrm/QormLogger.h>
 
 class QMETAORM_LIBRARY_API QormSessionFactoryDatabaseConnectionBuilder {
 public:
