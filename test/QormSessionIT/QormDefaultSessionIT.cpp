@@ -30,7 +30,7 @@ public:
    TODO:
    - Caching when save() and select() is called in sequence.
 */
-class QormSessionIT : public QObject {
+class QormDefaultSessionIT : public QObject {
 Q_OBJECT
 
 private:
@@ -38,7 +38,7 @@ private:
     SqlHelper::Ptr m_sqlHelper;
 
 public:
-    QormSessionIT() { }
+    QormDefaultSessionIT() { }
 
 private Q_SLOTS :
 
@@ -434,6 +434,6 @@ private Q_SLOTS :
 
 };
 
-QTEST_APPLESS_MAIN(QormSessionIT)
+QTEST_APPLESS_MAIN(QormDefaultSessionIT)
 
-#include "QormSessionIT.moc"
+#include "QormDefaultSessionIT.moc"

@@ -6,7 +6,7 @@ set(SRC
     Person.h
     SqlHelper.h
     TestMacros.h
-    QormSessionIT.cpp
+    QormDefaultSessionIT.cpp
     resource.qrc)
 set(NEEDED_FEATURES
     cxx_auto_type
