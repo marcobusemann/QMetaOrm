@@ -151,6 +151,21 @@ private Q_SLOTS :
         QCOMPARE(records[0][2].toString(), person->getSurname());
     }
 
+    void save_sqlToInsertOnePersonWithTwoParameters_personGetsInserted()
+    {
+        QString name = "Hans", surname = "Otto";
+
+        auto session = m_sessionFactory->createSession();
+        session->save(QormSql("insert into person (id, name, surname) values (1, ?, ?)", QVariantList() << name << surname));
+        session->commit();
+
+        auto records = m_sqlHelper->select("select id, name, surname from person");
+        QCOMPARE(records.size(), 1);
+        QCOMPARE(records[0][0].toInt(), 1);
+        QCOMPARE(records[0][1].toString(), name);
+        QCOMPARE(records[0][2].toString(), surname);
+    }
+
     void remove_existingPerson_personIsDeleted()
     {
         int idPerson = 1;
