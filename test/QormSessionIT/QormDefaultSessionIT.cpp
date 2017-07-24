@@ -57,17 +57,131 @@ private Q_SLOTS :
         m_sessionFactory.clear();
     }
 
-    void selectOneBySql_noPersonExists_nullptr()
+    void save_newPerson_personIsPersistetAndIdIsSet()
+    {
+        auto person = PersonSimple::Ptr(new PersonSimple());
+        person->setName("Mueller");
+        person->setSurname("Hans");
+
+        auto session = m_sessionFactory->createSession();
+        session->save(person, QormMappings::TsPersonSimpleMapping());
+        session->commit();
+
+        auto records = m_sqlHelper->select("select id, name, surname from person");
+        QCOMPARE(records.size(), 1);
+        QCOMPARE(records[0][0].toInt(), person->getId());
+        QCOMPARE(records[0][1].toString(), person->getName());
+        QCOMPARE(records[0][2].toString(), person->getSurname());
+    }
+
+    void save_newPersonWithCustomMapping_onlyFieldsOfThatMappingArePersistet()
+    {
+        auto metaEntity = QormMetaEntityBuilder::anEntity()
+            .forSource("PERSON")
+            .withId(PersonSimple::p::id, "ID")
+            .withData(PersonSimple::p::name, "NAME")
+            .build<PersonSimple>();
+
+        auto person = PersonSimple::Ptr(new PersonSimple());
+        person->setName("Mueller");
+        person->setSurname("Hans");
+
+        auto session = m_sessionFactory->createSession();
+        session->save(person, metaEntity);
+        session->commit();
+
+        auto records = m_sqlHelper->select("select id, name, surname from person");
+        QCOMPARE(records.size(), 1);
+        QCOMPARE(records[0][0].toInt(), person->getId());
+        QCOMPARE(records[0][1].toString(), person->getName());
+        QCOMPARE(records[0][2].toString(), QString());
+    }
+
+    void save_newPersonWithAddressRelation_personAndReferencedAddressIdIsPersistetButAddressDatasetStaysUntouched()
+    {
+        int idAddress = 1;
+        QString country = AnyBuilder::anyString(), postCode = AnyBuilder::anyString(), street = AnyBuilder::anyString();
+        m_sqlHelper->insert("insert into address (id, country, postCode, street) values (?,?,?,?)",
+            QVariantList() << idAddress << country << postCode << street);
+
+        auto address = Address::Ptr(new Address());
+        address->setId(idAddress);
+
+        auto person = PersonComplex::Ptr(new PersonComplex());
+        person->setName(AnyBuilder::anyString());
+        person->setAddress(address);
+
+        auto session = m_sessionFactory->createSession();
+        session->save(person, QormMappings::TsPersonComplexMapping());
+        session->commit();
+
+        auto personRecords = m_sqlHelper->select("select id, address from person");
+        QCOMPARE(personRecords.size(), 1);
+        QCOMPARE(personRecords[0][0].toInt(), person->getId());
+        QCOMPARE(personRecords[0][1].toInt(), address->getId());
+
+        auto addressRecords = m_sqlHelper->select("select id, country, postCode, street from address");
+        QCOMPARE(addressRecords.size(), 1);
+        QCOMPARE(addressRecords[0][0].toInt(), address->getId());
+        QCOMPARE(addressRecords[0][1].toString(), country);
+        QCOMPARE(addressRecords[0][1].toString(), postCode);
+        QCOMPARE(addressRecords[0][1].toString(), street);
+    }
+
+    void save_existingPerson_personIsUpdated()
+    {
+        int idPerson = 1;
+        QString name = AnyBuilder::anyString(), surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << idPerson << name << "Otto");
+
+        auto person = PersonSimple::Ptr(new PersonSimple());
+        person->setId(idPerson);
+        person->setName(name);
+        person->setSurname(surname);
+
+        auto session = m_sessionFactory->createSession();
+        session->save(person, QormMappings::TsPersonSimpleMapping());
+        session->commit();
+
+        auto records = m_sqlHelper->select("select id, name, surname from person");
+        QCOMPARE(records.size(), 1);
+        QCOMPARE(records[0][0].toInt(), person->getId());
+        QCOMPARE(records[0][1].toString(), person->getName());
+        QCOMPARE(records[0][2].toString(), person->getSurname());
+    }
+
+    void remove_existingPerson_personIsDeleted()
+    {
+        int idPerson = 1;
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << idPerson << name << surname);
+
+        auto person = PersonSimple::Ptr(new PersonSimple());
+        person->setId(idPerson);
+        person->setName(name);
+        person->setSurname(surname);
+
+        auto session = m_sessionFactory->createSession();
+        session->remove(person, QormMappings::TsPersonSimpleMapping());
+        session->commit();
+
+        auto records = m_sqlHelper->select("select id, name, surname from person");
+        QCOMPARE(records.size(), 0);
+    }
+
+    void selectOne_sqlThatReturnsNoResult_nullptr()
     {
         auto session = m_sessionFactory->createSession();
 
-        auto item = session->selectOne<PersonSimple>("select * from person limit 1",
+        auto item = session->selectOne<PersonSimple>(QormSql("select * from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QVERIFY(item==nullptr);
     }
 
-    void selectOneBySql_onePersonIsSelected_thatPerson()
+    void selectOne_sqlThatReturnsOneResult_thatPerson()
     {
         QString name = "Mueller", surname = "Hans";
         int id = 1;
@@ -84,7 +198,7 @@ private Q_SLOTS :
         QCOMPARE(item->getSurname(), surname);
     }
 
-    void selectOneBySql_twoPersonsAreSelected_exception()
+    void selectOne_sqlThatReturnsTwoResults_exception()
     {
         QString sql = "insert into person (id, name, surname) values (?,?,?)";
         m_sqlHelper->insert(sql, QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
@@ -96,7 +210,7 @@ private Q_SLOTS :
             QormMoreThanOneResultException);
     }
 
-    void selectOneBySql_onePersonWithNameOnlyIsSelected_onePersonWithNameOnlyIsFilled()
+    void selectOne_sqlThatSelectsOnlyName_onePersonWithNameOnlyIsFilled()
     {
         QString name = "Mueller";
         m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
@@ -112,21 +226,21 @@ private Q_SLOTS :
         QCOMPARE(item->getName(), name);
     }
 
-    void selectOneBySql_onePersonWithIdIsSelectedTwice_bothResultsShouldBeIdenticalBecauseOfCaching()
+    void selectOne_sqlThatReturnsBothTimesTheSameResult_bothResultsShouldBeIdenticalBecauseOfCaching()
     {
         m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
             QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
 
         auto session = m_sessionFactory->createSession();
-        auto item = session->selectOne<PersonSimple>("select id from person limit 1",
+        auto item = session->selectOne<PersonSimple>(QormSql("select id from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
-        auto item2 = session->selectOne<PersonSimple>("select id from person limit 1",
+        auto item2 = session->selectOne<PersonSimple>(QormSql("select id from person limit 1"),
             QormMappings::TsPersonSimpleMapping());
 
         QCOMPARE(item, item2);
     }
 
-    void selectOneBySql_onePersonWithNameIsSelectedTwice_bothResultsShouldDifferentBecauseOfNoCaching()
+    void selectOne_sqlThatReturnsBothTimesTheSameResultWithName_bothResultsShouldDifferentBecauseOfNoCaching()
     {
         m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
             QVariantList() << 1 << AnyBuilder::anyString() << AnyBuilder::anyString());
@@ -140,7 +254,7 @@ private Q_SLOTS :
         QVERIFY(item!=item2);
     }
 
-    void selectOneBySql_onePersonIsSelectedById_thePersonWithThatId()
+    void selectOne_sqlThatReturnsAnResultByAConcreteId_thePersonWithThatId()
     {
         int id = 1;
         m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
@@ -210,6 +324,26 @@ private Q_SLOTS :
         QCOMPARE(item->getAddress()->getCountry(), country);
         QCOMPARE(item->getAddress()->getPostCode(), postCode);
         QCOMPARE(item->getAddress()->getStreet(), street);
+    }
+
+    void selectOne_mappingWithConverter_valueGetsConverted()
+    {
+        auto mapping = QormMetaEntityBuilder::anEntity()
+            .forSource("person")
+            .withId("id", "ID")
+            .withConvertedData<ToUpperConverter>("upperName", "NAME")
+            .build<PersonSimple>();
+
+        int idPerson = 1;
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << idPerson << name << surname);
+
+        auto session = m_sessionFactory->createSession();
+        auto item = session->selectOne<PersonSimple>(1, mapping);
+
+        QVERIFY(item!=nullptr);
+        QCOMPARE(QString("MUELLER"), item->property("upperName").toString());
     }
 
     void selectManyBySql_noPersons_emptyList()
@@ -296,142 +430,6 @@ private Q_SLOTS :
 
         QCOMPARE(items[0], items2[0]);
     }
-
-    void save_newPerson_personIsPersistetAndIdIsSet()
-    {
-        auto person = PersonSimple::Ptr(new PersonSimple());
-        person->setName("Mueller");
-        person->setSurname("Hans");
-
-        auto session = m_sessionFactory->createSession();
-        session->save(person, QormMappings::TsPersonSimpleMapping());
-        session->commit();
-
-        auto records = m_sqlHelper->select("select id, name, surname from person");
-        QCOMPARE(records.size(), 1);
-        QCOMPARE(records[0][0].toInt(), person->getId());
-        QCOMPARE(records[0][1].toString(), person->getName());
-        QCOMPARE(records[0][2].toString(), person->getSurname());
-    }
-
-    void save_newPersonWithCustomMapping_onlyFieldsOfThatMappingArePersistet()
-    {
-        auto metaEntity = QormMetaEntityBuilder::anEntity()
-            .forSource("PERSON")
-            .withId(PersonSimple::p::id, "ID")
-            .withData(PersonSimple::p::name, "NAME")
-            .build<PersonSimple>();
-
-        auto person = PersonSimple::Ptr(new PersonSimple());
-        person->setName("Mueller");
-        person->setSurname("Hans");
-
-        auto session = m_sessionFactory->createSession();
-        auto generellEntity = person.objectCast<QObject>();
-        session->save(generellEntity, metaEntity);
-        session->commit();
-
-        auto records = m_sqlHelper->select("select id, name, surname from person");
-        QCOMPARE(records.size(), 1);
-        QCOMPARE(records[0][0].toInt(), person->getId());
-        QCOMPARE(records[0][1].toString(), person->getName());
-        QCOMPARE(records[0][2].toString(), QString());
-    }
-
-    void save_newPersonWithAddressRelation_personAndReferencedAddressIdIsPersistetButAddressDatasetStaysUntuched()
-    {
-        int idAddress = 1;
-        QString country = AnyBuilder::anyString(), postCode = AnyBuilder::anyString(), street = AnyBuilder::anyString();
-        m_sqlHelper->insert("insert into address (id, country, postCode, street) values (?,?,?,?)",
-            QVariantList() << idAddress << country << postCode << street);
-
-        auto address = Address::Ptr(new Address());
-        address->setId(idAddress);
-
-        auto person = PersonComplex::Ptr(new PersonComplex());
-        person->setName(AnyBuilder::anyString());
-        person->setAddress(address);
-
-        auto session = m_sessionFactory->createSession();
-        session->save(person, QormMappings::TsPersonComplexMapping());
-        session->commit();
-
-        auto personRecords = m_sqlHelper->select("select id, address from person");
-        QCOMPARE(personRecords.size(), 1);
-        QCOMPARE(personRecords[0][0].toInt(), person->getId());
-        QCOMPARE(personRecords[0][1].toInt(), address->getId());
-
-        auto addressRecords = m_sqlHelper->select("select id, country, postCode, street from address");
-        QCOMPARE(addressRecords.size(), 1);
-        QCOMPARE(addressRecords[0][0].toInt(), address->getId());
-        QCOMPARE(addressRecords[0][1].toString(), country);
-        QCOMPARE(addressRecords[0][1].toString(), postCode);
-        QCOMPARE(addressRecords[0][1].toString(), street);
-    }
-
-    void save_existingPerson_personIsUpdated()
-    {
-        int idPerson = 1;
-        QString name = AnyBuilder::anyString(), surname = "Hans";
-        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
-            QVariantList() << idPerson << name << "Otto");
-
-        auto person = PersonSimple::Ptr(new PersonSimple());
-        person->setId(idPerson);
-        person->setName(name);
-        person->setSurname(surname);
-
-        auto session = m_sessionFactory->createSession();
-        session->save(person, QormMappings::TsPersonSimpleMapping());
-        session->commit();
-
-        auto records = m_sqlHelper->select("select id, name, surname from person");
-        QCOMPARE(records.size(), 1);
-        QCOMPARE(records[0][0].toInt(), person->getId());
-        QCOMPARE(records[0][1].toString(), person->getName());
-        QCOMPARE(records[0][2].toString(), person->getSurname());
-    }
-
-    void remove_existingPerson_personIsDeleted()
-    {
-        int idPerson = 1;
-        QString name = "Mueller", surname = "Hans";
-        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
-            QVariantList() << idPerson << name << surname);
-
-        auto person = PersonSimple::Ptr(new PersonSimple());
-        person->setId(idPerson);
-        person->setName(name);
-        person->setSurname(surname);
-
-        auto session = m_sessionFactory->createSession();
-        session->remove(person, QormMappings::TsPersonSimpleMapping());
-        session->commit();
-
-        auto records = m_sqlHelper->select("select id, name, surname from person");
-        QCOMPARE(records.size(), 0);
-    }
-
-    void selectOne_mappingWithConverter_valueGetsConverted()
-    {
-        auto mapping = QormMetaEntityBuilder::anEntity()
-            .forSource("person")
-            .withId("id", "ID")
-            .withConvertedData<ToUpperConverter>("upperName", "NAME")
-            .build<PersonSimple>();
-
-        int idPerson = 1;
-        QString name = "Mueller", surname = "Hans";
-        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
-            QVariantList() << idPerson << name << surname);
-
-        auto session = m_sessionFactory->createSession();
-        auto item = session->selectOne<PersonSimple>(1, mapping);
-
-        QVERIFY(item!=nullptr);
-        QCOMPARE(QString("MUELLER"), item->property("upperName").toString());
-    }
-
 };
 
 QTEST_APPLESS_MAIN(QormDefaultSessionIT)
