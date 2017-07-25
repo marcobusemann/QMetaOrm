@@ -282,7 +282,7 @@ void QormDefaultSession::selectManyWithCustomMapping(
         throw QormCouldNotExecuteQueryException(query.lastError());
 
     QormOnDemandRecordMapperImpl recordMapper([&](const QormMetaEntity::Ptr& mapping, const QString& prefix) {
-        return m_entityMapper->mapToEntity(mapping, query.record());
+        return m_entityMapper->mapToEntity(mapping, query.record(), prefix);
     });
 
     bool continueWork = true;

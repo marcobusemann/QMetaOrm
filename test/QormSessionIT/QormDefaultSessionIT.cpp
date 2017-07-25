@@ -156,7 +156,8 @@ private Q_SLOTS :
         QString name = "Hans", surname = "Otto";
 
         auto session = m_sessionFactory->createSession();
-        session->save(QormSql("insert into person (id, name, surname) values (1, ?, ?)", QVariantList() << name << surname));
+        session->save(
+            QormSql("insert into person (id, name, surname) values (1, ?, ?)", QVariantList() << name << surname));
         session->commit();
 
         auto records = m_sqlHelper->select("select id, name, surname from person");
@@ -444,6 +445,70 @@ private Q_SLOTS :
         auto items2 = session->selectMany<PersonSimple>(QormMappings::TsPersonSimpleMapping());
 
         QCOMPARE(items[0], items2[0]);
+    }
+
+    void selectManyWithCustomMapping_sqlWithIdAndNameAndNoPrefix_aPersonWithIdAndName()
+    {
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << 1 << name << surname);
+
+        auto person = PersonSimple::Ptr();
+        auto session = m_sessionFactory->createSession();
+        session->selectManyWithCustomMapping(QormSql("select id, name from person"), [&](const QormOnDemandRecordMapper *mapper) {
+            person = mapper->mapToEntity<PersonSimple>(QormMappings::TsPersonSimpleMapping());
+            return false;
+        });
+
+        QVERIFY(person != nullptr);
+        QCOMPARE(person->getId(), 1);
+        QCOMPARE(person->getName(), name);
+    }
+
+    void selectManyWithCustomMapping_sqlWithIdAndNameAndAPrefix_aPersonWithIdAndName()
+    {
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname) values (?,?,?)",
+            QVariantList() << 1 << name << surname);
+
+        auto person = PersonSimple::Ptr();
+        auto session = m_sessionFactory->createSession();
+        session->selectManyWithCustomMapping(QormSql("select p.id as p_id, p.name as p_name from person p"), [&](const QormOnDemandRecordMapper *mapper) {
+            person = mapper->mapToEntity<PersonSimple>(QormMappings::TsPersonSimpleMapping(), "p");
+            return false;
+        });
+
+        QVERIFY(person != nullptr);
+        QCOMPARE(person->getId(), 1);
+        QCOMPARE(person->getName(), name);
+    }
+
+    void selectManyWithCustomMapping_sqlWithIdAndNameAndAddress_aPersonWithIdAndName()
+    {
+        int idAddress = 1;
+        QString country = AnyBuilder::anyString(), postCode = AnyBuilder::anyString(), street = AnyBuilder::anyString();
+        m_sqlHelper->insert("insert into address (id, country, postCode, street) values (?,?,?,?)",
+            QVariantList() << idAddress << country << postCode << street);
+
+        QString name = "Mueller", surname = "Hans";
+        m_sqlHelper->insert("insert into person (id, name, surname, address) values (?,?,?,?)",
+            QVariantList() << 1 << name << surname << idAddress);
+
+        auto person = PersonSimple::Ptr();
+        auto address = Address::Ptr();
+        auto session = m_sessionFactory->createSession();
+        session->selectManyWithCustomMapping(QormSql("select p.id as p_id, p.name as p_name, a.id as a_id from person p left join address a on (a.id = p.address)"), [&](const QormOnDemandRecordMapper *mapper) {
+            person = mapper->mapToEntity<PersonSimple>(QormMappings::TsPersonSimpleMapping(), "p");
+            address = mapper->mapToEntity<Address>(QormMappings::TsAddressMapping(), "a");
+            return false;
+        });
+
+        QVERIFY(person != nullptr);
+        QCOMPARE(person->getId(), 1);
+        QCOMPARE(person->getName(), name);
+
+        QVERIFY(address != nullptr);
+        QCOMPARE(address->getId(), idAddress);
     }
 };
 

@@ -9,17 +9,17 @@ Q_OBJECT
 
     Q_PROPERTY(int id
         READ
-        getId
+            getId
         WRITE
         setId)
     Q_PROPERTY(QString surname
         READ
-        getSurname
+            getSurname
         WRITE
         setSurname)
     Q_PROPERTY(QString name
         READ
-        getName
+            getName
         WRITE
         setName)
 
@@ -72,22 +72,22 @@ Q_OBJECT
 
     Q_PROPERTY(int id
         READ
-        getId
+            getId
         WRITE
         setId)
     Q_PROPERTY(QString country
         READ
-        getCountry
+            getCountry
         WRITE
         setCountry)
     Q_PROPERTY(QString postCode
         READ
-        getPostCode
+            getPostCode
         WRITE
         setPostCode)
     Q_PROPERTY(QString street
         READ
-        getStreet
+            getStreet
         WRITE
         setStreet)
 
@@ -138,22 +138,22 @@ Q_OBJECT
 
     Q_PROPERTY(int id
         READ
-        getId
+            getId
         WRITE
         setId)
     Q_PROPERTY(QString surname
         READ
-        getSurname
+            getSurname
         WRITE
         setSurname)
     Q_PROPERTY(QString name
         READ
-        getName
+            getName
         WRITE
         setName)
     Q_PROPERTY(Address::Ptr address
         READ
-        getAddress
+            getAddress
         WRITE
         setAddress)
 
@@ -211,4 +211,6 @@ namespace QormMappings {
     QormMetaEntity::Ptr TsPersonSimpleMapping();
 
     QormMetaEntity::Ptr TsPersonComplexMapping();
+
+    QormMetaEntity::Ptr TsAddressMapping();
 }
