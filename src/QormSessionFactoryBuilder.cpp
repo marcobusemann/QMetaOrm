@@ -9,27 +9,27 @@ QormSessionFactoryBuilder QormSessionFactoryBuilder::AFactory()
     return QormSessionFactoryBuilder();
 }
 
-QormSessionFactoryDatabaseConnectionBuilder
-QormSessionFactoryBuilder::withDatabase(const QormDatabaseFactory::Ptr& databaseFactory)
+QormSessionFactoryDatabaseConnectionBuilder QormSessionFactoryBuilder::withDatabase(
+    const QormDatabaseFactory::Ptr& databaseFactory)
 {
     return QormSessionFactoryDatabaseConnectionBuilder(databaseFactory);
 }
 
-QormSessionFactoryDatabaseConnectionBuilder
-QormSessionFactoryBuilder::withDatabase(const QString &driverName, const QormDatabaseSettings& databaseSettings)
+QormSessionFactoryDatabaseConnectionBuilder QormSessionFactoryBuilder::withDatabase(const QString& driverName,
+                                                                                    const QormDatabaseSettings& databaseSettings)
 {
     return withDatabase(QormSettingBasedDatabaseFactory::factory(driverName, databaseSettings));
 }
 
 QormSessionFactoryDatabaseConnectionBuilder::QormSessionFactoryDatabaseConnectionBuilder(
     const QormDatabaseFactory::Ptr& databaseFactory)
-    : databaseFactory(databaseFactory)
-    , logger(QormQtLogger::factory())
+    :databaseFactory(databaseFactory)
+     , logger(QormQtLogger::factory())
 {
 }
 
-QormSessionFactoryDatabaseConnectionBuilder
-QormSessionFactoryDatabaseConnectionBuilder::withLogger(const QormLogger::Ptr& logger)
+QormSessionFactoryDatabaseConnectionBuilder QormSessionFactoryDatabaseConnectionBuilder::withLogger(
+    const QormLogger::Ptr& logger)
 {
     this->logger = logger;
     return *this;

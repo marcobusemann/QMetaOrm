@@ -32,7 +32,7 @@ public:
     QormEntityMapper(const QormLogger::Ptr& logger);
 
     QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr& mapping, const QSqlRecord& record,
-        const QString& prefix = QString())
+                                        const QString& prefix = QString())
     {
         auto getRecordFunc = m_prefixer.getRecordValuePrefixer(record, prefix);
         QVariant result;
@@ -45,7 +45,7 @@ public:
 
     template<class T>
     QSharedPointer<T> mapToEntity(const QormMetaEntity::Ptr& mapping, const QSqlRecord& record,
-        const QString& prefix = QString())
+                                  const QString& prefix = QString())
     {
         return mapToEntity(mapping, record, prefix).objectCast<T>();
     }
@@ -54,7 +54,7 @@ public:
     {
         return [&](const QString& prop, const QVariant& value) {
             auto propertyName = prop.toStdString().c_str();
-            bool hadProperty = obj->metaObject()->indexOfProperty(propertyName) != -1;
+            bool hadProperty = obj->metaObject()->indexOfProperty(propertyName)!=-1;
             if (!obj->setProperty(propertyName, value)) {
                 if (value.isValid() && hadProperty) {
                     qWarning() << "Could not apply " << value << " to " << prop;
@@ -103,7 +103,8 @@ public:
                 QVariant value;
                 if (propertie.isReference() && isValidObject(mapping, getRecord)) {
                     value = createCachedReference(propertie.reference,
-                        m_prefixer.getEmbeddedRecordValuePrefixer(getRecord, propertie.databaseName));
+                                                  m_prefixer.getEmbeddedRecordValuePrefixer(getRecord,
+                                                                                            propertie.databaseName));
                 }
                 else {
                     value = getRecord(propertie.databaseName);
@@ -121,7 +122,7 @@ public:
     }
 
     QVariant createReference(const QormMetaEntity::Ptr& mapping,
-        QormPropertyPrefixer::Handler getRecord)
+                             QormPropertyPrefixer::Handler getRecord)
     {
         auto entityFactory = mapping->getEntityFactory();
         auto entity = entityFactory->construct();
@@ -130,7 +131,7 @@ public:
     }
 
     QVariant createCachedReference(const QormMetaEntity::Ptr& mapping,
-        QormPropertyPrefixer::Handler getRecord)
+                                   QormPropertyPrefixer::Handler getRecord)
     {
         auto entityFactory = mapping->getEntityFactory();
         auto key = getKeyFor(mapping, getRecord);

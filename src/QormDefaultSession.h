@@ -31,13 +31,12 @@ public:
 
     SharedObject selectOne(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping) override;
 
-    QList<SharedObject>
-    selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping) override;
+    QList<SharedObject> selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping) override;
 
     void selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping, ObjectHandler callback) override;
 
     void selectManyWithCustomMapping(const QormSql& sqlQuery,
-        std::function<bool(const QormOnDemandRecordMapper*)> callback) override;
+                                     std::function<bool(const QormOnDemandRecordMapper*)> callback) override;
 
     void commit() override;
 

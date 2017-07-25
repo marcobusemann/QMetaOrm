@@ -1,15 +1,15 @@
 #include "QormEntityMapper.h"
 
-QormPropertyPrefixer::Handler
-QormPropertyPrefixer::getRecordValuePrefixer(const QSqlRecord& record, const QString& prefixString)
+QormPropertyPrefixer::Handler QormPropertyPrefixer::getRecordValuePrefixer(const QSqlRecord& record,
+                                                                           const QString& prefixString)
 {
     return [record, prefixString, this](const QString& prop) -> QVariant {
         return record.value(prepend(prop, prefixString));
     };
 }
 
-QormPropertyPrefixer::Handler
-QormPropertyPrefixer::getEmbeddedRecordValuePrefixer(Handler prefixer, const QString& prefix)
+QormPropertyPrefixer::Handler QormPropertyPrefixer::getEmbeddedRecordValuePrefixer(Handler prefixer,
+                                                                                   const QString& prefix)
 {
     return [prefixer, prefix, this](const QString& prop) -> QVariant {
         return prefixer(prepend(prop, prefix));

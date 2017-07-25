@@ -67,15 +67,15 @@ public:
     }
 
     SelectBuilder withJoin(const QString& table, const QString& tableField, const QString& referenceTable,
-        const QString& referenceDatabaseField, const QStringList& fields, const QString& fieldPrefix)
+                           const QString& referenceDatabaseField, const QStringList& fields, const QString& fieldPrefix)
     {
         auto alias = aliasFor(table, fieldPrefix);
         auto aliasRef = aliasFor(referenceTable, ExtractPropertyPrevousPropertyFrom(fieldPrefix));
         m_joins.append(QString("LEFT JOIN %1 %2 ON (%3 = %4)")
-            .arg(table)
-            .arg(alias)
-            .arg(EmbeddAlias(alias, tableField))
-            .arg(EmbeddAlias(aliasRef, referenceDatabaseField)));
+                           .arg(table)
+                           .arg(alias)
+                           .arg(EmbeddAlias(alias, tableField))
+                           .arg(EmbeddAlias(aliasRef, referenceDatabaseField)));
         m_fields.append(map(fields, [&](const QString& field) -> QString {
             return QString("%1 AS %2_%3")
                 .arg(EmbeddAlias(alias, field))

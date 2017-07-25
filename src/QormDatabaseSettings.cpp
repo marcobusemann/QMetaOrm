@@ -56,7 +56,7 @@ void QormDatabaseSettings::applyTo(QSqlDatabase* database) const
     if (!hostName.isEmpty())
         database->setHostName(hostName);
 
-    if (port > 0)
+    if (port>0)
         database->setPort(port);
 
     if (!databaseName.isEmpty())
@@ -70,6 +70,6 @@ void QormDatabaseSettings::applyTo(QSqlDatabase* database) const
 }
 
 QormDatabaseSettings::QormDatabaseSettings()
-    : port(0)
+    :port(0)
 {
 }

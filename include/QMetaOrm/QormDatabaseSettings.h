@@ -27,7 +27,7 @@ public:
 
     void setPassword(const QString& password);
 
-    void applyTo(class QSqlDatabase *database) const;
+    void applyTo(class QSqlDatabase* database) const;
 
 private:
     QString databaseName;

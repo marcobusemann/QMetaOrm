@@ -30,7 +30,7 @@ QString GetThreadIdentifier()
     return QUuid::createUuid().toString();
 }
 
-QormDefaultSession::QormDefaultSession(const QormDatabaseFactory::Ptr &databaseFactory, const QormLogger::Ptr& logger)
+QormDefaultSession::QormDefaultSession(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr& logger)
     :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
      , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger)))
      , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
@@ -251,8 +251,7 @@ QList<QSharedPointer<QObject>> QormDefaultSession::selectMany(QormMetaEntity::Pt
     return result;
 }
 
-QList<QSharedPointer<QObject>>
-QormDefaultSession::selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
+QList<QSharedPointer<QObject>> QormDefaultSession::selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping)
 {
     QList<QSharedPointer<QObject>> result;
     auto func = [&result](const QSharedPointer<QObject>& item) -> bool {

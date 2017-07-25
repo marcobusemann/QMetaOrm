@@ -5,7 +5,8 @@
 
 class QormSettingBasedDatabaseFactory : public QormDatabaseFactory {
 public:
-    static Ptr factory(const QString& driverName, const QormDatabaseSettings& databaseSettings = QormDatabaseSettings());
+    static Ptr factory(const QString& driverName,
+                       const QormDatabaseSettings& databaseSettings = QormDatabaseSettings());
 
     QSqlDatabase createDatabase(const QString& name) const override;
 

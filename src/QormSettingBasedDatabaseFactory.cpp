@@ -16,8 +16,8 @@ QormSettingBasedDatabaseFactory::factory(const QString& driverName, const QormDa
 }
 
 QormSettingBasedDatabaseFactory::QormSettingBasedDatabaseFactory(const QString& driverName,
-    const QormDatabaseSettings& databaseSettings)
-    : driverName(driverName)
-    , databaseSettings(databaseSettings)
+                                                                 const QormDatabaseSettings& databaseSettings)
+    :driverName(driverName)
+     , databaseSettings(databaseSettings)
 {
 }

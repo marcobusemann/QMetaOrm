@@ -47,9 +47,8 @@ QormMetaEntityBuilder QormMetaEntityBuilder::withData(const QString& prop, const
     return *this;
 }
 
-QormMetaEntityBuilder
-QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field,
-    std::function<QormConverter::Ptr()> converterSelector)
+QormMetaEntityBuilder QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field,
+                                                               std::function<QormConverter::Ptr()> converterSelector)
 {
     QormMetaProperty value;
     value.propertyName = prop;
@@ -59,16 +58,16 @@ QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& fie
     return *this;
 }
 
-QormMetaEntityBuilder
-QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field, const QormConverter::Ptr& converter)
+QormMetaEntityBuilder QormMetaEntityBuilder::withConvertedData(const QString& prop, const QString& field,
+                                                               const QormConverter::Ptr& converter)
 {
     return withConvertedData(prop, field, [converter]() {
         return converter;
     });
 }
 
-QormMetaEntityBuilder
-QormMetaEntityBuilder::withOneToMany(const QString& prop, const QString& field, QormMetaEntity::Ptr referenceEntity)
+QormMetaEntityBuilder QormMetaEntityBuilder::withOneToMany(const QString& prop, const QString& field,
+                                                           QormMetaEntity::Ptr referenceEntity)
 {
     QormMetaProperty value;
     value.propertyName = prop;

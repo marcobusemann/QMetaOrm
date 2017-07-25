@@ -23,5 +23,7 @@ public:
     static QormSessionFactoryBuilder AFactory();
 
     QormSessionFactoryDatabaseConnectionBuilder withDatabase(const QormDatabaseFactory::Ptr& databaseFactory);
-    QormSessionFactoryDatabaseConnectionBuilder withDatabase(const QString &driverName, const QormDatabaseSettings& databaseSettings);
+
+    QormSessionFactoryDatabaseConnectionBuilder withDatabase(const QString& driverName,
+                                                             const QormDatabaseSettings& databaseSettings);
 };

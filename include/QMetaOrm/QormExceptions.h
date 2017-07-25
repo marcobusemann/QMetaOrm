@@ -27,8 +27,7 @@ public:
 class QMETAORM_LIBRARY_API QormQueryException : public QormDatabaseException {
 public:
     QormQueryException(const QSqlError& error)
-        :QormDatabaseException(error)
-    {}
+        :QormDatabaseException(error) { }
 };
 
 class QMETAORM_LIBRARY_API QormCouldNotPrepareQueryException : public QormQueryException {

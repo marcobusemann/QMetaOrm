@@ -27,11 +27,11 @@ public:
 
     QormMetaEntityBuilder withData(const QString& prop, const QString& field);
 
-    QormMetaEntityBuilder
-    withConvertedData(const QString& prop, const QString& field, std::function<QormConverter::Ptr()> converterSelector);
+    QormMetaEntityBuilder withConvertedData(const QString& prop, const QString& field,
+                                            std::function<QormConverter::Ptr()> converterSelector);
 
-    QormMetaEntityBuilder
-    withConvertedData(const QString& prop, const QString& field, const QormConverter::Ptr& converter);
+    QormMetaEntityBuilder withConvertedData(const QString& prop, const QString& field,
+                                            const QormConverter::Ptr& converter);
 
     template<class ConverterType>
     QormMetaEntityBuilder withConvertedData(const QString& prop, const QString& field)
@@ -53,7 +53,7 @@ public:
 
         auto keyType = gatherKeyType<T>(m_entity);
         Q_ASSERT_X(QormMetaEntity::SupportedKeyTypes.contains(keyType), "build",
-            "actually only int, long or string key types are allowed!");
+                   "actually only int, long or string key types are allowed!");
 
         m_entity->setEntityFactory(QormEntityFactory::Ptr(new QormDefaultEntityFactory<T>()));
 

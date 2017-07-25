@@ -38,7 +38,7 @@ public:
     virtual void selectMany(const QormSql& sqlQuery, QormMetaEntity::Ptr mapping, ObjectHandler callback) = 0;
 
     virtual void selectManyWithCustomMapping(const QormSql& sqlQuery,
-        std::function<bool(const QormOnDemandRecordMapper*)> callback) = 0;
+                                             std::function<bool(const QormOnDemandRecordMapper*)> callback) = 0;
 
     virtual void commit() = 0;
 

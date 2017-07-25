@@ -13,6 +13,6 @@ public:
         return mapToEntity(mapping, prefix).objectCast<T>();
     }
 
-    virtual QSharedPointer<QObject>
-    mapToEntity(const QormMetaEntity::Ptr& mapping, const QString& prefix = QString()) const = 0;
+    virtual QSharedPointer<QObject> mapToEntity(const QormMetaEntity::Ptr& mapping,
+                                                const QString& prefix = QString()) const = 0;
 };
