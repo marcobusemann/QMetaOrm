@@ -1,4 +1,4 @@
-/*
+﻿/*
     Took from qt source for usage in old qt versions
 */
 #  define VERIFY_EXCEPTION_THROWN(expression, exceptiontype) \

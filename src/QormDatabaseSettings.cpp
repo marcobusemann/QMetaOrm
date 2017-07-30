@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormDatabaseSettings.h>
+﻿#include <QMetaOrm/QormDatabaseSettings.h>
 #include <QSqlDatabase>
 
 const QString& QormDatabaseSettings::getDatabaseName() const

@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormExceptions.h>
+﻿#include <QMetaOrm/QormExceptions.h>
 
 #include "QormEntitySqlBuilder.h"
 #include "QormDefaultSession.h"

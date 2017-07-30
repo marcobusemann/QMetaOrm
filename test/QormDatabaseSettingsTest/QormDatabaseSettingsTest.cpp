@@ -1,4 +1,4 @@
-#include <QtTest>
+﻿#include <QtTest>
 #include <QtSql>
 
 #include <QMetaOrm/QormDatabaseSettings.h>

@@ -1,4 +1,4 @@
-#include "QormQtLogger.h"
+﻿#include "QormQtLogger.h"
 #include <QDebug>
 
 QormLogger::Ptr QormQtLogger::factory()

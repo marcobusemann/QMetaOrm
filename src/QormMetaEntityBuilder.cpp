@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormMetaEntityBuilder.h>
+﻿#include <QMetaOrm/QormMetaEntityBuilder.h>
 
 QormMetaEntityBuilder QormMetaEntityBuilder::anEntity()
 {

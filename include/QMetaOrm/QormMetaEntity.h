@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMetaOrm/QormConverter.h>
 #include <QMetaOrm/QormPrivate.h>

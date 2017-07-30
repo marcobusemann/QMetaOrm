@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormMetaEntity.h>
+﻿#include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormExceptions.h>
 
 const QList<QVariant::Type> QormMetaEntity::SupportedKeyTypes = (QList<QVariant::Type>() << QVariant::Int

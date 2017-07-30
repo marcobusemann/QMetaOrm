@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMetaOrm/QormMetaEntity.h>
 #include <QMetaOrm/QormExceptions.h>

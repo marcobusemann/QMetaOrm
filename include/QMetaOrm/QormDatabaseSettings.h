@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMetaOrm/QormPrivate.h>
 #include <QString>

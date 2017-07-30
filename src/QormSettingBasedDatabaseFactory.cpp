@@ -1,4 +1,4 @@
-#include "QormSettingBasedDatabaseFactory.h"
+﻿#include "QormSettingBasedDatabaseFactory.h"
 
 QSqlDatabase QormSettingBasedDatabaseFactory::createDatabase(const QString& name) const
 {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMetaOrm/QormOnDemandRecordMapper.h>
 #include <QMetaOrm/QormDatabaseFactory.h>

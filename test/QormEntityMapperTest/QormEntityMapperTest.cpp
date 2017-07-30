@@ -1,4 +1,4 @@
-#include <QSqlField>
+﻿#include <QSqlField>
 #include <QtTest>
 
 #include <QMetaOrm/QormMetaEntity.h>

@@ -1,4 +1,4 @@
-#include <QMetaOrm/QormSessionFactoryBuilder.h>
+﻿#include <QMetaOrm/QormSessionFactoryBuilder.h>
 
 #include "QormSettingBasedDatabaseFactory.h"
 #include "QormDefaultSessionFactory.h"

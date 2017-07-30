@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormLogger.h>

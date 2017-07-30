@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef QMETAORM_LIBRARY
 #  define QMETAORM_LIBRARY_API Q_DECL_EXPORT

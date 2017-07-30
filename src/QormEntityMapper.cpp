@@ -1,4 +1,4 @@
-#include "QormEntityMapper.h"
+﻿#include "QormEntityMapper.h"
 
 QormPropertyPrefixer::Handler QormPropertyPrefixer::getRecordValuePrefixer(const QSqlRecord& record,
                                                                            const QString& prefixString)

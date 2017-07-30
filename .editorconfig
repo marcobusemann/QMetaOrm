@@ -1,7 +1,9 @@
 root = true
 
+[*]
+end_of_line = crlf
+
 [*.{h,cpp,pro,pri}]
 charset = utf-8
 indent_style = space
 indent_size = 4
-

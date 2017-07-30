@@ -1,4 +1,4 @@
-#include "QormEntityCache.h"
+﻿#include "QormEntityCache.h"
 
 QVariant QormEntityCache::get(const QVariant& key, const QormMetaEntity::Ptr& mapping)
 {
