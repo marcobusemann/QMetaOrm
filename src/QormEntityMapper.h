@@ -53,8 +53,8 @@ public:
     ApplyHandler applyTo(QSharedPointer<QObject>& obj)
     {
         return [&](const QString& prop, const QVariant& value) {
-            auto propertyName = prop.toStdString().c_str();
-            bool hadProperty = obj->metaObject()->indexOfProperty(propertyName)!=-1;
+            auto propertyName = prop.toLocal8Bit();
+            bool hadProperty = obj->metaObject()->indexOfProperty(propertyName) > -1;
             if (!obj->setProperty(propertyName, value)) {
                 if (value.isValid() && hadProperty) {
                     qWarning() << "Could not apply " << value << " to " << prop;

@@ -179,7 +179,8 @@ public:
 
     QVariant getProperty(const QSharedPointer<QObject>& item, const QString& name) const
     {
-        return item==nullptr ? QVariant() : item->property(name.toStdString().c_str());
+        auto propertyName = name.toLocal8Bit();
+        return item==nullptr ? QVariant() : item->property(propertyName);
     }
 
     template<class T>
@@ -204,13 +205,15 @@ public:
     template<class T>
     void setProperty(QSharedPointer<T>& item, const QString& name, const QVariant& value) const
     {
-        item->setProperty(name.toStdString().c_str(), value);
+        auto propertyName = name.toLocal8Bit();
+        item->setProperty(propertyName, value);
     }
 
     template<class T>
     void setProperty(T* item, const QString& name, const QVariant& value) const
     {
-        item->setProperty(name.toStdString().c_str(), value);
+        auto propertyName = name.toLocal8Bit();
+        item->setProperty(propertyName, value);
     }
 
     Ptr copy();

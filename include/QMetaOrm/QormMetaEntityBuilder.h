@@ -65,7 +65,8 @@ private:
     static QVariant::Type gatherKeyType(QormMetaEntity::Ptr mapping)
     {
         QMetaObject metaObject = T::staticMetaObject;
-        int keyPropertyIndex = findKeyPropertyIndex(&metaObject, mapping->getKeyProperty().toStdString().c_str());
+        auto propertyName = mapping->getKeyProperty().toLocal8Bit();
+        int keyPropertyIndex = findKeyPropertyIndex(&metaObject, propertyName);
         return keyPropertyIndex<0 ? QVariant::Type::Invalid : metaObject.property(keyPropertyIndex).type();
     }
 
@@ -73,7 +74,8 @@ private:
     {
         if (metaObject==nullptr)
             return -1;
-        auto keyPropertyIndex = metaObject->indexOfProperty(prop.toStdString().c_str());
+        auto propertyName = prop.toLocal8Bit();
+        auto keyPropertyIndex = metaObject->indexOfProperty(propertyName);
         return keyPropertyIndex<0 ? findKeyPropertyIndex(metaObject->superClass(), prop) : keyPropertyIndex;
     }
 
