@@ -1,6 +1,6 @@
-﻿#include <QMetaOrm/QormExceptions.h>
+#include <QMetaOrm/QormExceptions.h>
 
-#include "QormEntitySqlBuilder.h"
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 #include "QormDefaultSession.h"
 #include "QormEntityMapper.h"
 
@@ -31,9 +31,9 @@ QString GetThreadIdentifier()
 }
 
 QormDefaultSession::QormDefaultSession(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr& logger)
-    :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
+    : m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
      , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger)))
-     , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
+     , m_entitySqlBuilder(databaseFactory->createSqlQueryBuilder())
 {
 }
 

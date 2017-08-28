@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormLogger.h>
@@ -51,5 +51,5 @@ private:
 
     QSqlDatabase m_database;
     QSharedPointer<class QormEntityMapper> m_entityMapper;
-    QSharedPointer<class QormEntitySqlBuilder> m_entitySqlBuilder;
+    QSharedPointer<class QormSqlQueryBuilder> m_entitySqlBuilder;
 };
