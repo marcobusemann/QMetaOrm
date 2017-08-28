@@ -136,8 +136,12 @@ QSharedPointer<QObject> QormDefaultSession::create(const QSharedPointer<QObject>
     else
         Q_ASSERT(false);
 
-    for (int i = 0; i<properties.size(); i++)
-        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i]));
+    query.bindValue(0, mapping->getFlatPropertyValue(entity, mapping->getKeyProperty()));
+    for (int propertyIndex = 0; propertyIndex < properties.size(); ++propertyIndex)
+    {
+        auto boundedValueIndex = propertyIndex + 1;
+        query.bindValue(boundedValueIndex, mapping->getFlatPropertyValue(entity, properties[propertyIndex]));
+    }
 
     if (!query.exec())
         throw QormCouldNotExecuteQueryException(query.lastError());
