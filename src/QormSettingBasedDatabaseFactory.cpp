@@ -1,4 +1,6 @@
-﻿#include "QormSettingBasedDatabaseFactory.h"
+#include "QormSettingBasedDatabaseFactory.h"
+
+#include <QMetaOrm/QormFirebirdSqlQueryBuilder.h>
 
 QSqlDatabase QormSettingBasedDatabaseFactory::createDatabase(const QString& name) const
 {
@@ -9,6 +11,14 @@ QSqlDatabase QormSettingBasedDatabaseFactory::createDatabase(const QString& name
     return QSqlDatabase::database(name, false);
 }
 
+QormSqlQueryBuilder::Ptr QormSettingBasedDatabaseFactory::createSqlQueryBuilder() const
+{
+    if (driverName == "QIBASE")
+        return QormSqlQueryBuilder::Ptr(new QormFirebirdSqlQueryBuilder());
+
+    return QormSqlQueryBuilder::Ptr(nullptr);
+}
+
 QormDatabaseFactory::Ptr
 QormSettingBasedDatabaseFactory::factory(const QString& driverName, const QormDatabaseSettings& databaseSettings)
 {
@@ -17,7 +27,7 @@ QormSettingBasedDatabaseFactory::factory(const QString& driverName, const QormDa
 
 QormSettingBasedDatabaseFactory::QormSettingBasedDatabaseFactory(const QString& driverName,
                                                                  const QormDatabaseSettings& databaseSettings)
-    :driverName(driverName)
-     , databaseSettings(databaseSettings)
+    : driverName(driverName)
+    , databaseSettings(databaseSettings)
 {
 }
