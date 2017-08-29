@@ -1,4 +1,5 @@
-﻿#include <QMetaOrm/QormDatabaseFactory.h>
+#include <QMetaOrm/QormDatabaseFactory.h>
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 
 #include <QStringList>
 #include <QSqlQuery>
@@ -6,6 +7,16 @@
 #include <QUuid>
 #include <QFile>
 #include <QDebug>
+
+class SQLiteQueryBuilder : public QormSqlQueryBuilder
+{
+public:
+    virtual QString buildSequenceSelect(QormMetaEntity::Ptr mapping) override
+    {
+        Q_ASSERT_X(false, __FUNCTION__, "SQLite does not suppoert sequence select");
+        return "";
+    }
+};
 
 class SQLiteEmbeddedDatabaseFactory : public QormDatabaseFactory {
 public:
@@ -38,6 +49,11 @@ public:
             }
         }
         return QSqlDatabase::database(name, true);
+    }
+
+    virtual QormSqlQueryBuilder::Ptr createSqlQueryBuilder() const override
+    {
+        return QormSqlQueryBuilder::Ptr(new SQLiteQueryBuilder());
     }
 
     void cleanup()
