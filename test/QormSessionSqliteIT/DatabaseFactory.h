@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QMetaOrm/QormDatabaseFactory.h>
 #include <QMetaOrm/QormSqlQueryBuilder.h>
 

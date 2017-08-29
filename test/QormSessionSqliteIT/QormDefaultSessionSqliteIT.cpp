@@ -1,18 +1,12 @@
-﻿#include "QormDefaultSessionIT"
+#include "QormDefaultSessionIT.h"
 #include "DatabaseFactory.h"
 
-class QormDefaultSessionSqliteIT : public QormDefaultSessionSqliteIT {
+class QormDefaultSessionSqliteIT : public QormDefaultSessionIT
+{
     Q_OBJECT
 private:
-    QormSessionFactory::Ptr m_sessionFactory;
-    SqlHelper::Ptr m_sqlHelper;
 
-public:
-    QormDefaultSessionSqliteIT() { }
-
-private:
-
-    virtual QormDatabaseFactory databaseFactory() const override
+    virtual QormDatabaseFactory::Ptr databaseFactory() const override
     {
         return SQLiteEmbeddedDatabaseFactory::factory();
     }

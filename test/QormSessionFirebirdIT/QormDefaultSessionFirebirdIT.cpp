@@ -1,14 +1,11 @@
-﻿#include "QormDefaultSessionIT"
+#include "QormDefaultSessionIT.h"
 #include "DatabaseFactory.h"
 
-class QormDefaultSessionFirebirdIT : public QormDefaultSessionSqliteIT {
+class QormDefaultSessionFirebirdIT : public QormDefaultSessionIT
+{
     Q_OBJECT
-public:
-    QormDefaultSessionFirebirdIT() { }
-
 private:
-
-    virtual QormDatabaseFactory databaseFactory() const override
+    virtual QormDatabaseFactory::Ptr databaseFactory() const override
     {
         return FirebirdDatabaseFactory::factory();
     }

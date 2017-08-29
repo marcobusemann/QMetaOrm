@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QMetaOrm/QormDatabaseFactory.h>
 #include <QMetaOrm/QormFirebirdSqlQueryBuilder.h>
 
@@ -16,15 +18,14 @@ namespace
 class FirebirdDatabaseFactory : public QormDatabaseFactory
 {
 public:
-    static Ptr factory(const QString &aDatabaseFile)
+    static Ptr factory()
     {
-        return Ptr(new FirebirdDatabaseFactory(aDatabaseFile));
+        return Ptr(new FirebirdDatabaseFactory());
     }
 
 public:
-    FirebirdDatabaseFactory(const QString &aDatabaseFile)
+    FirebirdDatabaseFactory()
         : m_isDatabaseInitialized(false)
-        , m_sourceDatabaseFile(aDatabaseFile)
     {
     }
 
@@ -38,7 +39,7 @@ public:
         if (!QSqlDatabase::contains(name))
         {
             QFile::remove(TEMP_DATABASE_FILE);
-            QFile::copy(m_sourceDatabaseFile, TEMP_DATABASE_FILE);
+            QFile::copy(":/EmptyFirebirdDatabase.fdb", TEMP_DATABASE_FILE);
             QFile(TEMP_DATABASE_FILE).setPermissions(QFile::Permission::ReadUser | QFile::Permission::WriteUser);
 
             QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE", name);
@@ -69,7 +70,6 @@ public:
     }
 
 private:
-    QString m_sourceDatabaseFile;
     mutable bool m_isDatabaseInitialized;
 
     void initializeDatabase(QSqlDatabase& db) const

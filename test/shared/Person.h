@@ -1,4 +1,6 @@
-﻿#include <QMetaOrm/QormMetaEntity.h>
+#pragma once
+
+#include <QMetaOrm/QormMetaEntity.h>
 
 #include <qstring.h>
 #include <qsharedpointer.h>

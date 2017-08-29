@@ -1,11 +1,10 @@
-﻿#include <QMetaOrm/QormMetaEntityBuilder.h>
+#include <QMetaOrm/QormMetaEntityBuilder.h>
 #include <QMetaOrm/QormSessionFactoryBuilder.h>
 #include <QMetaOrm/QormExceptions.h>
 
 #include <QtTest>
 #include <QtSql>
 
-#include "DatabaseFactory.h"
 #include "TestMacros.h"
 #include "SqlHelper.h"
 #include "Person.h"
@@ -30,25 +29,29 @@ public:
    TODO:
    - Caching when save() and select() is called in sequence.
 */
-class QormDefaultSessionIT : public QObject {
-Q_OBJECT
+class QormDefaultSessionIT : public QObject 
+{
+    Q_OBJECT
 
 private:
     QormSessionFactory::Ptr m_sessionFactory;
     SqlHelper::Ptr m_sqlHelper;
 
+private:
+    virtual QormDatabaseFactory::Ptr databaseFactory() const = 0;
+
 public:
     QormDefaultSessionIT() { }
+    virtual ~QormDefaultSessionIT() { }
 
-private Q_SLOTS :
-
+private Q_SLOTS:
     void init()
     {
-        auto databaseFactory = SQLiteEmbeddedDatabaseFactory::factory();
+        auto dbFactory = databaseFactory();
         m_sessionFactory = QormSessionFactoryBuilder::AFactory()
-            .withDatabase(databaseFactory)
+            .withDatabase(dbFactory)
             .build();
-        m_sqlHelper = SqlHelper::factory(databaseFactory);
+        m_sqlHelper = SqlHelper::factory(dbFactory);
     }
 
     void cleanup()
@@ -511,7 +514,3 @@ private Q_SLOTS :
         QCOMPARE(address->getId(), idAddress);
     }
 };
-
-QTEST_APPLESS_MAIN(QormDefaultSessionIT)
-
-#include "QormDefaultSessionIT.moc"
