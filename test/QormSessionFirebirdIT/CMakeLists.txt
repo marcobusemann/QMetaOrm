@@ -3,8 +3,8 @@ set(TESTNAME QormSessionFirebirdIT)
 set(SRC
     DatabaseFactory.h
     QormDefaultSessionFirebirdIT.cpp
-	../shared/QormDefaultSessionIT.h
 	../shared/Person.cpp
+	../shared/QormDefaultSessionIT.h
     resource.qrc)
 set(NEEDED_FEATURES
     cxx_auto_type
