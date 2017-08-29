@@ -45,8 +45,8 @@ public:
             QSqlDatabase db = QSqlDatabase::addDatabase("QIBASE", name);
             db.setDatabaseName(TEMP_DATABASE_FILE);
             db.setHostName("localhost/3052");
-            db.setUserName("SYSDBA");
-            db.setPassword("MASTERKEY");
+            db.setUserName("sysdba");
+            db.setPassword("masterkey");
 
             if (!m_isDatabaseInitialized)
             {
