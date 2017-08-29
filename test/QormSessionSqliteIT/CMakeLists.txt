@@ -2,10 +2,6 @@ include(../cmake/qtest.cmake)
 set(TESTNAME QormSessionSqliteIT)
 set(SRC
     DatabaseFactory.h
-    Person.cpp
-    Person.h
-    SqlHelper.h
-    TestMacros.h
     QormDefaultSessionSqliteIT.cpp
     resource.qrc)
 set(NEEDED_FEATURES
