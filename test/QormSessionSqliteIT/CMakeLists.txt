@@ -3,8 +3,8 @@ set(TESTNAME QormSessionSqliteIT)
 set(SRC
     DatabaseFactory.h
     QormDefaultSessionSqliteIT.cpp
-	../shared/Person.cpp
-	../shared/QormDefaultSessionIT.h
+    ../shared/Person.cpp
+    ../shared/QormDefaultSessionIT.h
     resource.qrc)
 set(NEEDED_FEATURES
     cxx_auto_type
@@ -12,5 +12,5 @@ set(NEEDED_FEATURES
     cxx_override
     cxx_lambdas)
 set(EXTRA_INCLUDEPATHS
-	../shared)
+    ../shared)
 include(../cmake/base.cmake)

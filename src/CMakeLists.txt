@@ -22,8 +22,8 @@ set(header
     ${header_path}/QormDatabaseSettings.h
     ${header_path}/QormOnDemandRecordMapper.h
     ${header_path}/QormSql.h
-	${header_path}/QormSqlQueryBuilder.h
-	${header_path}/QormFirebirdSqlQueryBuilder.h)
+    ${header_path}/QormSqlQueryBuilder.h
+    ${header_path}/QormFirebirdSqlQueryBuilder.h)
 
 set(src
     QormMetaEntityBuilder.cpp
