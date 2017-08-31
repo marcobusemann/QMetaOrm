@@ -10,16 +10,6 @@
 #include <QFile>
 #include <QDebug>
 
-class SQLiteQueryBuilder : public QormSqlQueryBuilder
-{
-public:
-    virtual QString buildSequenceSelect(QormMetaEntity::Ptr mapping) override
-    {
-        Q_ASSERT_X(false, __FUNCTION__, "SQLite does not suppoert sequence select");
-        return "";
-    }
-};
-
 class SQLiteEmbeddedDatabaseFactory : public QormDatabaseFactory {
 public:
     static Ptr factory()
@@ -55,7 +45,7 @@ public:
 
     virtual QormSqlQueryBuilder::Ptr createSqlQueryBuilder() const override
     {
-        return QormSqlQueryBuilder::Ptr(new SQLiteQueryBuilder());
+        return QormSqlQueryBuilder::Ptr(new QormSqlQueryBuilder());
     }
 
     void cleanup()
