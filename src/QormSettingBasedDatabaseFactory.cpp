@@ -16,8 +16,7 @@ QormSqlQueryBuilder::Ptr QormSettingBasedDatabaseFactory::createSqlQueryBuilder(
     if (driverName == "QIBASE")
         return QormSqlQueryBuilder::Ptr(new QormFirebirdSqlQueryBuilder());
 
-    Q_ASSERT_X(false, __FUNCTION__, "database driver not supported yet");
-    return QormSqlQueryBuilder::Ptr(nullptr);
+    return QormSqlQueryBuilder::Ptr(new QormSqlQueryBuilder());
 }
 
 QormDatabaseFactory::Ptr
