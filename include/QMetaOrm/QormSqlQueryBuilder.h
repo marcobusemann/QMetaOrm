@@ -26,5 +26,5 @@ public:
 
     virtual QString buildUpdate(QormMetaEntity::Ptr mapping, QStringList& properties);
 
-    virtual QString buildSequenceSelect(QormMetaEntity::Ptr mapping) = 0;
+    virtual QString buildSequenceSelect(QormMetaEntity::Ptr mapping);
 };
