@@ -1,5 +1,7 @@
-﻿#include "QormEntitySqlBuilder.h"
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 #include <QtSql>
+
+#include <algorithm>
 
 QString EmbeddAlias(const QString& alias, const QString& field)
 {
@@ -190,7 +192,7 @@ SelectBuilder ConstructSelect(QormMetaEntity::Ptr mapping)
     return builder;
 }
 
-QString QormEntitySqlBuilder::buildSelect(QormMetaEntity::Ptr mapping)
+QString QormSqlQueryBuilder::buildSelect(QormMetaEntity::Ptr mapping)
 {
 
     return ConstructSelect(mapping)
@@ -200,7 +202,7 @@ QString QormEntitySqlBuilder::buildSelect(QormMetaEntity::Ptr mapping)
 
 // TODO: - Cache build condition
 QString
-QormEntitySqlBuilder::buildSelectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize, QVariantList& conditions)
+QormSqlQueryBuilder::buildSelectMany(QormMetaEntity::Ptr mapping, int skip, int pageSize, QVariantList& conditions)
 {
     return ConstructSelect(mapping)
         .startWith(pageSize)
@@ -209,14 +211,14 @@ QormEntitySqlBuilder::buildSelectMany(QormMetaEntity::Ptr mapping, int skip, int
         .build();
 }
 
-QString QormEntitySqlBuilder::buildRemove(QormMetaEntity::Ptr mapping)
+QString QormSqlQueryBuilder::buildRemove(QormMetaEntity::Ptr mapping)
 {
     return QString("DELETE FROM %1 WHERE %2=?")
         .arg(mapping->getSource())
         .arg(mapping->getKeyProperty());
 }
 
-QString QormEntitySqlBuilder::buildInsertForSequence(QormMetaEntity::Ptr mapping, QStringList& properties)
+QString QormSqlQueryBuilder::buildInsertForSequence(QormMetaEntity::Ptr mapping, QStringList& properties)
 {
     properties = mapping->getProperties();
 
@@ -236,7 +238,7 @@ QString QormEntitySqlBuilder::buildInsertForSequence(QormMetaEntity::Ptr mapping
             params.join(","));
 }
 
-QString QormEntitySqlBuilder::buildInsertForIdentity(QormMetaEntity::Ptr mapping, QStringList& properties)
+QString QormSqlQueryBuilder::buildInsertForIdentity(QormMetaEntity::Ptr mapping, QStringList& properties)
 {
     properties = mapping->getProperties();
 
@@ -254,7 +256,7 @@ QString QormEntitySqlBuilder::buildInsertForIdentity(QormMetaEntity::Ptr mapping
             params.join(","));
 }
 
-QString QormEntitySqlBuilder::buildUpdate(QormMetaEntity::Ptr mapping, QStringList& properties)
+QString QormSqlQueryBuilder::buildUpdate(QormMetaEntity::Ptr mapping, QStringList& properties)
 {
     properties = mapping->getProperties();
 
@@ -268,9 +270,8 @@ QString QormEntitySqlBuilder::buildUpdate(QormMetaEntity::Ptr mapping, QStringLi
             mapping->getKeyDatabaseField());
 }
 
-QString QormEntitySqlBuilder::buildSequenceSelect(QormMetaEntity::Ptr mapping)
+QString QormSqlQueryBuilder::buildSequenceSelect(QormMetaEntity::Ptr mapping)
 {
-    Q_ASSERT_X(mapping->hasSequence(), __FUNCTION__, "actually inserting entities requires a sequence");
-    return QString("SELECT nextval FROM %1")
-        .arg(mapping->getSequence());
+    Q_ASSERT_X(false, __FUNCTION__, "Default SQL query build does not support sequences");
+    return QString("");
 }

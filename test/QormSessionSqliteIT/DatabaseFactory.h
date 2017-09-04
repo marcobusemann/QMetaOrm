@@ -1,4 +1,7 @@
-﻿#include <QMetaOrm/QormDatabaseFactory.h>
+#pragma once
+
+#include <QMetaOrm/QormDatabaseFactory.h>
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 
 #include <QStringList>
 #include <QSqlQuery>
@@ -38,6 +41,11 @@ public:
             }
         }
         return QSqlDatabase::database(name, true);
+    }
+
+    virtual QormSqlQueryBuilder::Ptr createSqlQueryBuilder() const override
+    {
+        return QormSqlQueryBuilder::Ptr(new QormSqlQueryBuilder());
     }
 
     void cleanup()

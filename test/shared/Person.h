@@ -1,4 +1,6 @@
-﻿#include <QMetaOrm/QormMetaEntity.h>
+#pragma once
+
+#include <QMetaOrm/QormMetaEntity.h>
 
 #include <qstring.h>
 #include <qsharedpointer.h>
@@ -206,11 +208,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(PersonComplex::Ptr)
-
-namespace QormMappings {
-    QormMetaEntity::Ptr TsPersonSimpleMapping();
-
-    QormMetaEntity::Ptr TsPersonComplexMapping();
-
-    QormMetaEntity::Ptr TsAddressMapping();
-}

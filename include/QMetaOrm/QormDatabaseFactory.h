@@ -1,9 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include <QMetaOrm/QormPrivate.h>
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 
 #include <QSharedPointer>
 #include <QSqlDatabase>
+
 
 class QMETAORM_LIBRARY_API QormDatabaseFactory {
 public:
@@ -13,4 +15,5 @@ public:
     virtual ~QormDatabaseFactory() { }
 
     virtual QSqlDatabase createDatabase(const QString& name = QString()) const = 0;
+    virtual QormSqlQueryBuilder::Ptr createSqlQueryBuilder() const = 0;
 };

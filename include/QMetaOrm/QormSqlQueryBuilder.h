@@ -1,18 +1,18 @@
-﻿#pragma once
+#pragma once
 
+#include <QMetaOrm/QormPrivate.h>
 #include <QMetaOrm/QormMetaEntity.h>
 
 #include <QSharedPointer>
 #include <QStringList>
 
-#include <algorithm>
-
-class QormEntitySqlBuilder {
+class QMETAORM_LIBRARY_API QormSqlQueryBuilder
+{
 public:
-    typedef QSharedPointer<QormEntitySqlBuilder> Ptr;
+    typedef QSharedPointer<QormSqlQueryBuilder> Ptr;
 
 public:
-    virtual ~QormEntitySqlBuilder() { }
+    virtual ~QormSqlQueryBuilder() { }
 
     virtual QString buildSelect(QormMetaEntity::Ptr mapping);
 

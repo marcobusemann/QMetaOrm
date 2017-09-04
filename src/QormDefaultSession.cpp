@@ -1,6 +1,6 @@
-﻿#include <QMetaOrm/QormExceptions.h>
+#include <QMetaOrm/QormExceptions.h>
 
-#include "QormEntitySqlBuilder.h"
+#include <QMetaOrm/QormSqlQueryBuilder.h>
 #include "QormDefaultSession.h"
 #include "QormEntityMapper.h"
 
@@ -31,9 +31,9 @@ QString GetThreadIdentifier()
 }
 
 QormDefaultSession::QormDefaultSession(const QormDatabaseFactory::Ptr& databaseFactory, const QormLogger::Ptr& logger)
-    :m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
+    : m_database(databaseFactory->createDatabase(GetThreadIdentifier()))
      , m_entityMapper(QormEntityMapper::Ptr(new QormEntityMapper(logger)))
-     , m_entitySqlBuilder(QormEntitySqlBuilder::Ptr(new QormEntitySqlBuilder()))
+     , m_entitySqlBuilder(databaseFactory->createSqlQueryBuilder())
 {
 }
 
@@ -136,8 +136,14 @@ QSharedPointer<QObject> QormDefaultSession::create(const QSharedPointer<QObject>
     else
         Q_ASSERT(false);
 
-    for (int i = 0; i<properties.size(); i++)
-        query.bindValue(i, mapping->getFlatPropertyValue(entity, properties[i]));
+    auto boundedValueIndex = 0;
+    if (keyStrategy == KeyGenerationStrategy::Sequence)
+    {
+        query.bindValue(boundedValueIndex, mapping->getFlatPropertyValue(entity, mapping->getKeyProperty()));
+        ++boundedValueIndex;
+    }
+    for (int propertyIndex = 0; propertyIndex < properties.size(); ++propertyIndex, ++boundedValueIndex)
+        query.bindValue(boundedValueIndex, mapping->getFlatPropertyValue(entity, properties[propertyIndex]));
 
     if (!query.exec())
         throw QormCouldNotExecuteQueryException(query.lastError());

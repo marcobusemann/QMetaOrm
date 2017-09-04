@@ -1,4 +1,4 @@
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC OFF)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(header_path_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
@@ -21,12 +21,14 @@ set(header
     ${header_path}/QormSessionFactoryBuilder.h
     ${header_path}/QormDatabaseSettings.h
     ${header_path}/QormOnDemandRecordMapper.h
-    ${header_path}/QormSql.h)
+    ${header_path}/QormSql.h
+    ${header_path}/QormSqlQueryBuilder.h
+    ${header_path}/QormFirebirdSqlQueryBuilder.h)
 
 set(src
     QormMetaEntityBuilder.cpp
-    QormEntitySqlBuilder.cpp
-    QormEntitySqlBuilder.h
+    QormSqlQueryBuilder.cpp
+	QormFirebirdSqlQueryBuilder.cpp
     QormMetaEntity.cpp
     QormEntityMapper.h
     QormEntityMapper.cpp

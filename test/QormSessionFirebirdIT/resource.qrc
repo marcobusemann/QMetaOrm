@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>schema.sql</file>
+		<file>EmptyFirebirdDatabase.fdb</file>
+    </qresource>
+</RCC>
