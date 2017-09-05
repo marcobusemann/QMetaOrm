@@ -2,6 +2,8 @@
 
 #include <QMetaOrm/QormFirebirdSqlQueryBuilder.h>
 
+#include <QSqlDatabase>
+
 QSqlDatabase QormSettingBasedDatabaseFactory::createDatabase(const QString& name) const
 {
     if (!QSqlDatabase::contains(name)) {

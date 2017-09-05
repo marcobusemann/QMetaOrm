@@ -4,8 +4,8 @@
 #include <QMetaOrm/QormSqlQueryBuilder.h>
 
 #include <QSharedPointer>
-#include <QSqlDatabase>
 
+class QSqlDatabase;
 
 class QMETAORM_LIBRARY_API QormDatabaseFactory {
 public:

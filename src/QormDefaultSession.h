@@ -3,6 +3,8 @@
 #include <QMetaOrm/QormSession.h>
 #include <QMetaOrm/QormLogger.h>
 
+#include <QSqlDatabase>
+
 /**
 * @todo - Add logging (TRACE/DEBUG)
 *       - Added identity persistence
