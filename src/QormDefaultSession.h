@@ -17,6 +17,8 @@ public:
 
     virtual ~QormDefaultSession();
 
+    int newIdBySequence(const QString &aSequence) override;
+
     SharedObject save(const SharedObject& entity, QormMetaEntity::Ptr mapping) override;
 
     void remove(const SharedObject& entity, QormMetaEntity::Ptr mapping) override;

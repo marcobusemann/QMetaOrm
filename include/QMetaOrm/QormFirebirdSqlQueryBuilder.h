@@ -7,5 +7,5 @@ class QMETAORM_LIBRARY_API QormFirebirdSqlQueryBuilder : public QormSqlQueryBuil
 public:
     virtual ~QormFirebirdSqlQueryBuilder() {}
 
-    QString buildSequenceSelect(QormMetaEntity::Ptr mapping) override;
+    QString buildSequenceSelect(const QString &aSequence) override;
 };

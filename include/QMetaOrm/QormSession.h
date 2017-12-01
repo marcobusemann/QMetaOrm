@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QMetaOrm/QormOnDemandRecordMapper.h>
 #include <QMetaOrm/QormDatabaseFactory.h>
@@ -16,6 +16,8 @@ public:
 
 public:
     virtual ~QormSession() { };
+
+    virtual int newIdBySequence(const QString &aSequence) = 0;
 
     virtual SharedObject save(const SharedObject& entity, QormMetaEntity::Ptr mapping) = 0;
 
