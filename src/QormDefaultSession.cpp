@@ -60,6 +60,18 @@ void QormDefaultSession::setupSession()
     m_database.transaction();
 }
 
+int QormDefaultSession::newIdBySequence(const QString &aSequence)
+{
+    QSqlQuery keyQuery(m_database);
+    if (!keyQuery.exec(m_entitySqlBuilder->buildSequenceSelect(aSequence)))
+        throw QormCouldNotQueryNextSequenceValueException(keyQuery.lastError());
+
+    if (!keyQuery.first())
+        throw QormCouldNotQueryNextSequenceValueException(keyQuery.lastError());
+
+    return keyQuery.value(0).value<int>();
+}
+
 QSharedPointer<QObject> QormDefaultSession::save(const QSharedPointer<QObject>& entity, QormMetaEntity::Ptr mapping)
 {
     setupSession();
@@ -117,14 +129,8 @@ QSharedPointer<QObject> QormDefaultSession::create(const QSharedPointer<QObject>
     auto keyStrategy = mapping->getKeyGenerationStrategy();
 
     if (keyStrategy==KeyGenerationStrategy::Sequence) {
-        QSqlQuery keyQuery(m_database);
-        if (!keyQuery.exec(m_entitySqlBuilder->buildSequenceSelect(mapping)))
-            throw QormCouldNotQueryNextSequenceValueException(query.lastError());
-
-        if (!keyQuery.first())
-            throw QormCouldNotQueryNextSequenceValueException(query.lastError());
-
-        mapping->setProperty(result, mapping->getKeyProperty(), keyQuery.value(0));
+        const auto generatedId = newIdBySequence(mapping->getSequence());
+        mapping->setProperty(result, mapping->getKeyProperty(), generatedId);
 
         if (!query.prepare(m_entitySqlBuilder->buildInsertForSequence(mapping, properties)))
             throw QormCouldNotPrepareQueryException(query.lastError());

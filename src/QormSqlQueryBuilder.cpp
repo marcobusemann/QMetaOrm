@@ -270,7 +270,7 @@ QString QormSqlQueryBuilder::buildUpdate(QormMetaEntity::Ptr mapping, QStringLis
             mapping->getKeyDatabaseField());
 }
 
-QString QormSqlQueryBuilder::buildSequenceSelect(QormMetaEntity::Ptr mapping)
+QString QormSqlQueryBuilder::buildSequenceSelect(const QString &aSequence)
 {
     Q_ASSERT_X(false, __FUNCTION__, "Default SQL query build does not support sequences");
     return QString("");
