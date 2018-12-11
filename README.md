@@ -1,3 +1,5 @@
+# NODE, Project has been canceled. As this ORM is fully based on the Qt-Meta-Object system, you loose a lot of flexibility when designing your models. They are fully Qt dependent and need getter/setters wich lead to anemic domain models. There will be no more development on this project.
+
 Platform    | Status | 
 ----------- | :------------ |
 Windows | [![Windows Status](https://ci.appveyor.com/api/projects/status/2u12ikvskeoi5fjy?svg=true)](https://ci.appveyor.com/project/marcobusemann/qmetaorm)
